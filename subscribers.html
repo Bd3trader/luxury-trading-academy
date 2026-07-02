@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>إدارة المشتركين | منصة تعليم التداول</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --gold:#B8860B;--gold-g:linear-gradient(135deg,#B8860B,#D4A017);
+      --bg:#f1f5f9;--white:#fff;--text:#1e293b;--muted:#64748b;
+      --border:#e2e8f0;--green:#059669;--red:#dc2626;--blue:#3b82f6;
+    }
+    body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+    /* ── LOGIN GATE ── */
+    #loginGate{
+      display:flex;align-items:center;justify-content:center;
+      min-height:100vh;background:linear-gradient(135deg,#1e293b,#0f172a);padding:24px;
+    }
+    .gate-card{background:#fff;border-radius:20px;padding:36px 32px;width:100%;max-width:400px;box-shadow:0 30px 80px rgba(0,0,0,.4)}
+    .gate-logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:24px}
+    .gate-icon{width:44px;height:44px;background:var(--gold-g);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem}
+    .gate-title{font-size:1.3rem;font-weight:900;text-align:center;margin-bottom:6px}
+    .gate-sub{color:var(--muted);font-size:.85rem;text-align:center;margin-bottom:24px}
+    .g-field{margin-bottom:16px}
+    .g-field label{display:block;font-weight:700;font-size:.82rem;margin-bottom:6px}
+    .g-field input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Cairo',sans-serif;font-size:.9rem;outline:none;transition:border-color .2s}
+    .g-field input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,134,11,.1)}
+    .gate-btn{width:100%;padding:13px;background:var(--gold-g);color:#fff;font-family:'Cairo',sans-serif;font-weight:800;font-size:.95rem;border:none;border-radius:11px;cursor:pointer;box-shadow:0 6px 20px rgba(184,134,11,.3)}
+    .gate-btn:hover{box-shadow:0 10px 28px rgba(184,134,11,.45);transform:translateY(-1px)}
+    .gate-err{display:none;background:#fef2f2;border:1px solid #fecaca;color:var(--red);padding:10px 14px;border-radius:9px;font-size:.82rem;margin-bottom:14px}
+    .gate-err.show{display:block}
+
+    /* ── MAIN APP ── */
+    #app{display:none}
+
+    /* Top Bar */
+    .topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 28px;height:62px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 10px rgba(0,0,0,.05);position:sticky;top:0;z-index:100}
+    .topbar-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .topbar-icon{width:38px;height:38px;background:var(--gold-g);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+    .topbar-title{font-size:1.05rem;font-weight:900}
+    .topbar-right{display:flex;align-items:center;gap:10px}
+    .tb-link{padding:8px 16px;background:var(--bg);border:1px solid var(--border);border-radius:9px;font-family:'Cairo',sans-serif;font-size:.82rem;font-weight:700;color:var(--text);text-decoration:none;cursor:pointer;transition:all .2s;border:none}
+    .tb-link:hover{border-color:var(--gold);color:var(--gold)}
+    .tb-logout{padding:7px 14px;background:rgba(220,38,38,.07);border:1px solid rgba(220,38,38,.2);border-radius:9px;font-family:'Cairo',sans-serif;font-size:.82rem;font-weight:700;color:var(--red);cursor:pointer;transition:all .2s}
+    .tb-logout:hover{background:rgba(220,38,38,.14)}
+
+    /* Content */
+    .content{max-width:1200px;margin:0 auto;padding:28px 24px}
+
+    /* Stats */
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
+    .stat-c{background:var(--white);border-radius:14px;padding:18px 20px;border:1px solid var(--border);position:relative;overflow:hidden}
+    .stat-c::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+    .stat-c.gold::before{background:var(--gold-g)}
+    .stat-c.green::before{background:linear-gradient(90deg,#059669,#10b981)}
+    .stat-c.blue::before{background:linear-gradient(90deg,#3b82f6,#60a5fa)}
+    .stat-c.orange::before{background:linear-gradient(90deg,#d97706,#f59e0b)}
+    .stat-icon{font-size:1.4rem;margin-bottom:8px}
+    .stat-n{font-size:1.8rem;font-weight:900;line-height:1;margin-bottom:3px}
+    .stat-l{font-size:.75rem;color:var(--muted);font-weight:600}
+
+    /* Table section */
+    .section-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+    .section-title{font-size:1rem;font-weight:900;display:flex;align-items:center;gap:8px}
+    .section-title::before{content:'';width:4px;height:18px;background:var(--gold-g);border-radius:2px}
+    .search-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .search-inp{padding:9px 14px;border:1.5px solid var(--border);border-radius:9px;font-family:'Cairo',sans-serif;font-size:.85rem;outline:none;width:220px;transition:border-color .2s}
+    .search-inp:focus{border-color:var(--gold)}
+    .btn-add{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;background:var(--gold-g);color:#fff;font-family:'Cairo',sans-serif;font-weight:800;font-size:.85rem;border:none;border-radius:10px;cursor:pointer;box-shadow:0 4px 14px rgba(184,134,11,.3);transition:all .25s}
+    .btn-add:hover{box-shadow:0 8px 22px rgba(184,134,11,.45);transform:translateY(-1px)}
+
+    /* Table */
+    .table-wrap{background:var(--white);border-radius:14px;border:1px solid var(--border);overflow:hidden}
+    table{width:100%;border-collapse:collapse;font-size:.84rem;min-width:900px}
+    th{padding:12px 14px;text-align:right;font-weight:800;color:var(--muted);font-size:.75rem;border-bottom:1px solid var(--border);background:#f8fafc;white-space:nowrap}
+    td{padding:13px 14px;border-bottom:1px solid rgba(0,0,0,.04);vertical-align:middle}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:#fafcff}
+    .overflow-x{overflow-x:auto}
+    .td-name{font-weight:800}
+    .td-user{font-family:monospace;font-size:.85rem;background:#f8fafc;padding:3px 8px;border-radius:6px;border:1px solid var(--border)}
+    .td-pwd{font-family:monospace;letter-spacing:2px;font-size:.9rem}
+    .school-tag{display:inline-block;padding:2px 9px;border-radius:6px;font-size:.72rem;font-weight:800;margin:2px}
+    .tag-classic{background:rgba(59,130,246,.1);color:var(--blue);border:1px solid rgba(59,130,246,.2)}
+    .tag-advanced{background:rgba(184,134,11,.1);color:var(--gold);border:1px solid rgba(184,134,11,.25)}
+    .status-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;font-size:.72rem;font-weight:800}
+    .active-badge{background:rgba(5,150,105,.1);color:var(--green);border:1px solid rgba(5,150,105,.2)}
+    .inactive-badge{background:rgba(100,116,139,.1);color:var(--muted);border:1px solid rgba(100,116,139,.15)}
+    .online-badge{background:rgba(5,150,105,.15);color:var(--green);border:1px solid rgba(5,150,105,.25)}
+    .action-btn{padding:5px 12px;border-radius:7px;font-family:'Cairo',sans-serif;font-size:.75rem;font-weight:700;border:none;cursor:pointer;transition:all .2s;margin-right:3px}
+    .btn-edit{background:rgba(59,130,246,.1);color:var(--blue)}
+    .btn-edit:hover{background:rgba(59,130,246,.2)}
+    .btn-del{background:rgba(220,38,38,.08);color:var(--red)}
+    .btn-del:hover{background:rgba(220,38,38,.15)}
+    .btn-toggle{background:rgba(5,150,105,.08);color:var(--green)}
+    .btn-toggle:hover{background:rgba(5,150,105,.18)}
+    .empty-row td{text-align:center;padding:48px;color:var(--muted)}
+
+    /* Modal */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;align-items:center;justify-content:center;padding:16px}
+    .modal-overlay.show{display:flex;animation:fadeIn .2s}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    .modal{background:#fff;border-radius:20px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 30px 80px rgba(0,0,0,.2)}
+    .mh{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+    .mh-title{font-size:1rem;font-weight:900}
+    .mh-close{width:32px;height:32px;border-radius:8px;background:var(--bg);border:none;cursor:pointer;font-size:1rem;color:var(--muted);display:flex;align-items:center;justify-content:center;transition:background .2s}
+    .mh-close:hover{background:rgba(220,38,38,.1);color:var(--red)}
+    .mb{padding:24px}
+    .mf{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px}
+    .field{margin-bottom:15px}
+    .field label{display:block;font-weight:700;font-size:.82rem;margin-bottom:6px}
+    .field input,.field select{width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:9px;font-family:'Cairo',sans-serif;font-size:.88rem;color:var(--text);outline:none;transition:border-color .2s;background:#fff}
+    .field input:focus,.field select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,134,11,.1)}
+    .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .checkbox-group{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+    .chk-item{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.88rem;font-weight:600;padding:8px 12px;border:1.5px solid var(--border);border-radius:9px;transition:border-color .2s}
+    .chk-item:hover{border-color:var(--gold)}
+    .chk-item input[type=checkbox]{width:16px;height:16px;accent-color:var(--gold);cursor:pointer}
+    .btn-primary{display:inline-flex;align-items:center;gap:6px;padding:10px 22px;background:var(--gold-g);color:#fff;font-family:'Cairo',sans-serif;font-weight:800;font-size:.88rem;border:none;border-radius:10px;cursor:pointer;box-shadow:0 4px 14px rgba(184,134,11,.3);transition:all .25s}
+    .btn-primary:hover{box-shadow:0 8px 22px rgba(184,134,11,.45);transform:translateY(-1px)}
+    .btn-secondary{display:inline-flex;align-items:center;gap:6px;padding:10px 22px;background:var(--bg);color:var(--text);font-family:'Cairo',sans-serif;font-weight:700;font-size:.88rem;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s}
+    .btn-secondary:hover{border-color:var(--gold);color:var(--gold)}
+    .pwd-wrap{position:relative}
+    .pwd-eye{position:absolute;left:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:.95rem;color:var(--muted)}
+    .hint{font-size:.72rem;color:var(--muted);margin-top:5px}
+
+    /* Toast */
+    #toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:12px;font-size:.85rem;font-weight:700;z-index:9999;opacity:0;transform:translateY(20px);transition:all .3s;pointer-events:none;color:#fff}
+    #toast.show{opacity:1;transform:translateY(0)}
+    #toast.success{background:#059669}
+    #toast.error{background:var(--red)}
+
+    @media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}.topbar{padding:0 16px}.content{padding:16px}}
+  </style>
+</head>
+<body>
+
+<!-- ══ LOGIN GATE ══ -->
+<div id="loginGate">
+  <div class="gate-card">
+    <div class="gate-logo">
+      <div class="gate-icon">👥</div>
+      <div>
+        <div style="font-weight:900;font-size:1rem">ملف المشتركين</div>
+        <div style="font-size:.72rem;color:var(--muted)">منصة تعليم التداول</div>
+      </div>
+    </div>
+    <div class="gate-title">وصول المسؤول فقط 🔐</div>
+    <div class="gate-sub">أدخل بيانات الأدمن للوصول لإدارة المشتركين</div>
+    <div class="gate-err" id="gErr">كلمة المرور غير صحيحة</div>
+    <form id="gateForm">
+      <div class="g-field"><label>اسم المستخدم</label><input type="text" id="gUser" placeholder="admin" dir="ltr" required/></div>
+      <div class="g-field"><label>كلمة المرور</label><input type="password" id="gPwd" placeholder="••••••••" dir="ltr" required/></div>
+      <button type="submit" class="gate-btn">دخول ←</button>
+    </form>
+  </div>
+</div>
+
+<!-- ══ MAIN APP ══ -->
+<div id="app">
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-logo">
+      <div class="topbar-icon">👥</div>
+      <div class="topbar-title">ملف المشتركين</div>
+    </div>
+    <div class="topbar-right">
+      <a href="admin-panel.html" class="tb-link" style="border:1.5px solid var(--border)">← لوحة التحكم</a>
+      <button class="tb-logout" onclick="gateLogout()">خروج</button>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+    <!-- Stats -->
+    <div class="stats" id="statsRow">
+      <div class="stat-c gold"><div class="stat-icon">👥</div><div class="stat-n" id="st-total">0</div><div class="stat-l">إجمالي المشتركين</div></div>
+      <div class="stat-c green"><div class="stat-icon">✅</div><div class="stat-n" id="st-active">0</div><div class="stat-l">مشتركون فعّالون</div></div>
+      <div class="stat-c blue"><div class="stat-icon">📚</div><div class="stat-n" id="st-classic">0</div><div class="stat-l">مشتركو الكلاسيك</div></div>
+      <div class="stat-c orange"><div class="stat-icon">👑</div><div class="stat-n" id="st-advanced">0</div><div class="stat-l">مشتركو المتقدمة</div></div>
+    </div>
+
+    <!-- Table -->
+    <div class="section-hd">
+      <div class="section-title">جدول المشتركين</div>
+      <div class="search-bar">
+        <input class="search-inp" type="text" placeholder="🔍 بحث بالاسم أو الإيميل..." id="searchInp" oninput="renderTable()"/>
+        <button class="btn-add" onclick="openAdd()">+ إضافة مشترك</button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <div class="overflow-x">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>الاسم الكامل</th>
+              <th>اسم المستخدم</th>
+              <th>كلمة المرور</th>
+              <th>البريد الإلكتروني</th>
+              <th>رقم الهاتف</th>
+              <th>المدارس</th>
+              <th>تاريخ الانضمام</th>
+              <th>الحالة</th>
+              <th>إجراءات</th>
+            </tr>
+          </thead>
+          <tbody id="subTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL ══ -->
+<div class="modal-overlay" id="subModal">
+  <div class="modal">
+    <div class="mh">
+      <div class="mh-title" id="modalTitle">إضافة مشترك جديد</div>
+      <button class="mh-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="mb">
+      <input type="hidden" id="editId"/>
+      <div class="field-row">
+        <div class="field"><label>الاسم الكامل *</label><input type="text" id="f-name" placeholder="محمد العتيبي"/></div>
+        <div class="field"><label>تاريخ الانضمام</label><input type="date" id="f-date"/></div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>اسم المستخدم *</label>
+          <input type="text" id="f-user" placeholder="mohammed2025" dir="ltr"/>
+          <div class="hint">يستخدمه المتدرب لتسجيل الدخول</div>
+        </div>
+        <div class="field">
+          <label>كلمة المرور *</label>
+          <div class="pwd-wrap">
+            <input type="password" id="f-pwd" placeholder="••••••••" dir="ltr"/>
+            <button type="button" class="pwd-eye" onclick="togglePwd('f-pwd',this)">👁</button>
+          </div>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>البريد الإلكتروني</label><input type="email" id="f-email" placeholder="example@email.com" dir="ltr"/></div>
+        <div class="field"><label>رقم الهاتف</label><input type="tel" id="f-phone" placeholder="96891000000" dir="ltr"/></div>
+      </div>
+      <div class="field">
+        <label>المدارس المتاحة *</label>
+        <div class="checkbox-group">
+          <label class="chk-item"><input type="checkbox" id="f-classic"/> 📘 مدرسة الكلاسيك</label>
+          <label class="chk-item"><input type="checkbox" id="f-advanced"/> 👑 المدرسة المتقدمة</label>
+        </div>
+      </div>
+      <div class="field">
+        <label>حالة الحساب</label>
+        <select id="f-active">
+          <option value="true">✅ فعّال — يمكنه الدخول</option>
+          <option value="false">🔴 موقوف — لا يمكنه الدخول</option>
+        </select>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn-secondary" onclick="closeModal()">إلغاء</button>
+      <button class="btn-primary" onclick="saveSubscriber()">💾 حفظ المشترك</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ═══ DATA LAYER ═══ */
+const STORE = 'tradingPlatform_v1';
+function getData(){try{const r=localStorage.getItem(STORE);if(r)return JSON.parse(r);}catch(e){}return initDB();}
+function saveData(d){localStorage.setItem(STORE,JSON.stringify(d));}
+function uid(){return 'sub_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);}
+
+function initDB(){
+  const data={
+    version:2,
+    adminCredentials:{username:'admin',password:'Admin@2025'},
+    subscribers:[
+      {id:'sub1',name:'أحمد المطيري',username:'ahmed2025',password:'ahmed@123',email:'ahmed@test.com',phone:'96891000001',schools:['classic'],isOnline:false,lastSeen:null,joinDate:'2025-01-15',active:true},
+      {id:'sub2',name:'محمد العتيبي',username:'mohammed2025',password:'mohammed@123',email:'mohammed@test.com',phone:'96891000002',schools:['classic','advanced'],isOnline:false,lastSeen:null,joinDate:'2025-02-20',active:true}
+    ],
+    content:{
+      classic:{
+        lectures:[
+          {id:'cl1',order:1,title:'مقدمة في مدرسة الكلاسيك',desc:'تعرّف على الأسس التي تقوم عليها مدرسة الكلاسيك في التداول',duration:'45 دقيقة',filename:'',date:'2025-01-10'},
+          {id:'cl2',order:2,title:'الشموع اليابانية وأنماطها',desc:'شرح مفصّل لأنواع الشموع اليابانية وأهم الأنماط السعرية',duration:'60 دقيقة',filename:'',date:'2025-01-12'},
+          {id:'cl3',order:3,title:'خطوط الدعم والمقاومة',desc:'كيفية تحديد خطوط الدعم والمقاومة والتداول عندها',duration:'55 دقيقة',filename:'',date:'2025-01-15'},
+          {id:'cl4',order:4,title:'إدارة رأس المال والمخاطر',desc:'أسس إدارة المخاطر وحماية رأس المال بفاعلية',duration:'50 دقيقة',filename:'',date:'2025-01-20'}
+        ],
+        books:[
+          {id:'cb1',order:1,title:'دليل مدرسة الكلاسيك',desc:'الدليل الشامل لأسس وقواعد مدرسة الكلاسيك في التداول',type:'book',filename:'',date:'2025-01-10'},
+          {id:'cb2',order:2,title:'ملخص الشموع اليابانية',desc:'ملخص مصوّر يشمل جميع أنماط الشموع اليابانية',type:'summary',filename:'',date:'2025-01-15'},
+          {id:'cb3',order:3,title:'قاموس مصطلحات التحليل الفني',desc:'جميع مصطلحات التحليل الفني بشرح مبسّط',type:'book',filename:'',date:'2025-01-20'}
+        ]
+      },
+      advanced:{
+        lectures:[
+          {id:'al1',order:1,title:'مقدمة في Smart Money Concepts',desc:'مقدمة شاملة في مفاهيم المال الذكي وكيف تفكر المؤسسات',duration:'55 دقيقة',filename:'',date:'2025-02-01'},
+          {id:'al2',order:2,title:'هيكلة السوق والسيولة',desc:'فهم بنية السوق ومناطق السيولة المؤسسية',duration:'70 دقيقة',filename:'',date:'2025-02-05'},
+          {id:'al3',order:3,title:'مناطق العرض والطلب المؤسسية',desc:'تحديد مناطق العرض والطلب بدقة مؤسسية عالية',duration:'65 دقيقة',filename:'',date:'2025-02-10'}
+        ],
+        books:[
+          {id:'ab1',order:1,title:'دليل Smart Money Concepts',desc:'الدليل الشامل لمفاهيم المال الذكي وتطبيقاتها العملية',type:'book',filename:'',date:'2025-02-01'},
+          {id:'ab2',order:2,title:'ملخص هيكلة السوق',desc:'ملخص مصوّر لمفاهيم هيكلة السوق والسيولة',type:'summary',filename:'',date:'2025-02-05'}
+        ]
+      }
+    },
+    sessions:[]
+  };
+  saveData(data);return data;
+}
+
+/* Migration: ensure new schema */
+function migrateData(){
+  let d;
+  try{const r=localStorage.getItem(STORE);d=r?JSON.parse(r):null;}catch(e){d=null;}
+  if(!d){initDB();return;}
+  let changed=false;
+  if(!d.subscribers && d.students){
+    d.subscribers=d.students.map(s=>({
+      id:s.id,name:s.name,
+      username:s.email?.split('@')[0]||'user_'+s.id,
+      password:s.phone||'password123',
+      email:s.email||'',phone:s.phone||'',
+      schools:(s.courses||[]).map(c=>c==='basic'?'classic':c),
+      isOnline:s.isOnline||false,lastSeen:s.lastSeen||null,
+      joinDate:s.joinDate||'',active:true
+    }));
+    changed=true;
+  }
+  if(!d.subscribers){d.subscribers=[];changed=true;}
+  if(!d.sessions){d.sessions=[];changed=true;}
+  if(!d.adminCredentials){d.adminCredentials={username:'admin',password:'Admin@2025'};changed=true;}
+  if(changed)saveData(d);
+}
+migrateData();
+
+/* ═══ GATE ═══ */
+function checkGate(){
+  if(sessionStorage.getItem('adminLoggedIn')==='true'){showApp();}
+}
+document.getElementById('gateForm').addEventListener('submit',function(e){
+  e.preventDefault();
+  const u=document.getElementById('gUser').value.trim();
+  const p=document.getElementById('gPwd').value;
+  const d=getData();
+  if(u===d.adminCredentials.username&&p===d.adminCredentials.password){
+    sessionStorage.setItem('adminLoggedIn','true');showApp();
+  } else {
+    document.getElementById('gErr').classList.add('show');
+  }
+});
+function showApp(){document.getElementById('loginGate').style.display='none';document.getElementById('app').style.display='block';renderAll();}
+function gateLogout(){sessionStorage.removeItem('adminLoggedIn');window.location.reload();}
+
+/* ═══ RENDER ═══ */
+function renderAll(){renderStats();renderTable();}
+
+function renderStats(){
+  const d=getData();
+  const subs=d.subscribers||[];
+  document.getElementById('st-total').textContent=subs.length;
+  document.getElementById('st-active').textContent=subs.filter(s=>s.active!==false).length;
+  document.getElementById('st-classic').textContent=subs.filter(s=>s.schools?.includes('classic')).length;
+  document.getElementById('st-advanced').textContent=subs.filter(s=>s.schools?.includes('advanced')).length;
+}
+
+function renderTable(){
+  const d=getData();
+  const q=(document.getElementById('searchInp').value||'').trim().toLowerCase();
+  let subs=d.subscribers||[];
+  if(q)subs=subs.filter(s=>s.name.includes(q)||s.email?.toLowerCase().includes(q)||s.username?.toLowerCase().includes(q));
+  const tb=document.getElementById('subTable');
+  if(subs.length===0){tb.innerHTML='<tr class="empty-row"><td colspan="10">لا يوجد مشتركون</td></tr>';return;}
+  tb.innerHTML=subs.map((s,i)=>{
+    const schools=(s.schools||[]).map(sc=>sc==='classic'?'<span class="school-tag tag-classic">📘 كلاسيك</span>':'<span class="school-tag tag-advanced">👑 متقدمة</span>').join('');
+    const active=s.active!==false;
+    const isOnline=s.isOnline&&s.lastSeen&&(Date.now()-s.lastSeen)<120000;
+    const statusHtml=isOnline
+      ?'<span class="status-badge online-badge">🟢 متصل الآن</span>'
+      :active?'<span class="status-badge active-badge">✅ فعّال</span>'
+      :'<span class="status-badge inactive-badge">🔴 موقوف</span>';
+    return`<tr>
+      <td>${i+1}</td>
+      <td class="td-name">${s.name}</td>
+      <td><span class="td-user">${s.username||'—'}</span></td>
+      <td><span class="td-pwd">••••••</span></td>
+      <td style="direction:ltr;text-align:right;color:var(--muted);font-size:.82rem">${s.email||'—'}</td>
+      <td style="direction:ltr;text-align:right;color:var(--muted);font-size:.82rem">${s.phone||'—'}</td>
+      <td>${schools||'—'}</td>
+      <td style="color:var(--muted);font-size:.82rem">${s.joinDate||'—'}</td>
+      <td>${statusHtml}</td>
+      <td>
+        <button class="action-btn btn-edit" onclick="openEdit('${s.id}')">✏️ تعديل</button>
+        <button class="action-btn btn-toggle" onclick="toggleActive('${s.id}')">${active?'🔴 إيقاف':'✅ تفعيل'}</button>
+        <button class="action-btn btn-del" onclick="deleteSub('${s.id}')">🗑</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+/* ═══ CRUD ═══ */
+function openAdd(){
+  document.getElementById('modalTitle').textContent='إضافة مشترك جديد';
+  document.getElementById('editId').value='';
+  document.getElementById('f-name').value='';
+  document.getElementById('f-user').value='';
+  document.getElementById('f-pwd').value='';
+  document.getElementById('f-email').value='';
+  document.getElementById('f-phone').value='';
+  document.getElementById('f-date').value=new Date().toISOString().slice(0,10);
+  document.getElementById('f-classic').checked=false;
+  document.getElementById('f-advanced').checked=false;
+  document.getElementById('f-active').value='true';
+  openModal();
+}
+
+function openEdit(id){
+  const d=getData();
+  const s=d.subscribers.find(x=>x.id===id);
+  if(!s)return;
+  document.getElementById('modalTitle').textContent='تعديل بيانات المشترك';
+  document.getElementById('editId').value=s.id;
+  document.getElementById('f-name').value=s.name;
+  document.getElementById('f-user').value=s.username||'';
+  document.getElementById('f-pwd').value=s.password||'';
+  document.getElementById('f-email').value=s.email||'';
+  document.getElementById('f-phone').value=s.phone||'';
+  document.getElementById('f-date').value=s.joinDate||'';
+  document.getElementById('f-classic').checked=s.schools?.includes('classic')||false;
+  document.getElementById('f-advanced').checked=s.schools?.includes('advanced')||false;
+  document.getElementById('f-active').value=String(s.active!==false);
+  openModal();
+}
+
+function saveSubscriber(){
+  const name=document.getElementById('f-name').value.trim();
+  const username=document.getElementById('f-user').value.trim();
+  const password=document.getElementById('f-pwd').value;
+  const email=document.getElementById('f-email').value.trim();
+  const phone=document.getElementById('f-phone').value.trim();
+  const date=document.getElementById('f-date').value;
+  const active=document.getElementById('f-active').value==='true';
+  const schools=[];
+  if(document.getElementById('f-classic').checked)schools.push('classic');
+  if(document.getElementById('f-advanced').checked)schools.push('advanced');
+
+  if(!name||!username||!password){toast('يرجى ملء الحقول الإلزامية (الاسم، اسم المستخدم، كلمة المرور)','error');return;}
+  if(schools.length===0){toast('يرجى تحديد مدرسة واحدة على الأقل','error');return;}
+
+  const d=getData();
+  const editId=document.getElementById('editId').value;
+  if(editId){
+    const s=d.subscribers.find(x=>x.id===editId);
+    if(s){Object.assign(s,{name,username,password,email,phone,joinDate:date,active,schools});}
+    toast('✅ تم تحديث بيانات المشترك');
+  } else {
+    if(d.subscribers.some(x=>x.username===username)){toast('اسم المستخدم مسجّل بالفعل','error');return;}
+    d.subscribers.push({id:uid(),name,username,password,email,phone,schools,isOnline:false,lastSeen:null,joinDate:date,active});
+    toast('✅ تمت إضافة المشترك بنجاح');
+  }
+  saveData(d);closeModal();renderAll();
+}
+
+function toggleActive(id){
+  const d=getData();
+  const s=d.subscribers.find(x=>x.id===id);
+  if(s){s.active=!(s.active!==false);}
+  saveData(d);renderTable();renderStats();
+  toast(s?.active?'✅ تم تفعيل الحساب':'🔴 تم إيقاف الحساب');
+}
+
+function deleteSub(id){
+  if(!confirm('هل تريد حذف هذا المشترك نهائياً؟'))return;
+  const d=getData();
+  d.subscribers=d.subscribers.filter(x=>x.id!==id);
+  saveData(d);renderAll();toast('🗑 تم حذف المشترك','error');
+}
+
+/* ═══ HELPERS ═══ */
+function togglePwd(inputId,btn){
+  const inp=document.getElementById(inputId);
+  inp.type=inp.type==='password'?'text':'password';
+  btn.textContent=inp.type==='password'?'👁':'🙈';
+}
+function openModal(){document.getElementById('subModal').classList.add('show');}
+function closeModal(){document.getElementById('subModal').classList.remove('show');}
+document.getElementById('subModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+function toast(msg,type='success'){const t=document.getElementById('toast');t.textContent=msg;t.className='show '+type;setTimeout(()=>t.className='',2800);}
+
+checkGate();
+
+// إذا جاء من admin-panel بعد حفظ مشترك، أظهر رسالة ترحيب
+if(document.referrer.includes('admin-panel.html')){
+  setTimeout(()=>{
+    if(document.getElementById('app').style.display!=='none'){
+      toast('✅ تم حفظ المشترك وتحديث صلاحيات الدخول');
+    }
+  },600);
+}
+</script>
+</body>
+</html>

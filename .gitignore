@@ -1,0 +1,23 @@
+# مجلد الفيديوهات والملفات الكبيرة
+files/
+
+# Node.js
+node_modules/
+.next/
+pnpm-lock.yaml
+package.json
+package-lock.json
+postcss.config.mjs
+next.config.mjs
+tsconfig.json
+components.json
+
+# System
+.DS_Store
+*.log
+
+# Other project files
+app/
+lib/
+components/
+public/

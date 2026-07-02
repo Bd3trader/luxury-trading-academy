@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>الاختبار العملي | منصة تعليم التداول</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --gold:#B8860B;--gold-g:linear-gradient(135deg,#B8860B,#D4A017);
+      --bg:#f8f6f1;--white:#fff;--text:#1a1a2e;--muted:#6b7280;
+      --border:rgba(184,134,11,.18);--green:#059669;--red:#dc2626;--blue:#3b82f6;
+    }
+    body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+    /* NAV */
+    nav{background:#fff;border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 14px rgba(0,0,0,.06)}
+    .nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none}
+    .nav-logo-icon{width:36px;height:36px;background:var(--gold-g);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem}
+    .nav-logo-name{font-weight:900;font-size:.9rem;background:var(--gold-g);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .nav-back{padding:7px 16px;background:rgba(184,134,11,.08);border:1px solid var(--border);border-radius:10px;font-family:'Cairo',sans-serif;font-size:.82rem;font-weight:700;color:var(--gold);cursor:pointer;text-decoration:none;transition:all .2s}
+    .nav-back:hover{background:rgba(184,134,11,.16)}
+
+    /* LAYOUT */
+    .page{max-width:1100px;margin:0 auto;padding:28px 20px 80px}
+
+    /* SCHOOL HEADER */
+    .school-banner{border-radius:18px;padding:22px 28px;margin-bottom:24px;display:flex;align-items:center;gap:16px}
+    .school-banner.classic{background:linear-gradient(135deg,#e8f4ff,#dbeafe);border:1px solid rgba(59,130,246,.2)}
+    .school-banner.advanced{background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid rgba(184,134,11,.2)}
+    .sb-icon{font-size:2.5rem}
+    .sb-info h2{font-size:1.2rem;font-weight:900;margin-bottom:4px}
+    .sb-info p{color:var(--muted);font-size:.85rem}
+    .sb-right{margin-right:auto;display:flex;align-items:center;gap:12px}
+    .quiz-progress{text-align:center}
+    .qp-num{font-size:1.5rem;font-weight:900;background:var(--gold-g);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .qp-lbl{font-size:.72rem;color:var(--muted)}
+    .prog-bar-wrap{width:120px;height:6px;background:rgba(0,0,0,.08);border-radius:999px;overflow:hidden;margin-top:4px}
+    .prog-bar{height:100%;background:var(--gold-g);border-radius:999px;transition:width .4s ease}
+
+    /* API KEY CARD */
+    .api-setup{background:#fff;border:1.5px solid rgba(59,130,246,.25);border-radius:16px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+    .api-icon{font-size:1.6rem;flex-shrink:0}
+    .api-text{flex:1;min-width:200px}
+    .api-text h3{font-size:.95rem;font-weight:900;margin-bottom:4px;color:var(--blue)}
+    .api-text p{font-size:.78rem;color:var(--muted);line-height:1.6}
+    .api-inp-wrap{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .api-inp{padding:9px 14px;border:1.5px solid rgba(59,130,246,.3);border-radius:10px;font-family:'Cairo',sans-serif;font-size:.82rem;width:280px;outline:none;direction:ltr}
+    .api-inp:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(59,130,246,.1)}
+    .api-save-btn{padding:9px 18px;background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;font-family:'Cairo',sans-serif;font-weight:800;font-size:.82rem;border:none;border-radius:10px;cursor:pointer;white-space:nowrap;transition:all .2s}
+    .api-save-btn:hover{box-shadow:0 4px 14px rgba(59,130,246,.4)}
+    .api-saved{display:none;padding:6px 14px;background:rgba(5,150,105,.1);color:var(--green);border:1px solid rgba(5,150,105,.2);border-radius:8px;font-size:.8rem;font-weight:700}
+    .api-saved.show{display:flex;align-items:center;gap:6px}
+
+    /* MAIN QUIZ GRID */
+    .quiz-grid{display:grid;grid-template-columns:1fr;gap:20px;align-items:start;max-width:700px;margin:0 auto}
+
+    /* QUESTION CARD */
+    .q-card{background:#fff;border:1px solid var(--border);border-radius:18px;overflow:hidden;position:sticky;top:80px}
+    .q-header{padding:16px 20px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,#fffdf5,#fef9e7)}
+    .q-step{font-size:.72rem;font-weight:800;color:var(--muted);margin-bottom:4px}
+    .q-title{font-size:.98rem;font-weight:900;line-height:1.6}
+    .q-body{padding:20px}
+
+    /* MCQ options */
+    .mcq-opts{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+    .mcq-opt{display:flex;align-items:center;gap:10px;padding:12px 14px;border:2px solid var(--border);border-radius:11px;cursor:pointer;transition:all .2s;font-size:.88rem;font-weight:600}
+    .mcq-opt:hover{border-color:rgba(184,134,11,.4);background:rgba(184,134,11,.04)}
+    .mcq-opt.selected{border-color:var(--gold);background:rgba(184,134,11,.08)}
+    .mcq-opt.correct{border-color:var(--green);background:rgba(5,150,105,.08);color:var(--green)}
+    .mcq-opt.wrong{border-color:var(--red);background:rgba(220,38,38,.06);color:var(--red)}
+    .opt-letter{width:26px;height:26px;border-radius:7px;background:rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:900;flex-shrink:0}
+    .mcq-opt.selected .opt-letter{background:var(--gold-g);color:#fff}
+
+    /* Open answer */
+    .open-q textarea{width:100%;min-height:90px;padding:12px 14px;border:1.5px solid var(--border);border-radius:11px;font-family:'Cairo',sans-serif;font-size:.88rem;resize:vertical;outline:none;transition:border-color .2s;color:var(--text)}
+    .open-q textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,134,11,.1)}
+
+    /* AI Feedback */
+    .ai-feedback{display:none;margin-top:14px;border-radius:12px;overflow:hidden;border:1px solid var(--border)}
+    .ai-feedback.show{display:block;animation:fadeIn .3s ease}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    .aif-header{padding:10px 16px;display:flex;align-items:center;gap:8px;font-size:.82rem;font-weight:800}
+    .aif-header.great{background:rgba(5,150,105,.1);color:var(--green)}
+    .aif-header.good{background:rgba(184,134,11,.1);color:var(--gold)}
+    .aif-header.review{background:rgba(220,38,38,.06);color:var(--red)}
+    .aif-body{padding:12px 16px;font-size:.84rem;line-height:1.8;color:var(--text);background:#fafafa}
+    .aif-score{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.75rem;font-weight:900;margin-right:8px}
+
+    /* Buttons */
+    .btn-gold{width:100%;padding:13px;background:var(--gold-g);color:#fff;font-family:'Cairo',sans-serif;font-weight:800;font-size:.9rem;border:none;border-radius:12px;cursor:pointer;transition:all .25s;box-shadow:0 4px 16px rgba(184,134,11,.25);display:flex;align-items:center;justify-content:center;gap:8px}
+    .btn-gold:hover:not(:disabled){box-shadow:0 8px 24px rgba(184,134,11,.4);transform:translateY(-1px)}
+    .btn-gold:disabled{opacity:.5;cursor:not-allowed;transform:none}
+    .btn-secondary{width:100%;padding:11px;background:var(--bg);color:var(--text);font-family:'Cairo',sans-serif;font-weight:700;font-size:.88rem;border:1.5px solid var(--border);border-radius:12px;cursor:pointer;transition:all .2s;margin-top:8px}
+    .btn-secondary:hover{border-color:var(--gold);color:var(--gold)}
+
+    /* Loading spinner */
+    .ai-loading{display:none;flex-direction:column;align-items:center;padding:20px;gap:10px;color:var(--muted);font-size:.84rem}
+    .ai-loading.show{display:flex}
+    .spinner{width:28px;height:28px;border:3px solid rgba(184,134,11,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* Results */
+    .results-card{background:#fff;border:1px solid var(--border);border-radius:18px;padding:32px;text-align:center;display:none}
+    .results-card.show{display:block;animation:fadeIn .4s ease}
+    .res-icon{font-size:3rem;margin-bottom:12px}
+    .res-score-circle{width:100px;height:100px;border-radius:50%;background:var(--gold-g);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 8px 28px rgba(184,134,11,.3)}
+    .res-score-num{font-size:1.8rem;font-weight:900;color:#fff}
+    .res-title{font-size:1.3rem;font-weight:900;margin-bottom:8px}
+    .res-msg{color:var(--muted);font-size:.9rem;margin-bottom:24px;line-height:1.7}
+    .res-details{display:flex;justify-content:center;gap:28px;margin-bottom:24px}
+    .rd-item{text-align:center}
+    .rd-num{font-size:1.4rem;font-weight:900}
+    .rd-lbl{font-size:.72rem;color:var(--muted)}
+    .rd-correct .rd-num{color:var(--green)}
+    .rd-wrong .rd-num{color:var(--red)}
+    .res-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+    .btn-res{padding:11px 28px;border-radius:11px;font-family:'Cairo',sans-serif;font-weight:800;font-size:.9rem;cursor:pointer;transition:all .2s;border:none}
+    .btn-res-primary{background:var(--gold-g);color:#fff;box-shadow:0 4px 14px rgba(184,134,11,.3)}
+    .btn-res-primary:hover{box-shadow:0 8px 22px rgba(184,134,11,.45);transform:translateY(-1px)}
+    .btn-res-secondary{background:var(--bg);color:var(--text);border:1.5px solid var(--border)}
+    .btn-res-secondary:hover{border-color:var(--gold);color:var(--gold)}
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="dashboard.html" class="nav-logo">
+    <div class="nav-logo-icon">📈</div>
+    <div class="nav-logo-name">منصة تعليم التداول</div>
+  </a>
+  <a href="dashboard.html" class="nav-back">← العودة للداشبورد</a>
+</nav>
+
+<div class="page">
+
+  <!-- School Banner -->
+  <div class="school-banner" id="schoolBanner">
+    <div class="sb-icon" id="sbIcon">📊</div>
+    <div class="sb-info">
+      <h2 id="sbTitle">الاختبار العملي</h2>
+      <p id="sbDesc">اختبر مهاراتك وقيّم فهمك للمادة</p>
+    </div>
+    <div class="sb-right">
+      <div class="quiz-progress">
+        <div class="qp-num"><span id="qCurrent">1</span>/<span id="qTotal">1</span></div>
+        <div class="qp-lbl">سؤال</div>
+        <div class="prog-bar-wrap"><div class="prog-bar" id="progBar" style="width:0%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- API Key Setup -->
+  <div class="api-setup" id="apiSetup">
+    <div class="api-icon">🤖</div>
+    <div class="api-text">
+      <h3>ربط الذكاء الاصطناعي (Claude AI)</h3>
+      <p>أدخل مفتاح Anthropic API لتفعيل التقييم الفوري بالذكاء الاصطناعي — يحلل إجاباتك ويعطيك ملاحظات دقيقة</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div class="api-inp-wrap">
+        <input type="password" class="api-inp" id="apiKeyInp" placeholder="sk-ant-api03-..." dir="ltr"/>
+        <button class="api-save-btn" onclick="saveApiKey()">حفظ المفتاح</button>
+      </div>
+      <div class="api-saved" id="apiSaved">✅ المفتاح محفوظ — الذكاء الاصطناعي جاهز</div>
+    </div>
+  </div>
+
+  <!-- Quiz Area -->
+  <div id="quizArea">
+    <div class="quiz-grid">
+
+      <!-- Question Panel -->
+      <div>
+        <div class="q-card" id="questionCard">
+          <div class="q-header">
+            <div class="q-step" id="qStep">السؤال 1 من 6</div>
+            <div class="q-title" id="qText">جاري التحميل...</div>
+          </div>
+          <div class="q-body">
+            <!-- MCQ -->
+            <div id="mcqArea" class="mcq-opts" style="display:none"></div>
+            <!-- Open -->
+            <div id="openArea" class="open-q" style="display:none">
+              <textarea id="openAnswer" placeholder="اكتب إجابتك هنا..." rows="4"></textarea>
+            </div>
+            <!-- Loading -->
+            <div class="ai-loading" id="aiLoading">
+              <div class="spinner"></div>
+              <span>الذكاء الاصطناعي يحلل إجابتك...</span>
+            </div>
+            <!-- Feedback -->
+            <div class="ai-feedback" id="aiFeedback">
+              <div class="aif-header" id="aifHeader"></div>
+              <div class="aif-body" id="aifBody"></div>
+            </div>
+            <!-- Actions -->
+            <div style="margin-top:16px">
+              <button class="btn-gold" id="submitBtn" onclick="submitAnswer()">
+                <span>✓</span> <span id="submitLabel">تحقق من الإجابة</span>
+              </button>
+              <button class="btn-secondary" id="nextBtn" onclick="nextQuestion()" style="display:none">
+                السؤال التالي ←
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div class="results-card" id="resultsCard">
+    <div class="res-icon" id="resIcon">🏆</div>
+    <div class="res-score-circle"><div class="res-score-num" id="resScore">0%</div></div>
+    <div class="res-title" id="resTitle">نتيجة اختبارك</div>
+    <div class="res-msg" id="resMsg"></div>
+    <div class="res-details">
+      <div class="rd-item rd-correct"><div class="rd-num" id="resCorrect">0</div><div class="rd-lbl">إجابات صحيحة</div></div>
+      <div class="rd-item rd-wrong"><div class="rd-num" id="resWrong">0</div><div class="rd-lbl">تحتاج مراجعة</div></div>
+    </div>
+    <div class="res-actions">
+      <button class="btn-res btn-res-primary" onclick="retakeQuiz()">🔄 إعادة الاختبار</button>
+      <button class="btn-res btn-res-secondary" onclick="window.location.href='dashboard.html'">← العودة للداشبورد</button>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+/* ════════════════════════════════
+   DATA
+════════════════════════════════ */
+const STORE='tradingPlatform_v1';
+function getData(){try{const r=localStorage.getItem(STORE);if(r)return JSON.parse(r);}catch(e){}return null;}
+
+const params=new URLSearchParams(location.search);
+const SCHOOL=params.get('school')||'classic';
+// Read subscriber — sessionStorage first, fallback to localStorage
+let subRaw=sessionStorage.getItem('currentSubscriber');
+if(!subRaw){
+  // Try to find active subscriber from localStorage data
+  const d=getData();
+  const activeSubs=(d?.subscribers||[]).filter(s=>s.isOnline&&s.lastSeen&&(Date.now()-s.lastSeen)<300000);
+  if(activeSubs.length>0){subRaw=JSON.stringify(activeSubs[0]);}
+  else{window.location.href='login.html';}
+}
+const SUB=JSON.parse(subRaw||'{}');
+if(!(SUB.schools||[]).includes(SCHOOL)){window.location.href='dashboard.html';}
+
+/* ════════════════════════════════
+   API KEY
+════════════════════════════════ */
+function saveApiKey(){
+  const k=document.getElementById('apiKeyInp').value.trim();
+  if(!k.startsWith('sk-ant-')){alert('المفتاح يجب أن يبدأ بـ sk-ant-');return;}
+  localStorage.setItem('aiApiKey',k);
+  document.getElementById('apiSaved').classList.add('show');
+  document.getElementById('apiKeyInp').value='';
+  document.getElementById('apiSetup').style.borderColor='rgba(5,150,105,.3)';
+}
+function getApiKey(){return localStorage.getItem('aiApiKey')||'';}
+
+// Default API key — pre-configured
+const DEFAULT_KEY='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';
+if(!getApiKey()){localStorage.setItem('aiApiKey',DEFAULT_KEY);}
+
+// Load saved key state
+if(getApiKey()){
+  document.getElementById('apiSaved').classList.add('show');
+  document.getElementById('apiSetup').style.borderColor='rgba(5,150,105,.3)';
+  document.getElementById('apiSetup').querySelector('h3').textContent='✅ الذكاء الاصطناعي مفعّل ومتصل';
+}
+
+/* ════════════════════════════════
+   QUESTION BANKS
+════════════════════════════════ */
+const QUESTIONS={
+  classic:[
+    {
+      id:'c1',type:'mcq',
+      chartFocus:'ابحث عن نمط شمعاني في المنطقة المحددة بالدائرة الحمراء',
+      text:'ما اسم النمط الشمعاني الذي يتكون من شمعتين — الأولى هابطة كبيرة والثانية صاعدة تبتلع الأولى بالكامل؟',
+      options:['نمط الدوجي (Doji)','نمط الابتلاع الصاعد (Bullish Engulfing)','نمط المطرقة (Hammer)','نمط النجمة المسائية (Evening Star)'],
+      correct:1,
+      explanation:'نمط الابتلاع الصاعد (Bullish Engulfing) يتكون من شمعتين: شمعة هابطة يتبعها شمعة صاعدة تبتلعها بالكامل، وهو إشارة انعكاس صاعد قوية عند مناطق الدعم.'
+    },
+    {
+      id:'c2',type:'mcq',
+      chartFocus:'انظر إلى أعلى نقطة في الشارت ثم أسفل نقطة',
+      text:'ما الفرق بين خط الدعم وخط المقاومة في التحليل الفني؟',
+      options:[
+        'لا فرق بينهما — كلاهما يعمل بنفس الطريقة',
+        'الدعم منطقة توقف الهبوط والانعكاس لأعلى، والمقاومة منطقة توقف الصعود والانعكاس لأسفل',
+        'الدعم للمدى القصير فقط والمقاومة للمدى البعيد',
+        'الدعم يُستخدم في الأسواق الصاعدة فقط'
+      ],
+      correct:1,
+      explanation:'الدعم هو السعر الذي يتوقف عنده الهبوط ويرتد منه السعر للأعلى (تجمّع طلبات الشراء). المقاومة هي السعر الذي يتوقف عنده الصعود ويرتد منه للأسفل (تجمّع طلبات البيع). عند كسر أحدهما يتحول الدور.'
+    },
+    {
+      id:'c3',type:'open',
+      chartFocus:'حدد أقوى منطقة دعم في الشارت وحدد سبب اختيارها',
+      text:'انظر للشارت أمامك: كيف تحدد أقوى خط دعم؟ وما الشروط التي تجعل منطقة الدعم قوية؟',
+      correctKeywords:['اختبار','مرات','ارتداد','حجم','زمن','قوة','شموع','تأكيد'],
+      modelAnswer:'أقوى خط دعم هو الذي: 1) اختُبر عدة مرات وصمد 2) ارتبط بحجم تداول مرتفع 3) نشأ عند مستوى تاريخي مهم 4) حدث عنده ارتداد حاد وسريع 5) تشكّلت عنده شموع انعكاسية.'
+    },
+    {
+      id:'c4',type:'mcq',
+      chartFocus:'لاحظ حجم شمعة الدوجي مقارنة بما حولها',
+      text:'متى تكون شمعة الدوجي (Doji) إشارة انعكاس قوية؟',
+      options:[
+        'دائماً وفي أي مكان في الشارت',
+        'عند تشكّلها في منتصف الترند فقط',
+        'عند تشكّلها بعد ترند طويل وعند مناطق دعم أو مقاومة مهمة',
+        'عندما يكون حجم التداول منخفضاً جداً'
+      ],
+      correct:2,
+      explanation:'شمعة الدوجي تكتسب أهميتها من موقعها وسياقها: تشكّلها بعد ترند صاعد أو هابط طويل + عند مستوى دعم أو مقاومة + مع حجم تداول مرتفع = إشارة انعكاس قوية. وحدها دون هذه الشروط إشارة ضعيفة.'
+    },
+    {
+      id:'c5',type:'open',
+      chartFocus:'ابحث في الشارت عن فرصة صفقة محتملة وحدد نقطة الدخول والهدف والوقف',
+      text:'ما هي قاعدة إدارة المخاطر 1:2 وكيف تطبقها على الصفقة التي تراها في الشارت؟',
+      correctKeywords:['1:2','وقف','هدف','خسارة','ربح','نسبة','مخاطرة','رأس المال'],
+      modelAnswer:'قاعدة 1:2 تعني أن الهدف المحتمل للربح ضعف حجم الوقف. مثلاً: دخول عند 1920، وقف عند 1910 (خسارة 10 دولار)، هدف عند 1940 (ربح 20 دولار). لا تخاطر بأكثر من 1-2% من رأس المال في صفقة واحدة.'
+    },
+    {
+      id:'c6',type:'mcq',
+      chartFocus:'انظر للشكل العام للشارت وحدد اتجاه السوق',
+      text:'ما تعريف الترند الصاعد (Uptrend) في التحليل الفني الكلاسيكي؟',
+      options:[
+        'الشارت يتحرك للأعلى بشكل مستمر دون أي تراجعات',
+        'تتالي قمم وقيعان أعلى من السابقة (Higher Highs & Higher Lows)',
+        'الشارت يرسم خطاً مستقيماً للأعلى',
+        'أي صعود يستمر لأكثر من 5 شموع'
+      ],
+      correct:1,
+      explanation:'الترند الصاعد الكلاسيكي يُعرَّف بتتالي قمم وقيعان أعلى (HH/HL). كسر هذه البنية بتكوين قاع أدنى من السابق يُعدّ إشارة لاحتمال تغيير الاتجاه. هذا التعريف هو أساس تحليل الهيكل.'
+    }
+  ],
+  advanced:[
+    {
+      id:'a1',type:'mcq',
+      chartFocus:'لاحظ آخر حركة كبيرة في الشارت وحدد إن كانت صاعدة أم هابطة',
+      text:'ما هو مفهوم Change of Character (CHOCH) في Smart Money Concepts؟',
+      options:[
+        'هو نفسه Break of Structure (BOS) ولا فرق بينهما',
+        'تغيير في طبيعة حركة السعر يشير لاحتمال انعكاس الاتجاه — أول كسر في الاتجاه الرئيسي',
+        'هو منطقة عرض أو طلب قوية',
+        'مؤشر لقياس زخم السعر'
+      ],
+      correct:1,
+      explanation:'CHOCH هو أول إشارة على تغيير الاتجاه الرئيسي — يحدث عندما يكسر السعر قاعاً أعلى في الترند الصاعد (أو قمة أدنى في الهابط)، مما يشير لدخول المؤسسات في الاتجاه المعاكس. يختلف عن BOS لأنه يكسر بنية الاتجاه الأصلي.'
+    },
+    {
+      id:'a2',type:'open',
+      chartFocus:'ابحث عن منطقة تجمع السيولة (Liquidity Pool) في الشارت',
+      text:'ما هو مفهوم السيولة (Liquidity) في SMC ولماذا تستهدفها المؤسسات؟',
+      correctKeywords:['وقف','صفقات','سيولة','مؤسسات','اصطياد','قمم','قيعان','تجميع','smart money'],
+      modelAnswer:'السيولة هي تجمّع أوامر وقف الخسارة (Stop Loss) للمتداولين الصغار. تتجمع عادةً عند القمم والقيعان الواضحة. المؤسسات تدفع السعر للوصول لهذه المناطق لـ"اصطياد" الأوامر وتوفير السيولة الكافية لتنفيذ صفقاتهم الكبيرة قبل عكس الاتجاه.'
+    },
+    {
+      id:'a3',type:'mcq',
+      chartFocus:'ابحث عن منطقة تحرّك بسرعة كبيرة في الشارت (Impulse)',
+      text:'ما هو Fair Value Gap (FVG) وكيف يستخدمه متداولو SMC؟',
+      options:[
+        'هو نفسه مستوى الدعم والمقاومة التقليدي',
+        'فجوة في الأسعار (Gap) تنشأ عن حركة قوية تترك منطقة غير متداولة، ويعود إليها السعر لـ"إكمالها"',
+        'مؤشر لقياس القيمة العادلة للسهم',
+        'منطقة عرض أو طلب مؤسسية قديمة'
+      ],
+      correct:1,
+      explanation:'FVG ينشأ عندما تتحرك الأسعار بسرعة كبيرة وتترك "فجوة" (3 شموع: الوسطى لا تتقاطع ظلالها مع الأولى والثالثة). السعر عادةً يعود لملء هذه الفجوة. المؤسسات تستخدمها نقاط دخول محتملة في اتجاه الحركة الرئيسية.'
+    },
+    {
+      id:'a4',type:'open',
+      chartFocus:'حدد آخر Order Block مرئي في الشارت واشرح لماذا اخترته',
+      text:'ما هو Order Block في SMC وكيف تحدده في الشارت؟ وما الفرق بينه وبين منطقة الدعم والمقاومة التقليدية؟',
+      correctKeywords:['مؤسسات','آخر','شمعة','عكس','صاعد','هابط','دخول','تجميع','order block'],
+      modelAnswer:'Order Block هو آخر شمعة هابطة قبل حركة صاعدة قوية (أو آخر شمعة صاعدة قبل هبوط حاد). يمثل منطقة تجميع/توزيع مؤسسي. الفرق: الدعم والمقاومة التقليدي يعتمد على الارتدادات المتعددة، بينما OB يعتمد على آثر الأمر المؤسسي الذي سبب الحركة الكبيرة.'
+    },
+    {
+      id:'a5',type:'mcq',
+      chartFocus:'حدد هيكل السوق العام — هل هو صاعد أم هابط؟',
+      text:'في تحليل هيكل السوق (Market Structure) في SMC — متى يكون الترند رسمياً انكسر؟',
+      options:[
+        'عندما يكسر السعر المتوسط المتحرك 200',
+        'عند تكوين شمعة هابطة كبيرة',
+        'عند كسر آخر قاع مهم في الترند الصاعد (BOS هابط) مما يُنشئ CHOCH',
+        'عند إغلاق 3 شموع تحت مستوى معين'
+      ],
+      correct:2,
+      explanation:'كسر هيكل السوق يحدث عند كسر آخر قاع رئيسي في الترند الصاعد (أو آخر قمة في الهابط). هذا يُسمى Change of Character (CHOCH) ويشير لاحتمال انعكاس الاتجاه. المتداولون SMC ينتظرون هذا الكسر كتأكيد قبل البحث عن نقاط دخول عكسية.'
+    },
+    {
+      id:'a6',type:'open',
+      chartFocus:'انظر للهيكل الكامل وحدد: أين يكون السعر الآن في دورة السوق؟',
+      text:'اشرح مفهوم Premium وDiscount Zones في SMC وكيف تستخدمهما لتحديد نقاط الدخول المثلى؟',
+      correctKeywords:['50%','فيبوناتشي','أعلى','أدنى','premium','discount','نصف','مثلى','شراء','بيع'],
+      modelAnswer:'Premium Zone = السعر أعلى من 50% من آخر حركة (باهظ — يُفضّل البيع). Discount Zone = السعر أدنى من 50% (رخيص — يُفضّل الشراء). يُستخدم مستوى فيبوناتشي 50% كخط الفصل. القاعدة: ابحث عن Buy في Discount عند OB أو FVG، وعن Sell في Premium عند OB أو FVG.'
+    }
+  ]
+};
+
+/* ════════════════════════════════
+   TRADINGVIEW CHART
+════════════════════════════════ */
+
+
+/* ════════════════════════════════
+   QUIZ ENGINE
+════════════════════════════════ */
+const questions=QUESTIONS[SCHOOL]||[];
+let qIdx=0,score=0,wrongCount=0,selectedOpt=null,mcqAnswered=false;
+
+function loadQuestion(){
+  if(qIdx>=questions.length){showResults();return;}
+  const q=questions[qIdx];
+  const total=questions.length;
+
+  document.getElementById('qStep').textContent=`السؤال ${qIdx+1} من ${total}`;
+  document.getElementById('qCurrent').textContent=qIdx+1;
+  document.getElementById('qTotal').textContent=total;
+  document.getElementById('progBar').style.width=`${(qIdx/total)*100}%`;
+  document.getElementById('qText').textContent=q.text;
+  // Reset UI
+  selectedOpt=null;mcqAnswered=false;
+  document.getElementById('aiFeedback').classList.remove('show');
+  document.getElementById('aiLoading').classList.remove('show');
+  document.getElementById('nextBtn').style.display='none';
+  document.getElementById('submitBtn').style.display='flex';
+  document.getElementById('submitBtn').disabled=false;
+  document.getElementById('submitLabel').textContent='تحقق من الإجابة';
+
+  // MCQ or Open
+  if(q.type==='mcq'){
+    document.getElementById('mcqArea').style.display='flex';
+    document.getElementById('openArea').style.display='none';
+    document.getElementById('mcqArea').innerHTML=q.options.map((opt,i)=>`
+      <div class="mcq-opt" id="opt-${i}" onclick="selectOpt(${i})">
+        <div class="opt-letter">${['أ','ب','ج','د'][i]}</div>
+        <span>${opt}</span>
+      </div>`).join('');
+  } else {
+    document.getElementById('mcqArea').style.display='none';
+    document.getElementById('openArea').style.display='block';
+    document.getElementById('openAnswer').value='';
+  }
+}
+
+function selectOpt(i){
+  if(mcqAnswered)return;
+  selectedOpt=i;
+  document.querySelectorAll('.mcq-opt').forEach(o=>o.classList.remove('selected'));
+  document.getElementById('opt-'+i)?.classList.add('selected');
+}
+
+async function submitAnswer(){
+  const q=questions[qIdx];
+  if(q.type==='mcq'){
+    if(selectedOpt===null){alert('اختر إجابة أولاً');return;}
+    mcqAnswered=true;
+    const correct=selectedOpt===q.correct;
+    if(correct)score++;else wrongCount++;
+    // Show correct/wrong colors
+    document.querySelectorAll('.mcq-opt').forEach((o,i)=>{
+      if(i===q.correct)o.classList.add('correct');
+      else if(i===selectedOpt&&!correct)o.classList.add('wrong');
+    });
+    showMCQFeedback(q,correct);
+  } else {
+    const ans=document.getElementById('openAnswer').value.trim();
+    if(ans.length<10){alert('اكتب إجابة أكثر تفصيلاً');return;}
+    document.getElementById('submitBtn').disabled=true;
+    await evaluateOpenAnswer(q,ans);
+  }
+  document.getElementById('submitBtn').style.display='none';
+  document.getElementById('nextBtn').style.display='block';
+}
+
+function showMCQFeedback(q,correct){
+  const fb=document.getElementById('aiFeedback');
+  const hdr=document.getElementById('aifHeader');
+  const body=document.getElementById('aifBody');
+  hdr.className='aif-header '+(correct?'great':'review');
+  hdr.innerHTML=(correct?'✅ إجابة صحيحة! +1 نقطة':'❌ إجابة غير صحيحة')+
+    `<span class="aif-score" style="background:${correct?'rgba(5,150,105,.15)':'rgba(220,38,38,.1)'};color:${correct?'var(--green)':'var(--red)'}">${correct?'✓':'✗'}</span>`;
+  body.innerHTML=`<strong>💡 الشرح:</strong><br>${q.explanation}`;
+  fb.classList.add('show');
+}
+
+async function evaluateOpenAnswer(q,ans){
+  document.getElementById('aiLoading').classList.add('show');
+  const apiKey=getApiKey();
+  let feedback,isGood=false;
+
+  if(apiKey){
+    try{
+      const keywords=(q.correctKeywords||[]).join('، ');
+      const prompt=`أنت مدرب خبير في التداول. المتدرب أجاب على سؤال تعليمي.
+
+السؤال: ${q.text}
+إجابة المتدرب: ${ans}
+النموذج الصحيح: ${q.modelAnswer}
+الكلمات المفتاحية المطلوبة: ${keywords}
+
+قيّم الإجابة بـ:
+1. الدرجة: (ممتاز/جيد/يحتاج مراجعة)
+2. نقاط القوة في الإجابة
+3. ما ينقص الإجابة
+4. الشرح الصحيح الكامل
+
+اكتب بالعربية بشكل مشجع وتعليمي. اجعل ردك موجزاً (5-6 أسطر).`;
+
+      const res=await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'x-api-key':apiKey,
+          'anthropic-version':'2023-06-01',
+          'anthropic-dangerous-direct-browser-access':'true'
+        },
+        body:JSON.stringify({
+          model:'claude-3-5-haiku-20241022',
+          max_tokens:400,
+          messages:[{role:'user',content:prompt}]
+        })
+      });
+      const data=await res.json();
+      if(data.content?.[0]?.text){
+        feedback=data.content[0].text;
+        isGood=feedback.includes('ممتاز')||feedback.includes('جيد')||feedback.includes('صحيح');
+        if(isGood)score++;else wrongCount++;
+      } else throw new Error('no response');
+    } catch(e){
+      feedback=fallbackEvaluate(q,ans);
+      const pts=evalKeywords(q,ans);
+      if(pts>=0.5)score++;else wrongCount++;
+      isGood=pts>=0.5;
+    }
+  } else {
+    // Offline evaluation
+    feedback=fallbackEvaluate(q,ans);
+    const pts=evalKeywords(q,ans);
+    if(pts>=0.5)score++;else wrongCount++;
+    isGood=pts>=0.5;
+  }
+
+  document.getElementById('aiLoading').classList.remove('show');
+  const fb=document.getElementById('aiFeedback');
+  const hdr=document.getElementById('aifHeader');
+  const body=document.getElementById('aifBody');
+  const grade=isGood?'great':'review';
+  hdr.className='aif-header '+grade;
+  hdr.innerHTML=(isGood?'🤖 ذكاء اصطناعي: إجابة جيدة!':'🤖 ذكاء اصطناعي: تحتاج مراجعة');
+  body.innerHTML=feedback.replace(/\n/g,'<br>');
+  fb.classList.add('show');
+}
+
+function evalKeywords(q,ans){
+  const kw=q.correctKeywords||[];
+  const found=kw.filter(k=>ans.includes(k));
+  return found.length/kw.length;
+}
+
+function fallbackEvaluate(q,ans){
+  const pts=evalKeywords(q,ans);
+  if(pts>=0.7){
+    return`✅ إجابة ممتازة! تضمّنت معظم النقاط الأساسية.\n\n📌 الإجابة النموذجية:\n${q.modelAnswer}`;
+  } else if(pts>=0.4){
+    return`👍 إجابة جيدة جزئياً — هناك نقاط مهمة تحتاج إضافة.\n\n📌 الإجابة الكاملة:\n${q.modelAnswer}`;
+  } else {
+    return`💡 إجابة تحتاج مراجعة — راجع الدروس ذات الصلة.\n\n📌 الإجابة الصحيحة:\n${q.modelAnswer}`;
+  }
+}
+
+function nextQuestion(){
+  qIdx++;
+  loadQuestion();
+}
+
+/* ════════════════════════════════
+   RESULTS
+════════════════════════════════ */
+function showResults(){
+  document.getElementById('quizArea').style.display='none';
+  document.getElementById('resultsCard').classList.add('show');
+  const total=questions.length;
+  const pct=Math.round((score/total)*100);
+  document.getElementById('progBar').style.width='100%';
+  document.getElementById('resScore').textContent=pct+'%';
+  document.getElementById('resCorrect').textContent=score;
+  document.getElementById('resWrong').textContent=total-score;
+
+  let icon,title,msg;
+  if(pct>=80){
+    icon='🏆';title='ممتاز! أداء رائع';
+    msg=`حصلت على ${score} من ${total} — إجاباتك تُظهر فهماً عميقاً للمادة. استمر بهذا المستوى!`;
+  } else if(pct>=60){
+    icon='⭐';title='جيد! على الطريق الصحيح';
+    msg=`حصلت على ${score} من ${total} — لديك أساس جيد. راجع الأسئلة التي أخطأت بها وأعد الاختبار.`;
+  } else {
+    icon='📖';title='تحتاج مراجعة أكثر';
+    msg=`حصلت على ${score} من ${total} — لا تقلق! راجع المحاضرات مجدداً وأعد الاختبار. التكرار هو مفتاح النجاح.`;
+  }
+  document.getElementById('resIcon').textContent=icon;
+  document.getElementById('resTitle').textContent=title;
+  document.getElementById('resMsg').textContent=msg;
+}
+
+function retakeQuiz(){
+  qIdx=0;score=0;wrongCount=0;selectedOpt=null;mcqAnswered=false;
+  document.getElementById('resultsCard').classList.remove('show');
+  document.getElementById('quizArea').style.display='block';
+  loadQuestion();
+}
+
+/* ════════════════════════════════
+   INIT
+════════════════════════════════ */
+const schoolMeta={
+  classic:{name:'مدرسة الكلاسيك',icon:'📊',bannerClass:'classic',desc:'اختبر مهاراتك في التحليل الكلاسيكي والشموع اليابانية والدعم والمقاومة'},
+  advanced:{name:'المدرسة المتقدمة — SMC',icon:'🏆',bannerClass:'advanced',desc:'اختبر فهمك لـ Smart Money Concepts وهيكلة السوق والسيولة'}
+};
+const meta=schoolMeta[SCHOOL];
+document.getElementById('sbIcon').textContent=meta.icon;
+document.getElementById('sbTitle').textContent='اختبار عملي — '+meta.name;
+document.getElementById('sbDesc').textContent=meta.desc;
+document.getElementById('schoolBanner').classList.add(meta.bannerClass);
+document.title=`اختبار ${meta.name} | منصة تعليم التداول`;
+
+// Init
+loadQuestion();
+</script>
+</body>
+</html>

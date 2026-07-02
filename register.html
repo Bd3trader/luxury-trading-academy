@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>تسجيل جديد | منصة تعليم التداول</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--gold:#B8860B;--gold-g:linear-gradient(135deg,#B8860B,#D4A017);--text:#1a1a2e;--muted:#6b7280;--border:rgba(184,134,11,.2);--green:#0a9e78}
+    body{font-family:'Cairo',sans-serif;background:linear-gradient(135deg,#f8f6f1,#f0ece3,#e8dfc8);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+    .wrap{width:100%;max-width:460px}
+
+    .brand{display:flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;margin-bottom:28px}
+    .brand-icon{width:50px;height:50px;background:var(--gold-g);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;box-shadow:0 8px 24px rgba(184,134,11,.3)}
+    .brand-name{font-size:1.05rem;font-weight:900;background:var(--gold-g);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .brand-sub{font-size:.72rem;color:var(--muted)}
+
+    .card{background:#fff;border-radius:24px;padding:40px 36px;box-shadow:0 24px 60px rgba(0,0,0,.1);border:1px solid var(--border)}
+    .card-top{text-align:center;margin-bottom:28px}
+    .card-title{font-size:1.5rem;font-weight:900;color:var(--text);margin-bottom:6px}
+    .card-sub{color:var(--muted);font-size:.86rem;line-height:1.7}
+
+    .field{margin-bottom:18px}
+    label{display:block;font-weight:700;font-size:.84rem;color:var(--text);margin-bottom:6px}
+    input{width:100%;padding:13px 16px;border:1.5px solid rgba(0,0,0,.1);border-radius:11px;font-family:'Cairo',sans-serif;font-size:.9rem;background:#fafafa;color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s}
+    input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,134,11,.12);background:#fff}
+
+    .error{display:none;background:#fef2f2;border:1px solid #fecaca;color:#dc2626;padding:10px 14px;border-radius:10px;font-size:.84rem;margin-bottom:14px;text-align:center;font-weight:700}
+    .error.show{display:block}
+    .success-card{display:none;text-align:center;padding:20px 0}
+    .success-card.show{display:block}
+    .success-icon{font-size:3rem;margin-bottom:14px}
+    .success-title{font-size:1.2rem;font-weight:900;color:var(--green);margin-bottom:8px}
+    .success-sub{font-size:.85rem;color:var(--muted);line-height:1.7}
+
+    .btn{width:100%;padding:14px;background:var(--gold-g);color:#fff;font-family:'Cairo',sans-serif;font-weight:800;font-size:1rem;border:none;border-radius:12px;cursor:pointer;transition:all .25s;box-shadow:0 8px 24px rgba(184,134,11,.3)}
+    .btn:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(184,134,11,.45)}
+    .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+    .back{text-align:center;margin-top:18px}
+    .back a{color:var(--muted);font-size:.82rem;text-decoration:none}
+    .back a:hover{color:var(--gold)}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <a href="index.html" class="brand">
+    <div class="brand-icon">📈</div>
+    <div>
+      <div class="brand-name">منصة تعليم التداول</div>
+      <div class="brand-sub">تسجيل جديد</div>
+    </div>
+  </a>
+
+  <div class="card">
+    <div class="card-top" id="formHeader">
+      <div class="card-title">سجّل بياناتك</div>
+      <div class="card-sub">أدخل بياناتك وسنتواصل معك لتفعيل حسابك في أقرب وقت</div>
+    </div>
+
+    <div class="error" id="errMsg"></div>
+
+    <form id="regForm" autocomplete="off">
+      <div class="field">
+        <label>الاسم الكامل</label>
+        <input type="text" id="fullName" placeholder="أدخل اسمك الكامل" required/>
+      </div>
+      <div class="field">
+        <label>رقم الهاتف</label>
+        <input type="tel" id="phone" placeholder="+968 79XXXXXX" dir="ltr" required/>
+      </div>
+      <div class="field">
+        <label>البريد الإلكتروني</label>
+        <input type="email" id="email" placeholder="example@email.com" dir="ltr" required/>
+      </div>
+      <button type="submit" class="btn" id="submitBtn">إرسال الطلب</button>
+    </form>
+
+    <div class="success-card" id="successCard">
+      <div class="success-icon">✅</div>
+      <div class="success-title">تم إرسال بياناتك بنجاح</div>
+      <div class="success-sub">سنتواصل معك قريباً لتفعيل حسابك<br>شكراً لاهتمامك بالمنصة</div>
+    </div>
+  </div>
+
+  <div class="back"><a href="index.html">← العودة للموقع الرئيسي</a></div>
+</div>
+
+<script>
+document.getElementById('regForm').addEventListener('submit',function(e){
+  e.preventDefault();
+  const errEl=document.getElementById('errMsg');
+  errEl.classList.remove('show');
+
+  const name=document.getElementById('fullName').value.trim();
+  const phone=document.getElementById('phone').value.trim();
+  const email=document.getElementById('email').value.trim();
+
+  if(!name||!phone||!email){
+    errEl.textContent='جميع الحقول مطلوبة';
+    errEl.classList.add('show');
+    return;
+  }
+
+  document.getElementById('submitBtn').disabled=true;
+  document.getElementById('submitBtn').textContent='جاري الإرسال...';
+
+  // إرسال عبر EmailJS (formsubmit.co — بدون باك اند)
+  const form=document.createElement('form');
+  form.method='POST';
+  form.action='https://formsubmit.co/bd3trader@gmail.com';
+  form.target='_blank';
+  form.style.display='none';
+
+  const fields={
+    'الاسم':name,
+    'الهاتف':phone,
+    'الإيميل':email,
+    '_subject':'طلب تسجيل جديد — '+name,
+    '_template':'table',
+    '_captcha':'false',
+    '_next':window.location.origin+'/register.html?success=1'
+  };
+  Object.entries(fields).forEach(([k,v])=>{
+    const inp=document.createElement('input');
+    inp.name=k;inp.value=v;
+    form.appendChild(inp);
+  });
+
+  document.body.appendChild(form);
+  form.submit();
+  document.body.removeChild(form);
+
+  // عرض رسالة نجاح
+  setTimeout(()=>{
+    document.getElementById('regForm').style.display='none';
+    document.getElementById('formHeader').style.display='none';
+    document.getElementById('successCard').classList.add('show');
+  },500);
+});
+
+// إذا رجع من formsubmit بنجاح
+if(window.location.search.includes('success=1')){
+  document.getElementById('regForm').style.display='none';
+  document.getElementById('formHeader').style.display='none';
+  document.getElementById('successCard').classList.add('show');
+}
+
+['fullName','phone','email'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',()=>document.getElementById('errMsg').classList.remove('show'));
+});
+</script>
+</body>
+</html>

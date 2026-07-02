@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>دخول المسؤول | منصة تعليم التداول</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --gold: #B8860B; --gold-g: linear-gradient(135deg,#B8860B,#D4A017);
+      --navy: #1e293b; --text: #1a1a2e; --muted: #6b7280;
+      --border: rgba(184,134,11,.2); --red: #dc2626;
+    }
+    body {
+      font-family:'Cairo',sans-serif;
+      background:linear-gradient(135deg,#1e293b 0%,#0f172a 100%);
+      min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
+    }
+    .wrap { width:100%; max-width:420px; }
+
+    .brand { display:flex; align-items:center; justify-content:center; gap:10px; text-decoration:none; margin-bottom:28px; }
+    .brand-icon { width:52px; height:52px; background:var(--gold-g); border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:1.5rem; box-shadow:0 8px 24px rgba(184,134,11,.4); }
+    .brand-name { font-size:1.1rem; font-weight:900; color:#fff; }
+    .brand-sub { font-size:.72rem; color:rgba(255,255,255,.5); }
+
+    .card { background:#fff; border-radius:24px; padding:40px 36px; box-shadow:0 30px 80px rgba(0,0,0,.4); }
+    .admin-badge {
+      display:inline-flex; align-items:center; gap:6px;
+      padding:4px 12px; background:rgba(184,134,11,.1); border:1px solid var(--border);
+      border-radius:999px; font-size:.75rem; font-weight:800; color:var(--gold);
+      margin-bottom:16px;
+    }
+    h1 { font-size:1.55rem; font-weight:900; color:var(--text); margin-bottom:6px; }
+    .subtitle { color:var(--muted); font-size:.88rem; margin-bottom:28px; }
+
+    .field { margin-bottom:18px; }
+    label { display:block; font-weight:700; font-size:.85rem; color:var(--text); margin-bottom:6px; }
+    .inp-wrap { position:relative; }
+    .inp-icon { position:absolute; right:13px; top:50%; transform:translateY(-50%); font-size:1rem; pointer-events:none; }
+    input {
+      width:100%; padding:12px 40px 12px 14px;
+      border:1.5px solid rgba(0,0,0,.1); border-radius:11px;
+      font-family:'Cairo',sans-serif; font-size:.9rem;
+      background:#fafafa; color:var(--text); outline:none;
+      transition:border-color .2s,box-shadow .2s;
+    }
+    input:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(184,134,11,.12); background:#fff; }
+
+    .eye-btn {
+      position:absolute; left:12px; top:50%; transform:translateY(-50%);
+      background:none; border:none; cursor:pointer; font-size:1rem;
+      color:var(--muted); padding:2px;
+    }
+
+    .error { display:none; background:#fef2f2; border:1px solid #fecaca; color:var(--red); padding:10px 14px; border-radius:10px; font-size:.84rem; margin-bottom:16px; }
+    .error.show { display:flex; align-items:center; gap:8px; }
+
+    .btn { width:100%; padding:14px; background:var(--gold-g); color:#fff; font-family:'Cairo',sans-serif; font-weight:800; font-size:1rem; border:none; border-radius:12px; cursor:pointer; transition:all .25s; box-shadow:0 8px 24px rgba(184,134,11,.35); }
+    .btn:hover { transform:translateY(-2px); box-shadow:0 12px 30px rgba(184,134,11,.5); }
+
+    .divider { height:1px; background:rgba(0,0,0,.08); margin:24px 0; }
+    .back-link { text-align:center; font-size:.83rem; color:var(--muted); }
+    .back-link a { color:var(--gold); font-weight:700; text-decoration:none; }
+
+    /* Admin hint box */
+    .hint-box {
+      background:#f8f6f1; border:1px solid rgba(184,134,11,.2);
+      border-radius:12px; padding:14px 16px;
+      font-size:.78rem; color:var(--muted); line-height:1.7;
+      margin-bottom:20px;
+    }
+    .hint-box strong { color:var(--text); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="brand">
+      <div class="brand-icon">🛡️</div>
+      <div>
+        <div class="brand-name">لوحة التحكم</div>
+        <div class="brand-sub">منصة تعليم التداول</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="admin-badge">🔐 وصول المسؤول فقط</div>
+      <h1>تسجيل دخول المسؤول</h1>
+      <p class="subtitle">هذه الصفحة مخصصة لإدارة المنصة فقط</p>
+
+      <div class="error" id="errMsg">⚠️ اسم المستخدم أو كلمة المرور غير صحيحة</div>
+
+      <form id="adminForm" autocomplete="off">
+        <div class="field">
+          <label>اسم المستخدم</label>
+          <div class="inp-wrap">
+            <span class="inp-icon">👤</span>
+            <input type="text" id="username" placeholder="admin" dir="ltr" required />
+          </div>
+        </div>
+        <div class="field">
+          <label>كلمة المرور</label>
+          <div class="inp-wrap">
+            <span class="inp-icon">🔑</span>
+            <input type="password" id="password" placeholder="••••••••" dir="ltr" required />
+            <button type="button" class="eye-btn" id="eyeBtn" onclick="togglePwd()">👁</button>
+          </div>
+        </div>
+        <button type="submit" class="btn">دخول لوحة التحكم →</button>
+      </form>
+
+      <div class="divider"></div>
+      <div class="back-link"><a href="index.html">← الموقع الرئيسي</a></div>
+    </div>
+  </div>
+
+<script>
+const STORE = 'tradingPlatform_v1';
+function getData() { try { const r=localStorage.getItem(STORE); if(r) return JSON.parse(r); } catch(e){} return null; }
+function saveData(d) { localStorage.setItem(STORE,JSON.stringify(d)); }
+function initDB() {
+  const data = {
+    adminCredentials: { username: 'admin', password: 'Admin@2025' },
+    students: [
+      { id:'s1', name:'أحمد المطيري', email:'ahmed@test.com', phone:'96891000001', courses:['basic'], isOnline:false, lastSeen:null, joinDate:'2025-01-15' },
+      { id:'s2', name:'محمد العتيبي', email:'mohammed@test.com', phone:'96891000002', courses:['basic','advanced'], isOnline:false, lastSeen:null, joinDate:'2025-02-20' }
+    ],
+    lectures: {
+      basic: [
+        { id:'b1', order:1, title:'مقدمة في الأسواق المالية', desc:'تعرّف على أساسيات الأسواق المالية وكيفية عملها', duration:'45 دقيقة', filename:'', date:'2025-01-10' },
+        { id:'b2', order:2, title:'الشموع اليابانية وأنماطها', desc:'شرح مفصّل لأنواع الشموع اليابانية وأهم الأنماط', duration:'60 دقيقة', filename:'', date:'2025-01-12' },
+        { id:'b3', order:3, title:'التحليل الفني - المستوى الأول', desc:'أدوات التحليل الفني وكيفية قراءة الرسوم البيانية', duration:'55 دقيقة', filename:'', date:'2025-01-15' },
+        { id:'b4', order:4, title:'إدارة رأس المال والمخاطر', desc:'أسس إدارة المخاطر وكيفية حماية رأس المال بفاعلية', duration:'50 دقيقة', filename:'', date:'2025-01-20' }
+      ],
+      advanced: [
+        { id:'a1', order:1, title:'مفهوم Smart Money Concepts', desc:'مقدمة شاملة في مفاهيم المال الذكي وكيف تفكر المؤسسات', duration:'55 دقيقة', filename:'', date:'2025-02-01' },
+        { id:'a2', order:2, title:'هيكلة السوق والسيولة', desc:'فهم بنية السوق ومناطق السيولة المؤسسية', duration:'70 دقيقة', filename:'', date:'2025-02-05' },
+        { id:'a3', order:3, title:'مناطق العرض والطلب المؤسسية', desc:'تحديد مناطق العرض والطلب بدقة مؤسسية عالية', duration:'65 دقيقة', filename:'', date:'2025-02-10' }
+      ]
+    },
+    sessions: []
+  };
+  saveData(data); return data;
+}
+
+if (!getData()) initDB();
+
+function togglePwd() {
+  const inp = document.getElementById('password');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  document.getElementById('eyeBtn').textContent = inp.type === 'password' ? '👁' : '🙈';
+}
+
+document.getElementById('adminForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  const data = getData() || initDB();
+  const creds = data.adminCredentials;
+  if (username === creds.username && password === creds.password) {
+    sessionStorage.setItem('adminLoggedIn', 'true');
+    window.location.href = 'admin-panel.html';
+  } else {
+    document.getElementById('errMsg').classList.add('show');
+  }
+});
+
+['username','password'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => document.getElementById('errMsg').classList.remove('show'));
+});
+</script>
+</body>
+</html>

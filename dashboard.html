@@ -1,0 +1,1878 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>منصتي | منصة تعليم التداول</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --gold:#B8860B;--gold-g:linear-gradient(135deg,#B8860B,#D4A017);
+      --bg:#f8f6f1;--white:#fff;--text:#1a1a2e;--muted:#6b7280;
+      --border:rgba(184,134,11,.18);--green:#0a9e78;--red:#dc2626;--blue:#3b82f6;
+    }
+    body{font-family:'Cairo',sans-serif;background:#f5f5f0;color:var(--text);min-height:100vh}
+
+    /* ── Navbar ── */
+    nav{background:#1a1a2e;padding:0 28px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+    .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .nav-logo-icon{width:34px;height:34px;background:var(--gold-g);border-radius:9px;display:flex;align-items:center;justify-content:center}
+    .nav-logo-name{font-weight:900;font-size:.9rem;color:#fff}
+    .nav-right{display:flex;align-items:center;gap:10px}
+    /* ── User Menu ── */
+    .user-menu-wrap{position:relative}
+    .user-chip{cursor:pointer;user-select:none;transition:background .2s}
+    .user-chip:hover{background:rgba(255,255,255,.1)!important}
+    .user-dropdown{display:none;position:absolute;top:calc(100% + 10px);left:0;width:300px;background:#fff;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.18);border:1px solid rgba(0,0,0,.07);overflow:hidden;z-index:9999;animation:dropIn .2s ease}
+    .user-dropdown.open{display:block}
+    @keyframes dropIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+    .ud-header{background:linear-gradient(135deg,#1a1a2e,#16213e);padding:20px 18px;display:flex;align-items:center;gap:14px}
+    .ud-avatar{width:46px;height:46px;border-radius:14px;background:var(--gold-g);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:900;flex-shrink:0;box-shadow:0 4px 12px rgba(184,134,11,.4)}
+    .ud-name{font-size:.95rem;font-weight:900;color:#fff}
+    .ud-email{font-size:.72rem;color:rgba(255,255,255,.45);margin-top:2px;direction:ltr;text-align:right}
+    .ud-sep{height:1px;background:rgba(0,0,0,.06);margin:0 12px}
+    .ud-item{display:flex;align-items:center;gap:12px;padding:13px 18px;cursor:pointer;transition:background .15s;color:#1a1a2e;font-size:.86rem;font-weight:700;text-decoration:none;border:none;background:none;width:100%;font-family:'Cairo',sans-serif}
+    .ud-item:hover{background:#f8f7f4}
+    .ud-item-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+    .ud-item.logout .ud-item-icon{background:#fef2f2}
+    .ud-item.logout{color:#dc2626}
+    .ud-item.logout:hover{background:#fef2f2}
+    /* ── Modal base ── */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:10000;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+    .modal-overlay.open{display:flex}
+    .modal-box{background:#fff;border-radius:22px;width:100%;max-width:460px;box-shadow:0 30px 80px rgba(0,0,0,.2);overflow:hidden;animation:modalIn .25s ease}
+    @keyframes modalIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+    .modal-head{background:linear-gradient(135deg,#1a1a2e,#16213e);padding:22px 24px;display:flex;align-items:center;justify-content:space-between}
+    .modal-title{font-size:1rem;font-weight:900;color:#fff}
+    .modal-close{background:rgba(255,255,255,.1);border:none;color:#fff;width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center}
+    .modal-body{padding:24px}
+    .info-row{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid rgba(0,0,0,.06)}
+    .info-row:last-child{border-bottom:none}
+    .info-icon{width:36px;height:36px;border-radius:10px;background:#f5f3ee;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+    .info-label{font-size:.72rem;color:#6b7280;font-weight:700;margin-bottom:2px}
+    .info-val{font-size:.9rem;font-weight:800;color:#1a1a2e}
+    /* Support form */
+    .sf-field{margin-bottom:16px}
+    .sf-label{display:block;font-weight:700;font-size:.82rem;color:#1a1a2e;margin-bottom:5px}
+    .sf-input,.sf-textarea,.sf-select{width:100%;padding:11px 14px;border:1.5px solid rgba(0,0,0,.1);border-radius:10px;font-family:'Cairo',sans-serif;font-size:.88rem;background:#fafafa;color:#1a1a2e;outline:none;transition:border-color .2s}
+    .sf-input:focus,.sf-textarea:focus,.sf-select:focus{border-color:var(--gold);background:#fff}
+    .sf-textarea{resize:vertical;min-height:90px}
+    .sf-btn{width:100%;padding:13px;background:var(--gold-g);color:#fff;font-family:'Cairo',sans-serif;font-weight:800;font-size:.95rem;border:none;border-radius:12px;cursor:pointer;box-shadow:0 6px 20px rgba(184,134,11,.3);transition:all .2s}
+    .sf-btn:hover{transform:translateY(-1px);box-shadow:0 10px 28px rgba(184,134,11,.4)}
+    .sf-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+    /* Theme toggle */
+    .theme-row{display:flex;align-items:center;gap:14px;padding:14px 18px}
+    .theme-opt{flex:1;padding:14px 10px;border-radius:14px;border:2px solid rgba(0,0,0,.08);cursor:pointer;text-align:center;transition:all .2s;background:#fafafa}
+    .theme-opt:hover{border-color:var(--gold);background:#fffbf0}
+    .theme-opt.active{border-color:var(--gold);background:rgba(184,134,11,.08)}
+    .theme-opt-icon{font-size:1.6rem;margin-bottom:6px}
+    .theme-opt-label{font-size:.78rem;font-weight:800;color:#1a1a2e}
+    /* Light theme */
+    body.light-theme{background:#f5f5f0}
+    body.dark-theme{background:#0d1117;color:#e6edf3}
+    body.dark-theme main section,body.dark-theme .school-card,body.dark-theme .cp-wrap{background:#161b22;border-color:#30363d;color:#e6edf3}
+    body.dark-theme .welcome{background:linear-gradient(135deg,#0d1117,#161b22,#1c2128)!important}
+    body.dark-theme nav{background:#0d1117}
+    .user-chip{display:flex;align-items:center;gap:8px;padding:5px 12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:999px;font-size:.82rem;font-weight:700;color:rgba(255,255,255,.85)}
+    .user-avatar{width:26px;height:26px;border-radius:50%;background:var(--gold-g);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:900}
+    .btn-logout{padding:6px 14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:rgba(255,255,255,.6);font-family:'Cairo',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s}
+    .btn-logout:hover{background:rgba(220,38,38,.15);color:#f87171;border-color:rgba(220,38,38,.3)}
+    @media(max-width:600px){nav{padding:0 16px}}
+
+    /* ── Main ── */
+    main{max-width:960px;margin:0 auto;padding:32px 20px 80px}
+
+    /* ── Welcome Banner ── */
+    .welcome{background:linear-gradient(135deg,#1a1a2e 0%,#16213e 60%,#0f3460 100%);border-radius:20px;padding:28px 32px;margin-bottom:28px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(26,26,46,.25)}
+    .welcome::before{content:'';position:absolute;top:-40px;left:-40px;width:200px;height:200px;background:radial-gradient(circle,rgba(184,134,11,.15) 0%,transparent 70%);pointer-events:none}
+    .welcome::after{content:'';position:absolute;bottom:-30px;right:80px;width:150px;height:150px;background:radial-gradient(circle,rgba(37,99,235,.12) 0%,transparent 70%);pointer-events:none}
+    .welcome-text{position:relative;z-index:1}
+    .welcome-text h1{font-size:1.5rem;font-weight:900;margin-bottom:10px;color:#fff}
+    .welcome-text p{color:var(--muted);font-size:.82rem}
+    .welcome-schools{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+    .school-badge{display:inline-flex;align-items:center;gap:7px;padding:7px 16px;background:rgba(255,255,255,.07);border:1px solid rgba(184,134,11,.3);border-radius:50px;font-size:.8rem;font-weight:800;color:#E8C547;backdrop-filter:blur(4px)}
+    .school-badge::before{content:'🏫';font-size:.85rem}
+    .welcome-stats{display:flex;gap:20px}
+    .ws-item{text-align:center;padding:8px 16px;background:#f8f6f1;border-radius:10px}
+    .ws-num{font-size:1.3rem;font-weight:900;color:var(--gold)}
+    .ws-lbl{font-size:.68rem;color:var(--muted);font-weight:700}
+
+    /* ── Sec Title ── */
+    .sec-title{font-size:1rem;font-weight:900;margin-bottom:16px;display:flex;align-items:center;gap:8px;color:var(--text)}
+    .sec-title-bar{width:3px;height:18px;background:var(--gold-g);border-radius:2px}
+
+    /* ── School Cards ── */
+    .schools-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:28px}
+    .school-card{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;overflow:hidden;transition:all .3s;position:relative}
+    .school-card.locked{opacity:.5;cursor:not-allowed}
+    .school-card:not(.locked):hover{transform:translateY(-4px);box-shadow:0 12px 36px rgba(0,0,0,.08)}
+    .school-card.open{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold)}
+    .sc-banner{height:56px;display:flex;align-items:center;justify-content:center;position:relative}
+    .sc-banner.classic{background:linear-gradient(135deg,#1e3a5f,#2563eb)}
+    .sc-banner.advanced{background:linear-gradient(135deg,#78350f,#b45309)}
+    .sc-badge{position:absolute;top:50%;right:16px;transform:translateY(-50%);padding:3px 10px;border-radius:999px;font-size:.68rem;font-weight:800}
+    .badge-enrolled{background:rgba(255,255,255,.2);color:#fff}
+    .badge-locked{background:rgba(255,255,255,.15);color:rgba(255,255,255,.7)}
+    .sc-body{padding:18px}
+    .sc-name{font-size:1.05rem;font-weight:900;margin-bottom:4px}
+    .sc-desc{color:var(--muted);font-size:.78rem;margin-bottom:12px;line-height:1.6}
+    .sc-meta{display:flex;gap:12px;font-size:.74rem;color:var(--muted);margin-bottom:12px;font-weight:700}
+    .sc-btn{display:flex;align-items:center;justify-content:center;width:100%;padding:11px;background:var(--gold-g);color:#fff;font-family:'Cairo',sans-serif;font-weight:800;font-size:.85rem;border:none;border-radius:10px;cursor:pointer;transition:all .25s}
+    .sc-btn:hover{box-shadow:0 6px 20px rgba(184,134,11,.35);transform:translateY(-1px)}
+    .sc-btn-locked{width:100%;padding:11px;background:rgba(0,0,0,.03);border:1px solid rgba(0,0,0,.06);border-radius:10px;font-family:'Cairo',sans-serif;font-size:.82rem;font-weight:700;color:var(--muted);cursor:not-allowed}
+
+    /* ── Quiz Button ── */
+    .sc-quiz-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:9px;background:#1a1a2e;color:#fff;font-family:'Cairo',sans-serif;font-weight:800;font-size:.8rem;border:none;border-radius:10px;cursor:pointer;transition:all .25s;margin-top:6px}
+    .sc-quiz-btn:hover{background:#2d2d44}
+    .sc-quiz-btn .quiz-ai-badge{background:var(--gold-g);color:#fff;font-size:.62rem;padding:2px 6px;border-radius:999px;font-weight:900}
+
+    /* ── Section Buttons ── */
+    .sc-sections{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px;padding-top:8px;border-top:1px solid rgba(0,0,0,.05)}
+    .sc-sec-btn{display:flex;align-items:center;justify-content:center;padding:9px 6px;background:#f8f6f1;border:1px solid rgba(0,0,0,.06);border-radius:9px;font-family:'Cairo',sans-serif;font-size:.76rem;font-weight:800;color:var(--text);cursor:pointer;transition:all .2s;text-align:center;line-height:1.3}
+    .sc-sec-btn:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-1px)}
+    .sc-sec-btn.active-sec{border-color:var(--gold);background:rgba(184,134,11,.06);color:var(--gold)}
+
+    /* ── Content Panel ── */
+    .content-panel{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;overflow:hidden;margin-bottom:28px;display:none;animation:slideDown .3s ease}
+    .content-panel.show{display:block}
+    @keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+
+    .cp-header{background:#1a1a2e;padding:16px 22px;display:flex;align-items:center;justify-content:space-between}
+    .cp-title{font-weight:900;font-size:.95rem;display:flex;align-items:center;gap:8px;color:#fff}
+    .cp-close{width:30px;height:30px;background:rgba(255,255,255,.1);border:none;border-radius:7px;cursor:pointer;font-size:.85rem;color:rgba(255,255,255,.6);display:flex;align-items:center;justify-content:center;transition:background .2s}
+    .cp-close:hover{background:rgba(220,38,38,.3);color:#fff}
+
+    /* ── Tabs ── */
+    .tabs-bar{display:flex;gap:0;background:#f8f6f1;border-bottom:1px solid rgba(0,0,0,.06)}
+    .tab-btn{padding:12px 22px;font-family:'Cairo',sans-serif;font-weight:700;font-size:.84rem;border:none;background:none;cursor:pointer;color:var(--muted);position:relative;transition:color .2s}
+    .tab-btn.active{color:var(--gold);font-weight:800}
+    .tab-btn.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2.5px;background:var(--gold-g);border-radius:2px 2px 0 0}
+    .tab-content{display:none;padding:20px}
+    .tab-content.active{display:block;animation:fadeIn .25s ease}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+    /* ── Lectures List ── */
+    .lectures-list{list-style:none;display:flex;flex-direction:column;gap:8px}
+    .lec-item{display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid rgba(0,0,0,.05);border-radius:12px;background:#fafaf8;transition:all .2s}
+    .lec-item:hover{border-color:rgba(184,134,11,.18);background:#fffef9;box-shadow:0 4px 14px rgba(0,0,0,.04)}
+    .lec-num{min-width:36px;height:36px;border-radius:10px;background:#1a1a2e;color:var(--gold);font-weight:900;font-size:.82rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .lec-info{flex:1}
+    .lec-title{font-weight:800;font-size:.88rem;margin-bottom:2px;color:var(--text)}
+    .lec-desc{color:var(--muted);font-size:.75rem;line-height:1.5}
+    .lec-meta{display:flex;align-items:center;gap:8px;margin-top:3px;font-size:.72rem;color:var(--muted)}
+    .lec-btn,.book-btn{padding:8px 16px;border-radius:8px;font-family:'Cairo',sans-serif;font-weight:700;font-size:.78rem;border:none;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+    .has-file{background:#1a1a2e;color:var(--gold)}
+    .has-file:hover{background:#2d2d44;transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.12)}
+    .no-file{background:rgba(0,0,0,.04);color:var(--muted);border:1px solid rgba(0,0,0,.06);cursor:default}
+
+    /* ── Books List ── */
+    .books-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+    .book-card{background:#fafaf8;border:1px solid rgba(0,0,0,.05);border-radius:12px;padding:16px;transition:all .2s}
+    .book-card:hover{border-color:rgba(184,134,11,.2);box-shadow:0 4px 16px rgba(0,0,0,.05)}
+    .book-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+    .book-icon{font-size:1.4rem}
+    .book-type-badge{padding:2px 8px;border-radius:6px;font-size:.65rem;font-weight:800}
+    .type-book{background:rgba(26,26,46,.08);color:#1a1a2e}
+    .type-summary{background:rgba(184,134,11,.08);color:var(--gold)}
+    .book-title{font-weight:800;font-size:.85rem;margin-bottom:3px}
+    .book-desc{color:var(--muted);font-size:.74rem;line-height:1.5;margin-bottom:10px}
+
+    /* ── Empty ── */
+    .empty{text-align:center;padding:40px 24px;color:var(--muted)}
+    .empty-icon{font-size:2rem;margin-bottom:10px;opacity:.5}
+    .empty-text{font-size:.85rem}
+
+    /* ── Section Panel Badge ── */
+    .sec-panel-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:.7rem;font-weight:800;background:rgba(255,255,255,.15);color:rgba(255,255,255,.8);margin-right:8px}
+
+    /* ── Economic Calendar ── */
+    .econ-section{margin-bottom:28px}
+    .econ-card{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;overflow:hidden}
+    .econ-header{padding:16px 22px;border-bottom:1px solid rgba(0,0,0,.06);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+    .econ-title{display:flex;align-items:center;gap:10px;font-weight:900;font-size:.95rem}
+    .econ-title-icon{width:34px;height:34px;background:#1a1a2e;border-radius:9px;display:flex;align-items:center;justify-content:center}
+    .econ-badge{padding:3px 10px;background:rgba(26,26,46,.06);color:#1a1a2e;border:1px solid rgba(0,0,0,.08);border-radius:999px;font-size:.7rem;font-weight:800}
+    .econ-update{font-size:.75rem;color:var(--muted);display:flex;align-items:center;gap:5px}
+    .econ-live-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;display:inline-block;animation:blink 1.5s ease-in-out infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+    .econ-table{width:100%;border-collapse:collapse}
+    .econ-table thead{background:#f8f6f1}
+    .econ-table th{padding:12px 16px;font-size:.78rem;font-weight:800;color:var(--muted);text-align:right;border-bottom:1px solid var(--border)}
+    .econ-table td{padding:13px 16px;font-size:.85rem;font-weight:600;border-bottom:1px solid rgba(0,0,0,.05);vertical-align:middle}
+    .econ-table tr:last-child td{border-bottom:none}
+    .econ-table tr:hover{background:rgba(184,134,11,.03)}
+    .econ-time{font-weight:900;color:var(--text);font-size:.82rem;direction:ltr;text-align:center;white-space:nowrap}
+    .econ-event{font-weight:800;color:var(--text);line-height:1.5}
+    .econ-stars{color:#f59e0b;letter-spacing:2px;font-size:.85rem}
+    .econ-val{font-weight:900;font-size:.82rem;text-align:center}
+    .econ-val.positive{color:#16a34a}
+    .econ-val.negative{color:#dc2626}
+    .econ-val.neutral{color:var(--muted)}
+    .econ-flag{font-size:1.1rem}
+    .econ-loading{text-align:center;padding:40px;color:var(--muted);font-size:.88rem}
+    .econ-empty{text-align:center;padding:48px 24px;color:var(--muted)}
+    .econ-empty-icon{font-size:2.2rem;margin-bottom:10px}
+    .econ-empty-text{font-size:.9rem;font-weight:700}
+    .econ-date-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;background:rgba(184,134,11,.08);border-radius:8px;font-size:.78rem;font-weight:800;color:var(--gold);margin-right:10px}
+
+    /* ── Daily Tip ── */
+    /* ── Schedule Cards ── */
+    .sched-card{background:#fff;border-radius:16px;padding:18px 20px;border:1px solid rgba(0,0,0,.07);display:flex;gap:16px;align-items:flex-start;transition:box-shadow .2s;position:relative;overflow:hidden}
+    .sched-card:hover{box-shadow:0 6px 24px rgba(0,0,0,.09)}
+    .sched-card.today{border-color:rgba(184,134,11,.35);background:linear-gradient(135deg,#fffbf0,#fff)}
+    .sched-card.today::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--gold-g)}
+    .sched-card.past{opacity:.55}
+    .sched-date-box{min-width:54px;height:60px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;gap:1px}
+    .sched-date-box.online{background:#dbeafe}
+    .sched-date-box.offline{background:#dcfce7}
+    .sched-date-box.replay{background:#fef9c3}
+    .sched-day{font-size:1.4rem;font-weight:900;line-height:1}
+    .sched-day.online{color:#1d4ed8}
+    .sched-day.offline{color:#15803d}
+    .sched-day.replay{color:#a16207}
+    .sched-month{font-size:.65rem;font-weight:800;opacity:.7}
+    .sched-info{flex:1;min-width:0}
+    .sched-title{font-size:.92rem;font-weight:900;color:#1a1a2e;margin-bottom:5px}
+    .sched-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+    .sched-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:800}
+    .sched-badge.online{background:#dbeafe;color:#1d4ed8}
+    .sched-badge.offline{background:#dcfce7;color:#15803d}
+    .sched-badge.replay{background:#fef9c3;color:#a16207}
+    .sched-time{font-size:.78rem;color:#6b7280;font-weight:700;direction:ltr;display:inline-block}
+    .sched-school{font-size:.72rem;color:#6b7280;font-weight:700}
+    .sched-link{display:inline-flex;align-items:center;gap:5px;margin-top:8px;padding:5px 12px;background:#f0f4ff;color:#2563eb;border-radius:8px;font-size:.78rem;font-weight:800;text-decoration:none;border:1px solid rgba(37,99,235,.15);transition:background .2s}
+    .sched-link:hover{background:#dbeafe}
+    .sched-today-badge{position:absolute;top:10px;left:12px;background:var(--gold-g);color:#fff;font-size:.65rem;font-weight:900;padding:2px 8px;border-radius:20px}
+    .tip-section{margin-bottom:28px}
+    .tip-card{background:#1a1a2e;border-radius:16px;padding:28px 32px;text-align:center;cursor:pointer;transition:all .3s;position:relative;overflow:hidden}
+    .tip-card:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.15)}
+    .tip-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--gold-g)}
+    .tip-label{font-size:.75rem;font-weight:800;color:rgba(255,255,255,.4);margin-bottom:12px;letter-spacing:1px}
+    .tip-text{font-size:1.2rem;font-weight:900;color:#fff;line-height:1.8;margin-bottom:14px;min-height:40px;transition:opacity .3s}
+    .tip-hint{font-size:.7rem;color:rgba(255,255,255,.3);font-weight:600}
+    .tip-bar{display:flex;justify-content:center;gap:4px;margin-top:12px}
+    .tip-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.15)}
+    .tip-dot.active{background:var(--gold)}
+
+    /* ── WhatsApp Section ── */
+    .wa-section{margin-bottom:28px}
+    .wa-card{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;overflow:hidden;transition:all .3s}
+    .wa-card:hover{box-shadow:0 8px 28px rgba(0,0,0,.06)}
+    .wa-card-top{display:flex;align-items:center;gap:18px;padding:24px 28px}
+    .wa-icon-box{width:58px;height:58px;border-radius:16px;background:linear-gradient(135deg,#25D366,#128C7E);display:flex;align-items:center;justify-content:center;font-size:1.7rem;flex-shrink:0;box-shadow:0 6px 20px rgba(37,211,102,.35)}
+    .wa-text h3{font-size:1.05rem;font-weight:900;color:var(--text);margin-bottom:4px}
+    .wa-text p{font-size:.83rem;color:var(--muted);line-height:1.6}
+    .wa-open-btn{margin-right:auto;padding:11px 24px;background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;border:none;border-radius:12px;font-family:'Cairo',sans-serif;font-weight:900;font-size:.9rem;cursor:pointer;transition:all .25s;box-shadow:0 4px 16px rgba(37,211,102,.3);white-space:nowrap;flex-shrink:0}
+    .wa-open-btn:hover{box-shadow:0 8px 24px rgba(37,211,102,.5);transform:translateY(-1px)}
+
+    .wa-form{display:none;padding:0 28px 24px;border-top:1px solid rgba(37,211,102,.12);margin-top:0}
+    .wa-form.show{display:block;animation:fadeIn .25s ease}
+    .wa-form label{display:block;font-weight:800;font-size:.84rem;color:var(--text);margin-bottom:8px;margin-top:16px}
+    .wa-textarea{width:100%;padding:13px 16px;border:1.5px solid rgba(0,0,0,.1);border-radius:12px;font-family:'Cairo',sans-serif;font-size:.88rem;color:var(--text);resize:none;outline:none;transition:border-color .2s;line-height:1.6;background:#fafaf8}
+    .wa-textarea:focus{border-color:#25D366;box-shadow:0 0 0 3px rgba(37,211,102,.1);background:#fff}
+    .wa-send-btn{margin-top:14px;width:100%;padding:13px;background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;border:none;border-radius:12px;font-family:'Cairo',sans-serif;font-weight:900;font-size:.95rem;cursor:pointer;transition:all .25s;box-shadow:0 4px 16px rgba(37,211,102,.3);display:flex;align-items:center;justify-content:center;gap:8px}
+    .wa-send-btn:hover{box-shadow:0 8px 24px rgba(37,211,102,.45);transform:translateY(-1px)}
+
+    /* ── AI Chat ── */
+    .ai-fab{position:fixed;bottom:28px;left:28px;z-index:999;display:flex;align-items:center;gap:10px;cursor:pointer}
+    .ai-fab-btn{width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#10a37f,#1a7f64);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.5rem;box-shadow:0 6px 24px rgba(16,163,127,.4);transition:all .25s;animation:fabPulse 2.5s ease-in-out infinite}
+    .ai-fab-btn:hover{transform:scale(1.1);box-shadow:0 10px 32px rgba(16,163,127,.55)}
+    @keyframes fabPulse{0%,100%{box-shadow:0 6px 24px rgba(16,163,127,.4)}50%{box-shadow:0 6px 32px rgba(16,163,127,.65),0 0 0 8px rgba(16,163,127,.1)}}
+    .ai-fab-label{background:#1a1a2e;color:#fff;padding:7px 14px;border-radius:10px;font-size:.8rem;font-weight:800;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.25);animation:fabPulse 2.5s ease-in-out infinite}
+
+    .ai-chat-panel{position:fixed;bottom:0;left:0;width:100%;max-width:420px;height:600px;background:#fff;border-radius:20px 20px 0 0;box-shadow:0 -8px 48px rgba(0,0,0,.18);z-index:1000;display:none;flex-direction:column;overflow:hidden;animation:slideUp .3s ease}
+    .ai-chat-panel.open{display:flex}
+    @keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
+    .ai-chat-header{background:linear-gradient(135deg,#10a37f,#1a7f64);padding:16px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+    .ai-chat-avatar{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,#1e293b,#0f172a);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 14px rgba(0,0,0,.3);border:2px solid rgba(255,255,255,.15);overflow:hidden}
+    .ai-chat-info{flex:1}
+    .ai-chat-name{color:#fff;font-weight:900;font-size:.95rem}
+    .ai-chat-status{color:rgba(255,255,255,.75);font-size:.72rem;display:flex;align-items:center;gap:5px}
+    .ai-status-dot{width:7px;height:7px;border-radius:50%;background:#4ade80;display:inline-block}
+    .ai-chat-close{width:32px;height:32px;background:rgba(255,255,255,.15);border:none;border-radius:8px;cursor:pointer;color:#fff;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:background .2s}
+    .ai-chat-close:hover{background:rgba(255,255,255,.25)}
+
+    .ai-chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:#f8fffe}
+    .ai-msg{display:flex;gap:8px;align-items:flex-end;max-width:88%}
+    .ai-msg.bot{align-self:flex-start}
+    .ai-msg.user{align-self:flex-end;flex-direction:row-reverse}
+    .ai-msg-avatar{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.8rem}
+    .ai-msg.bot .ai-msg-avatar{background:linear-gradient(135deg,#10a37f,#1a7f64);color:#fff}
+    .ai-msg.user .ai-msg-avatar{background:var(--gold-g);color:#fff}
+    .ai-msg-bubble{padding:10px 14px;border-radius:14px;font-size:.84rem;line-height:1.65;font-weight:500}
+    .ai-msg.bot .ai-msg-bubble{background:#fff;border:1px solid rgba(16,163,127,.15);color:var(--text);border-radius:14px 14px 14px 4px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+    .ai-msg.user .ai-msg-bubble{background:linear-gradient(135deg,#10a37f,#1a7f64);color:#fff;border-radius:14px 14px 4px 14px}
+    .ai-typing{display:flex;gap:4px;padding:10px 14px;background:#fff;border:1px solid rgba(16,163,127,.15);border-radius:14px 14px 14px 4px;box-shadow:0 2px 8px rgba(0,0,0,.06);width:fit-content}
+    .ai-typing span{width:7px;height:7px;border-radius:50%;background:#10a37f;animation:typing .9s ease-in-out infinite}
+    .ai-typing span:nth-child(2){animation-delay:.15s}
+    .ai-typing span:nth-child(3){animation-delay:.3s}
+    @keyframes typing{0%,80%,100%{transform:scale(0.6);opacity:.4}40%{transform:scale(1);opacity:1}}
+
+    .ai-chat-input-area{padding:10px 12px;border-top:1px solid rgba(0,0,0,.07);background:#fff;display:flex;flex-direction:column;gap:8px;flex-shrink:0}
+    .ai-input-row{display:flex;gap:8px;align-items:flex-end}
+    .ai-chat-input{flex:1;padding:10px 14px;border:1.5px solid rgba(0,0,0,.1);border-radius:12px;font-family:'Cairo',sans-serif;font-size:.85rem;color:var(--text);outline:none;resize:none;max-height:100px;line-height:1.5;transition:border-color .2s}
+    .ai-chat-input:focus{border-color:#10a37f;box-shadow:0 0 0 3px rgba(16,163,127,.1)}
+    .ai-img-btn{width:38px;height:38px;border-radius:10px;background:#f0fdf4;border:1.5px solid rgba(16,163,127,.25);color:#10a37f;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;transition:all .2s}
+    .ai-img-btn:hover{background:#dcfce7;border-color:#10a37f}
+    .ai-img-preview{display:none;align-items:center;gap:8px;background:#f0fdf4;border:1px solid rgba(16,163,127,.2);border-radius:10px;padding:7px 10px;font-size:.78rem;color:#0a7955;font-weight:700}
+    .ai-img-preview.show{display:flex}
+    .ai-img-preview img{width:36px;height:36px;object-fit:cover;border-radius:6px;border:1px solid rgba(16,163,127,.3)}
+    .ai-img-remove{background:none;border:none;cursor:pointer;color:#dc2626;font-size:.9rem;margin-right:auto;padding:2px 6px;border-radius:6px}
+    .ai-img-remove:hover{background:#fef2f2}
+    .ai-send-btn{width:40px;height:40px;background:linear-gradient(135deg,#10a37f,#1a7f64);border:none;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1rem;flex-shrink:0;transition:all .2s;box-shadow:0 3px 10px rgba(16,163,127,.3)}
+    .ai-send-btn:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(16,163,127,.45)}
+    .ai-send-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+    .ai-quick-btns{padding:8px 14px 0;display:flex;gap:6px;flex-wrap:wrap}
+    .ai-quick-btn{padding:5px 11px;background:#f0fdf9;border:1px solid rgba(16,163,127,.25);border-radius:8px;font-family:'Cairo',sans-serif;font-size:.72rem;font-weight:700;color:#10a37f;cursor:pointer;transition:all .2s;white-space:nowrap}
+    .ai-quick-btn:hover{background:#dcfdf4;border-color:#10a37f}
+
+    /* ── Strategy Groups ── */
+    .groups-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;padding:24px}
+    .group-card{background:#fafaf8;border:1px solid rgba(0,0,0,.08);border-radius:16px;overflow:hidden;transition:all .25s}
+    .group-card:hover{box-shadow:0 8px 28px rgba(0,0,0,.08);transform:translateY(-3px);border-color:rgba(184,134,11,.25)}
+    .group-header{background:linear-gradient(135deg,#1e293b,#334155);padding:16px 18px;display:flex;align-items:center;gap:10px}
+    .group-icon{width:38px;height:38px;background:var(--gold-g);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+    .group-name{color:#fff;font-weight:900;font-size:.92rem;line-height:1.3}
+    .group-files{padding:14px}
+    .group-file-row{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;margin-bottom:6px;background:#fff;border:1px solid rgba(0,0,0,.06)}
+    .group-file-row:last-child{margin-bottom:0}
+    .gf-icon{font-size:1rem;flex-shrink:0}
+    .gf-name{flex:1;font-size:.8rem;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .gf-btn{padding:5px 13px;border-radius:7px;font-family:'Cairo',sans-serif;font-weight:700;font-size:.75rem;border:none;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;white-space:nowrap}
+    .gf-btn.has{background:var(--gold-g);color:#fff;box-shadow:0 2px 8px rgba(184,134,11,.2)}
+    .gf-btn.has:hover{box-shadow:0 4px 14px rgba(184,134,11,.4);transform:translateY(-1px)}
+
+    /* ── TradingView Section ── */
+    .tv-section{margin-bottom:28px}
+    .tv-teaser{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;overflow:hidden;cursor:pointer;transition:all .3s;position:relative}
+    .tv-teaser:hover{box-shadow:0 8px 28px rgba(0,0,0,.08);transform:translateY(-2px)}
+    .tv-teaser-inner{display:flex;align-items:center;gap:20px;padding:22px 28px}
+    .tv-logo-box{width:56px;height:56px;background:linear-gradient(135deg,#1e293b,#0f172a);border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.6rem}
+    .tv-teaser-text h3{font-size:1.1rem;font-weight:900;margin-bottom:4px;color:var(--text)}
+    .tv-teaser-text p{font-size:.84rem;color:var(--muted)}
+    .tv-open-badge{margin-right:auto;padding:8px 20px;background:var(--gold-g);color:#fff;border-radius:10px;font-weight:800;font-size:.85rem;white-space:nowrap;flex-shrink:0;box-shadow:0 4px 14px rgba(184,134,11,.3)}
+    .tv-bar{height:4px;background:linear-gradient(90deg,#B8860B,#D4A017,#f59e0b,#B8860B);background-size:200%;animation:tvBar 2s linear infinite}
+    @keyframes tvBar{0%{background-position:0%}100%{background-position:200%}}
+
+    .tv-panel{display:none;background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;overflow:hidden;margin-top:12px;animation:slideDown .3s ease}
+    .tv-panel.show{display:block}
+    .tv-panel-header{background:linear-gradient(135deg,#1e293b,#0f172a);padding:16px 22px;display:flex;align-items:center;justify-content:space-between}
+    .tv-panel-title{color:#fff;font-weight:900;font-size:.95rem;display:flex;align-items:center;gap:10px}
+    .tv-panel-controls{display:flex;gap:6px;align-items:center}
+    .tv-tf-btn{padding:5px 12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:7px;font-family:'Cairo',sans-serif;font-size:.75rem;font-weight:700;color:rgba(255,255,255,.7);cursor:pointer;transition:all .2s}
+    .tv-tf-btn:hover,.tv-tf-btn.active{background:var(--gold-g);color:#fff;border-color:transparent}
+    .tv-close-btn{width:30px;height:30px;background:rgba(255,255,255,.1);border:none;border-radius:7px;cursor:pointer;color:rgba(255,255,255,.6);font-size:.9rem;display:flex;align-items:center;justify-content:center;transition:background .2s;margin-right:8px}
+    .tv-close-btn:hover{background:rgba(220,38,38,.3);color:#fff}
+    #tvChartContainer{width:100%;height:520px}
+    .tv-symbol-row{padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;background:#fafaf8}
+    .tv-sym-btn{padding:6px 14px;background:#fff;border:1.5px solid var(--border);border-radius:8px;font-family:'Cairo',sans-serif;font-size:.78rem;font-weight:800;color:var(--text);cursor:pointer;transition:all .2s}
+    .tv-sym-btn:hover,.tv-sym-btn.active{background:var(--gold-g);color:#fff;border-color:transparent}
+
+    @media(max-width:600px){main{padding:20px 16px 60px}.welcome{padding:20px 18px}.schools-row{grid-template-columns:1fr}.tv-teaser-inner{flex-wrap:wrap}.tv-open-badge{margin-right:0}}
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-icon" style="font-weight:900;font-size:.75rem;color:#fff">T</div>
+    <div class="nav-logo-name">منصة تعليم التداول</div>
+  </a>
+  <div class="nav-right">
+    <div class="user-menu-wrap">
+      <div class="user-chip" onclick="toggleUserMenu()" style="display:flex;align-items:center;gap:8px;padding:5px 14px 5px 10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:50px;cursor:pointer">
+        <div class="user-avatar" id="avatarLetter" style="width:30px;height:30px;border-radius:50%;background:var(--gold-g);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:900;flex-shrink:0">؟</div>
+        <span id="userName" style="font-size:.82rem;font-weight:800;color:#fff">...</span>
+        <span style="color:rgba(255,255,255,.4);font-size:.6rem" id="menuArrow">▼</span>
+      </div>
+      <div class="user-dropdown" id="userDropdown">
+        <div class="ud-header">
+          <div class="ud-avatar" id="udAvatar">؟</div>
+          <div>
+            <div class="ud-name" id="udName">—</div>
+            <div class="ud-email" id="udEmail">—</div>
+          </div>
+        </div>
+        <div style="padding:6px 0">
+          <button class="ud-item" onclick="openModal('infoModal');closeUserMenu()">
+            <div class="ud-item-icon" style="background:#f0f4ff">👤</div>
+            <span>المعلومات الشخصية</span>
+          </button>
+          <button class="ud-item" onclick="openModal('themeModal');closeUserMenu()">
+            <div class="ud-item-icon" style="background:#fdf4ff">🎨</div>
+            <span>تغيير المظهر</span>
+          </button>
+          <button class="ud-item" onclick="openModal('supportModal');closeUserMenu()">
+            <div class="ud-item-icon" style="background:#f0fdf4">🎧</div>
+            <span>طلب دعم فني</span>
+          </button>
+          <div class="ud-sep"></div>
+          <button class="ud-item logout" onclick="logout()">
+            <div class="ud-item-icon">🚪</div>
+            <span>تسجيل الخروج</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Modal: المعلومات الشخصية -->
+<div class="modal-overlay" id="infoModal" onclick="if(event.target===this)closeModal('infoModal')">
+  <div class="modal-box">
+    <div class="modal-head">
+      <span class="modal-title">👤 المعلومات الشخصية</span>
+      <button class="modal-close" onclick="closeModal('infoModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="info-row"><div class="info-icon">🏷️</div><div><div class="info-label">الاسم الكامل</div><div class="info-val" id="info-name">—</div></div></div>
+      <div class="info-row"><div class="info-icon">📧</div><div><div class="info-label">البريد الإلكتروني</div><div class="info-val" id="info-email" style="direction:ltr;text-align:right">—</div></div></div>
+      <div class="info-row"><div class="info-icon">📱</div><div><div class="info-label">رقم الهاتف</div><div class="info-val" id="info-phone" style="direction:ltr;text-align:right">—</div></div></div>
+      <div class="info-row"><div class="info-icon">🌍</div><div><div class="info-label">البلد</div><div class="info-val" id="info-country">—</div></div></div>
+      <div class="info-row"><div class="info-icon">🎓</div><div><div class="info-label">المدارس المشترك بها</div><div class="info-val" id="info-schools">—</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: تغيير المظهر -->
+<div class="modal-overlay" id="themeModal" onclick="if(event.target===this)closeModal('themeModal')">
+  <div class="modal-box">
+    <div class="modal-head">
+      <span class="modal-title">🎨 تغيير المظهر</span>
+      <button class="modal-close" onclick="closeModal('themeModal')">✕</button>
+    </div>
+    <div class="modal-body" style="padding:16px">
+      <div style="font-size:.82rem;color:#6b7280;font-weight:700;text-align:center;margin-bottom:14px">اختر المظهر المفضل لك</div>
+      <div class="theme-row">
+        <div class="theme-opt active" id="themeLight" onclick="setTheme('light')">
+          <div class="theme-opt-icon">☀️</div>
+          <div class="theme-opt-label">المظهر الفاتح</div>
+        </div>
+        <div class="theme-opt" id="themeDark" onclick="setTheme('dark')">
+          <div class="theme-opt-icon">🌙</div>
+          <div class="theme-opt-label">المظهر الداكن</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: الدعم الفني -->
+<div class="modal-overlay" id="supportModal" onclick="if(event.target===this)closeModal('supportModal')">
+  <div class="modal-box">
+    <div class="modal-head">
+      <span class="modal-title">🎧 طلب دعم فني</span>
+      <button class="modal-close" onclick="closeModal('supportModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="supportForm">
+        <div class="sf-field">
+          <label class="sf-label">نوع الطلب</label>
+          <select class="sf-select" id="sf-type">
+            <option value="">اختر نوع الطلب...</option>
+            <option>مشكلة تقنية في الموقع</option>
+            <option>استفسار عن المحتوى</option>
+            <option>طلب تفعيل الحساب</option>
+            <option>مشكلة في التشغيل</option>
+            <option>اقتراح أو ملاحظة</option>
+            <option>أخرى</option>
+          </select>
+        </div>
+        <div class="sf-field">
+          <label class="sf-label">شرح المشكلة أو الطلب</label>
+          <textarea class="sf-textarea" id="sf-desc" placeholder="اشرح مشكلتك أو طلبك بالتفصيل..."></textarea>
+        </div>
+        <div class="sf-field">
+          <label class="sf-label">رقم التواصل (واتساب)</label>
+          <input class="sf-input" id="sf-phone" type="tel" placeholder="+968 XXXXXXXX" dir="ltr"/>
+        </div>
+        <div id="sf-err" style="display:none;background:#fef2f2;border:1px solid #fecaca;color:#dc2626;padding:9px 12px;border-radius:9px;font-size:.82rem;font-weight:700;margin-bottom:12px;text-align:center"></div>
+        <button class="sf-btn" id="sf-submit" onclick="sendSupportRequest()">إرسال الطلب</button>
+      </div>
+      <div id="supportSuccess" style="display:none;text-align:center;padding:10px 0">
+        <div style="font-size:2.5rem;margin-bottom:12px">✅</div>
+        <div style="font-size:1rem;font-weight:900;color:#0a9e78;margin-bottom:6px">تم إرسال طلبك بنجاح</div>
+        <div style="font-size:.83rem;color:#6b7280;line-height:1.7">سنتواصل معك في أقرب وقت ممكن<br>شكراً لتواصلك معنا</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main -->
+<main>
+  <!-- Welcome -->
+  <div class="welcome">
+    <div class="welcome-text">
+      <h1 id="welcomeMsg">مرحباً</h1>
+      <div class="welcome-schools" id="welcomeSchools"></div>
+    </div>
+    <div id="welcomeLevel" style="position:relative;z-index:1;text-align:center;padding:16px 24px;background:rgba(255,255,255,.06);border:1px solid rgba(184,134,11,.25);border-radius:16px;backdrop-filter:blur(8px);min-width:110px">
+      <div style="font-size:.65rem;color:rgba(255,255,255,.45);font-weight:700;letter-spacing:.05em;margin-bottom:4px">المستوى</div>
+      <div id="levelText" style="font-size:1.25rem;font-weight:900;color:#E8C547;line-height:1">مبتدئ</div>
+      <div id="levelStars" style="margin-top:6px;font-size:.75rem;color:rgba(232,197,71,.6)">⭐</div>
+    </div>
+  </div>
+
+  <!-- Schools -->
+  <div class="sec-title"><div class="sec-title-bar"></div> مدارسك التعليمية</div>
+  <div class="schools-row" id="schoolsRow"></div>
+
+  <!-- TradingView Section -->
+  <div class="tv-section">
+    <div class="sec-title"><div class="sec-title-bar"></div> منصة التحليل الفني</div>
+    <div class="tv-teaser" id="tvTeaser" onclick="openTVPanel()">
+      <div class="tv-bar"></div>
+      <div class="tv-teaser-inner">
+        <div class="tv-logo-box" style="font-weight:900;font-size:.8rem;color:#fff">TV</div>
+        <div class="tv-teaser-text">
+          <h3>TradingView — شارت مباشر</h3>
+          <p>تحليل فني احترافي · شموع يابانية · رسم مباشر على الشارت · أزواج متعددة</p>
+        </div>
+        <div class="tv-open-badge">افتح الشارت ←</div>
+      </div>
+    </div>
+
+    <div class="tv-panel" id="tvPanel">
+      <div class="tv-panel-header">
+        <div class="tv-panel-title">
+          📈 TradingView &nbsp;·&nbsp; <span id="tvSymLabel">XAUUSD</span>
+        </div>
+        <div class="tv-panel-controls">
+          <button class="tv-tf-btn active" onclick="tvSwitchTF('15',this)">15د</button>
+          <button class="tv-tf-btn" onclick="tvSwitchTF('60',this)">1H</button>
+          <button class="tv-tf-btn" onclick="tvSwitchTF('240',this)">4H</button>
+          <button class="tv-tf-btn" onclick="tvSwitchTF('D',this)">يومي</button>
+          <button class="tv-tf-btn" onclick="tvSwitchTF('W',this)">أسبوعي</button>
+          <button class="tv-close-btn" onclick="closeTVPanel()">✕</button>
+        </div>
+      </div>
+      <div id="tvChartContainer"></div>
+      <div class="tv-symbol-row" id="tvSymbolRow"></div>
+    </div>
+  </div>
+
+  <!-- Content Panel -->
+  <div class="content-panel" id="contentPanel">
+    <div class="cp-header">
+      <div class="cp-title" id="cpTitle">المحتوى</div>
+      <button class="cp-close" onclick="closePanel()">✕</button>
+    </div>
+    <div class="tabs-bar">
+      <button class="tab-btn active" id="tab-lectures" onclick="switchTab('lectures',this)">الدروس والمحاضرات</button>
+      <button class="tab-btn" id="tab-books" onclick="switchTab('books',this)">الكتب والملخصات</button>
+    </div>
+    <div class="tab-content active" id="tc-lectures"><ul class="lectures-list" id="lecturesList"></ul></div>
+    <div class="tab-content" id="tc-books"><div class="books-grid" id="booksList"></div></div>
+  </div>
+
+  <!-- Economic Calendar Section -->
+  <div class="econ-section">
+    <div class="sec-title"><div class="sec-title-bar"></div> الأخبار الاقتصادية</div>
+    <div class="econ-card">
+      <div class="econ-header">
+        <div class="econ-title">
+          <div class="econ-title-icon" style="font-weight:900;font-size:.75rem;color:#fff">EC</div>
+          التقويم الاقتصادي — أخبار اليوم
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span class="econ-badge">🇺🇸 الدولار الأمريكي</span>
+          <span class="econ-update"><span class="econ-live-dot"></span> يتحدث تلقائياً</span>
+        </div>
+      </div>
+      <div id="econWidget">
+        <div style="height:460px;width:100%">
+        <div class="tradingview-widget-container" style="height:100%;width:100%">
+          <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
+          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js" async>
+          {
+            "width": "100%",
+            "height": "100%",
+            "colorTheme": "light",
+            "isTransparent": true,
+            "locale": "ar_AE",
+            "importanceFilter": "1",
+            "countryFilter": "us"
+          }
+          </script>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WhatsApp Section -->
+  <div class="wa-section">
+    <div class="sec-title"><div class="sec-title-bar"></div> تواصل مع المدرب</div>
+    <div class="wa-card">
+      <div class="wa-card-top">
+        <div class="wa-icon-box" style="font-weight:900;font-size:.8rem;color:#fff">WA</div>
+        <div class="wa-text">
+          <h3>تواصل مباشرة مع المدرب عبر واتساب</h3>
+          <p>لديك سؤال أو استفسار؟ أرسل رسالتك وسيرد عليك المدرب في أقرب وقت</p>
+        </div>
+        <button class="wa-open-btn" onclick="toggleWaForm()">تواصل مع المدرب</button>
+      </div>
+      <div class="wa-form" id="waForm">
+        <label>اكتب استفسارك أو سؤالك:</label>
+        <textarea class="wa-textarea" id="waMsg" rows="4" placeholder="مثال: عندي سؤال عن الأوردر بلوك وكيف أطبّقه..."></textarea>
+        <button class="wa-send-btn" onclick="sendToWhatsApp()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          إرسال عبر واتساب
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Daily Tip -->
+  <!-- Scheduled Sessions -->
+  <div style="margin-bottom:28px" id="scheduleSection">
+    <div class="sec-title"><div class="sec-title-bar"></div> جلسات هذا الشهر</div>
+    <div id="scheduleCards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px"></div>
+    <div id="scheduleEmpty" style="display:none;background:#fff;border-radius:14px;padding:32px;text-align:center;color:#6b7280;font-size:.88rem;border:1px solid rgba(0,0,0,.06)">
+      <div style="font-size:2rem;margin-bottom:8px">📅</div>
+      لا توجد جلسات مجدولة هذا الشهر
+    </div>
+  </div>
+
+  <!-- Live Prices -->
+  <div style="margin-bottom:28px">
+    <div class="sec-title"><div class="sec-title-bar"></div> أسعار السوق المباشرة</div>
+    <div style="border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.08);border:1px solid rgba(0,0,0,.06)">
+      <div class="tradingview-widget-container">
+        <div class="tradingview-widget-container__widget"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+        {
+          "symbols": [
+            {"proName":"FOREXCOM:XAUUSD","title":"الذهب"},
+            {"proName":"FX_IDC:EURUSD","title":"يورو/دولار"},
+            {"proName":"FX_IDC:GBPUSD","title":"إسترليني/دولار"},
+            {"proName":"FX_IDC:USDJPY","title":"دولار/ين"},
+            {"proName":"FX_IDC:USDCHF","title":"دولار/فرنك"},
+            {"proName":"FX_IDC:AUDUSD","title":"أسترالي/دولار"},
+            {"proName":"FX_IDC:USDCAD","title":"دولار/كندي"},
+            {"proName":"FX_IDC:NZDUSD","title":"نيوزيلندي/دولار"},
+            {"proName":"FOREXCOM:XAGUSD","title":"الفضة"},
+            {"proName":"NASDAQ:NDX","title":"ناسداك"},
+            {"proName":"SP:SPX","title":"S&P 500"},
+            {"proName":"BITSTAMP:BTCUSD","title":"بيتكوين"}
+          ],
+          "showSymbolLogo": true,
+          "isTransparent": false,
+          "displayMode": "adaptive",
+          "colorTheme": "dark",
+          "locale": "ar_AE"
+        }
+        </script>
+      </div>
+    </div>
+  </div>
+
+  <div class="tip-section">
+    <div class="sec-title"><div class="sec-title-bar"></div> نصيحة اليوم</div>
+    <div class="tip-card" onclick="nextTip()">
+      <div class="tip-label">نصيحة المتداول</div>
+      <div class="tip-text" id="tipText">السوق يكافئ الصابر.</div>
+      <div class="tip-hint">اضغط للنصيحة التالية</div>
+    </div>
+  </div>
+
+</main>
+
+<!-- AI Chat FAB -->
+<div class="ai-fab" id="aiFab" onclick="toggleChat()">
+  <div class="ai-fab-label">مساعد المتداول الذكي</div>
+  <button class="ai-fab-btn">
+    <svg width="28" height="28" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polyline points="4,30 12,22 18,26 28,12 36,16" stroke="white" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <circle cx="12" cy="22" r="2" fill="white"/>
+      <circle cx="18" cy="26" r="2" fill="white"/>
+      <circle cx="28" cy="12" r="2" fill="white"/>
+      <circle cx="33" cy="33" r="7" fill="white"/>
+      <text x="33" y="37" text-anchor="middle" font-size="7" font-weight="900" font-family="Arial" fill="#10a37f">AI</text>
+    </svg>
+  </button>
+</div>
+
+<!-- AI Chat Panel -->
+<div class="ai-chat-panel" id="aiChatPanel">
+  <div class="ai-chat-header">
+    <div class="ai-chat-avatar">
+      <svg width="30" height="30" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- شارت صاعد -->
+        <polyline points="4,30 12,22 18,26 28,12 36,16" stroke="#E8C547" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <!-- نقاط على الشارت -->
+        <circle cx="12" cy="22" r="2" fill="#E8C547"/>
+        <circle cx="18" cy="26" r="2" fill="#E8C547"/>
+        <circle cx="28" cy="12" r="2" fill="#E8C547"/>
+        <!-- دائرة AI صغيرة -->
+        <circle cx="33" cy="33" r="7" fill="#E8C547"/>
+        <text x="33" y="37" text-anchor="middle" font-size="7" font-weight="900" font-family="Arial" fill="#1e293b">AI</text>
+      </svg>
+    </div>
+    <div class="ai-chat-info">
+      <div class="ai-chat-name">مساعد المتداول الذكي</div>
+    </div>
+    <button class="ai-chat-close" onclick="toggleChat()">✕</button>
+  </div>
+  <div class="ai-quick-btns">
+    <button class="ai-quick-btn" onclick="quickAsk('ما هو الأوردر بلوك؟')">ما هو الأوردر بلوك؟</button>
+    <button class="ai-quick-btn" onclick="quickAsk('اشرح لي مفهوم السيولة')">مفهوم السيولة</button>
+    <button class="ai-quick-btn" onclick="quickAsk('كيف أحدد نقطة الدخول؟')">نقطة الدخول</button>
+    <button class="ai-quick-btn" onclick="quickAsk('ما الفرق بين الكلاسيك و SMC؟')">كلاسيك vs SMC</button>
+  </div>
+  <div class="ai-chat-messages" id="aiMessages"></div>
+  <div class="ai-chat-input-area">
+    <div class="ai-img-preview" id="aiImgPreview">
+      <img id="aiImgThumb" src="" alt=""/>
+      <span id="aiImgName">صورة</span>
+      <button class="ai-img-remove" onclick="removeAiImage()" title="إزالة الصورة">✕</button>
+    </div>
+    <div class="ai-input-row">
+      <button class="ai-img-btn" onclick="document.getElementById('aiImgInput').click()" title="إرفاق صورة للتحليل">🖼️</button>
+      <input type="file" id="aiImgInput" accept="image/*" style="display:none" onchange="handleAiImage(this)"/>
+      <textarea class="ai-chat-input" id="aiInput" placeholder="اسأل أي سؤال عن التداول..." rows="1"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAiMsg()}"
+        oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+      <button class="ai-send-btn" id="aiSendBtn" onclick="sendAiMsg()">➤</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORE='tradingPlatform_v1';
+function getData(){try{const r=localStorage.getItem(STORE);if(r)return JSON.parse(r);}catch(e){}return null;}
+function saveData(d){localStorage.setItem(STORE,JSON.stringify(d));}
+
+/* ── ترحيل وإضافة الملفات الحقيقية تلقائياً ── */
+function migrateAndSync(){
+  let d=getData();
+  if(!d){return;}
+
+  let changed=false;
+
+  // ترحيل البنية القديمة
+  if(!d.subscribers && d.students){
+    d.subscribers=d.students.map(s=>({
+      id:s.id,name:s.name,
+      username:s.email?.split('@')[0]||'user_'+s.id,
+      password:s.phone||'pass123',
+      email:s.email||'',phone:s.phone||'',
+      schools:(s.courses||[]).map(c=>c==='basic'?'classic':c),
+      isOnline:s.isOnline||false,lastSeen:s.lastSeen||null,
+      joinDate:s.joinDate||'',active:true
+    }));
+    changed=true;
+  }
+  if(!d.content){
+    d.content={classic:{lectures:[],books:[]},advanced:{lectures:[],books:[]}};
+    changed=true;
+  }
+  if(!d.content.classic){d.content.classic={lectures:[],books:[]};changed=true;}
+  if(!d.content.advanced){d.content.advanced={lectures:[],books:[]};changed=true;}
+  if(!d.content.classic.lectures){d.content.classic.lectures=[];changed=true;}
+  if(!d.content.advanced.lectures){d.content.advanced.lectures=[];changed=true;}
+  if(!d.content.classic.books){d.content.classic.books=[];changed=true;}
+  if(!d.content.advanced.books){d.content.advanced.books=[];changed=true;}
+
+  // تهيئة أقسام جديدة
+  ['classic','advanced'].forEach(school=>{
+    ['liquidity','strategies','reviews'].forEach(sec=>{
+      if(!d.content[school][sec])d.content[school][sec]={lectures:[],books:[],groups:[]};
+      if(!d.content[school][sec].lectures){d.content[school][sec].lectures=[];changed=true;}
+      if(!d.content[school][sec].books){d.content[school][sec].books=[];changed=true;}
+      if(!d.content[school][sec].groups){d.content[school][sec].groups=[];changed=true;}
+    });
+  });
+
+  // ── مجلدات الاستراتيجيات المعروفة ──
+  const STRATEGY_GROUPS=[
+    {
+      school:'classic', section:'strategies',
+      folder:'استراتيجية مؤشر ORB',
+      name:'استراتيجية مؤشر ORB',
+      files:[
+        {filename:'شرح الاستراتيجية.mp4',  title:'شرح الاستراتيجية',  type:'video', order:1},
+        {filename:'محاضرة مراجعة .mp4',    title:'محاضرة مراجعة',    type:'video', order:2},
+        {filename:'اعدادات المؤشر.png',    title:'إعدادات المؤشر',   type:'image', order:3},
+        {filename:'نقاط مهمة.png',         title:'نقاط مهمة',        type:'image', order:4},
+      ]
+    },
+    // أضف مجلدات جديدة هنا بنفس الهيكل
+  ];
+
+  STRATEGY_GROUPS.forEach(g=>{
+    const sec=d.content[g.school][g.section];
+    const exists=sec.groups.some(x=>x.folder===g.folder);
+    if(!exists){
+      sec.groups.push({
+        id:'grp_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),
+        name:g.name, folder:g.folder, files:g.files
+      });
+      changed=true;
+    }
+  });
+
+  // ── ملفات الأقسام الفرعية المعروفة ──
+  // أضف هنا أي ملف ترفعه في المجلدات الفرعية وسيُضاف تلقائياً
+  const SECTION_FILES=[
+    // مثال: {school:'classic', section:'liquidity', filename:'درس السيولة ١.mp4', title:'درس السيولة الأول', order:1},
+    // {school:'classic',  section:'liquidity',   filename:'', title:'', order:1},
+    // {school:'classic',  section:'strategies',  filename:'', title:'', order:1},
+    // {school:'classic',  section:'reviews',     filename:'', title:'', order:1},
+    // {school:'advanced', section:'liquidity',   filename:'', title:'', order:1},
+    // {school:'advanced', section:'strategies',  filename:'', title:'', order:1},
+    {school:'advanced', section:'reviews', filename:'تطبيق smc.mp4',        title:'تطبيق SMC',          order:1},
+    {school:'advanced', section:'reviews', filename:'دخول الصفقات ٢ .mov',  title:'دخول الصفقات (٢)',   order:2},
+  ];
+
+  SECTION_FILES.filter(f=>f.filename).forEach(f=>{
+    const {school,section,filename,title,order}=f;
+    const vid=/\.(mp4|mov|avi|mkv|webm)$/i.test(filename);
+    if(vid){
+      const exists=d.content[school][section].lectures.some(l=>l.filename===filename);
+      if(!exists){
+        d.content[school][section].lectures.push({
+          id:'sec_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),
+          order,title,desc:'',duration:'',filename,date:today
+        });
+        changed=true;
+      }
+    } else {
+      const exists=d.content[school][section].books.some(b=>b.filename===filename);
+      if(!exists){
+        const isSum=title.includes('ملخص')||title.includes('summary');
+        d.content[school][section].books.push({
+          id:'sec_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),
+          order,title,desc:'',type:isSum?'summary':'book',filename,date:today
+        });
+        changed=true;
+      }
+    }
+  });
+
+  // الملفات الحقيقية الموجودة في مجلد files/advanced/
+  const REAL_FILES={
+    advanced:[
+      {filename:'مقدمة في مدرسة smc .mp4',     title:'مقدمة في مدرسة SMC',                    order:1},
+      {filename:'الدرس الاول (هيكلة السوق ).mp4', title:'الدرس الأول — هيكلة السوق',           order:2},
+      {filename:'الدرس الثاني ( تغير اتجاه حركة السوق ) .mov', title:'الدرس الثاني — تغيّر اتجاه حركة السوق', order:3},
+      {filename:'الدرس الثاني ( الاندوسمنت ) .mov', title:'الدرس الثاني — الاندوسمنت',         order:4},
+      {filename:'الاوردر بلوك .mov',             title:'الأوردر بلوك (Order Block)',             order:5},
+      {filename:'الاوردر فلو.mp4',               title:'الأوردر فلو (Order Flow)',               order:6},
+      {filename:'الريجكشن بلوك.mp4',             title:'الريجكشن بلوك (Rejection Block)',        order:7},
+      {filename:'BB.mp4',                        title:'BB',                                      order:8},
+      {filename:'شمعة BCD.mp4',                  title:'شمعة BCD',                               order:9},
+      {filename:'شمعة IFC.mp4',                  title:'شمعة IFC',                               order:10},
+      {filename:'الفيبو.mp4',                    title:'الفيبوناتشي',                             order:11},
+      {filename:'التصحيح لتحديد القمم والقيعان.mp4', title:'التصحيح لتحديد القمم والقيعان',    order:12},
+      {filename:'مقدمة في المرحلة الثانية.mp4', title:'مقدمة في المرحلة الثانية',               order:13},
+      {filename:'دمج الفريمات ودخول الصفقات .mov', title:'دمج الفريمات ودخول الصفقات',         order:14},
+      {filename:'دخول الصفقات ٢ .mov',           title:'دخول الصفقات (٢)',                       order:15},
+    ],
+    classic:[
+      {filename:'الدرس الاول .mp4',                        title:'الدرس الأول',                               order:1},
+      {filename:'الدرس الثاني .mp4',                       title:'الدرس الثاني',                              order:2},
+      {filename:'الدرس الثالث .mp4',                       title:'الدرس الثالث',                              order:3},
+      {filename:'الدرس الرابع.mp4',                        title:'الدرس الرابع',                               order:4},
+      {filename:'الدرس الخامس.mp4',                        title:'الدرس الخامس',                               order:5},
+      {filename:'الدرس السادس .mp4',                       title:'الدرس السادس',                               order:6},
+      {filename:'شموع الهايكناشي .mov',                   title:'شموع الهايكناشي',                            order:7},
+      {filename:'دخول الصفقات بشموع الهايكناشي.mp4',     title:'دخول الصفقات بشموع الهايكناشي',              order:8},
+      {filename:'دخول الصفقات.mp4',                        title:'دخول الصفقات',                               order:9},
+    ]
+  };
+
+  // الكتب والملخصات والصور
+  const REAL_BOOKS={
+    advanced:[
+      {filename:'كتاب ملخص مدرسة smc للمرحلة الاولى.pdf', title:'كتاب ملخص مدرسة SMC — المرحلة الأولى', type:'summary', order:1},
+      {filename:'الاوردر بلوك .png',           title:'الأوردر بلوك',                  type:'summary', order:2},
+      {filename:'تغير الاتجاه الشوك.png',      title:'تغير الاتجاه — الشوك',         type:'summary', order:3},
+      {filename:'شرح ال idm الاندوسمنت.png',   title:'شرح الـ IDM والاندوسمنت',       type:'summary', order:4},
+      {filename:'شموع البرايس اكشن ١.JPG',     title:'شموع البرايس أكشن (١)',         type:'summary', order:5},
+      {filename:'شموع البرايس اكشن ٢.JPG',     title:'شموع البرايس أكشن (٢)',         type:'summary', order:6},
+    ],
+    classic:[
+      // PDFs
+      {filename:'شرح الاساسيات والشموع اليابانية.pdf',                 title:'شرح الأساسيات والشموع اليابانية',              type:'book',    order:1},
+      {filename:'شرح الترند ومناطق الدعوم والمقاومات والكسر .pdf',    title:'شرح الترند ومناطق الدعوم والمقاومات والكسر',   type:'book',    order:2},
+      {filename:'اداة الفيبوناتشي شرح 2.pdf',                          title:'أداة الفيبوناتشي — شرح',                        type:'book',    order:3},
+      // صور
+      {filename:'الاشكال الهندسية ومناطق الدخول فيها.JPEG',           title:'الأشكال الهندسية ومناطق الدخول فيها',          type:'summary', order:4},
+      {filename:'الاشكال الهندسية ١.JPEG',                             title:'الأشكال الهندسية (١)',                          type:'summary', order:5},
+      {filename:'الاشكال الهندسية ٢.JPEG',                             title:'الأشكال الهندسية (٢)',                          type:'summary', order:6},
+      {filename:'العملات المستخدمة في سوق الفوركس للتداول.JPEG',      title:'العملات المستخدمة في سوق الفوركس',              type:'summary', order:7},
+      {filename:'نموذج شموع البرايس اكشن .JPEG',                      title:'نموذج شموع البرايس أكشن',                       type:'summary', order:8},
+      {filename:'شموع البرايس اكشن ٢ .JPEG',                          title:'شموع البرايس أكشن (٢)',                         type:'summary', order:9},
+    ]
+  };
+
+  const today=new Date().toISOString().slice(0,10);
+
+  // إضافة المحاضرات
+  Object.entries(REAL_FILES).forEach(([school,files])=>{
+    files.forEach(f=>{
+      const exists=d.content[school].lectures.some(l=>l.filename===f.filename);
+      if(!exists){
+        d.content[school].lectures.push({
+          id:'auto_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),
+          order:f.order,title:f.title,desc:'',duration:'',filename:f.filename,date:today
+        });
+        changed=true;
+      }
+    });
+  });
+
+  // إضافة الكتب والملخصات
+  Object.entries(REAL_BOOKS).forEach(([school,books])=>{
+    books.forEach(b=>{
+      const exists=d.content[school].books.some(x=>x.filename===b.filename);
+      if(!exists){
+        d.content[school].books.push({
+          id:'book_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),
+          order:b.order,title:b.title,desc:'',type:b.type,filename:b.filename,date:today
+        });
+        changed=true;
+      }
+    });
+  });
+
+  if(changed)saveData(d);
+}
+
+/* ── Session Check ── */
+let sub=null,sesId=null;
+function init(){
+  const raw=sessionStorage.getItem('currentSubscriber');
+  sesId=sessionStorage.getItem('sessionId');
+  if(!raw){window.location.href='login.html';return;}
+  sub=JSON.parse(raw);
+
+  const initLetter=sub.name.charAt(0);
+  document.getElementById('avatarLetter').textContent=initLetter;
+  document.getElementById('userName').textContent=sub.name;
+  // Populate dropdown header
+  document.getElementById('udAvatar').textContent=initLetter;
+  document.getElementById('udName').textContent=sub.name;
+  document.getElementById('udEmail').textContent=sub.email||'—';
+  // Populate info modal
+  document.getElementById('info-name').textContent=sub.name||'—';
+  document.getElementById('info-email').textContent=sub.email||'—';
+  document.getElementById('info-phone').textContent=sub.phone||'—';
+  document.getElementById('info-country').textContent=sub.country||'غير محدد';
+  document.getElementById('info-schools').textContent=(sub.schools||[]).map(k=>k==='classic'?'مدرسة الكلاسيك':'المدرسة المتقدمة SMC').join(' | ')||'—';
+  document.getElementById('welcomeMsg').textContent='مرحباً '+sub.name;
+
+  const d=getData();
+  const schools=sub.schools||[];
+  const totalLecs=schools.reduce((a,k)=>a+(d?.content?.[k]?.lectures?.length||0),0);
+
+  const schoolNames=schools.map(k=>k==='classic'?'مدرسة الكلاسيك':'المدرسة المتقدمة SMC');
+  document.getElementById('welcomeSchools').innerHTML=schoolNames.map(n=>
+    `<span class="school-badge">أنت متداول في ${n}</span>`
+  ).join('');
+
+  // حساب المستوى
+  let level='مبتدئ', stars='⭐';
+  if(totalLecs>=20){level='متقدم';stars='⭐⭐⭐';}
+  else if(totalLecs>=10){level='متوسط';stars='⭐⭐';}
+  document.getElementById('levelText').textContent=level;
+  document.getElementById('levelStars').textContent=stars;
+  renderSchools();
+  renderScheduledSessions();
+  heartbeat();
+}
+
+/* ── Schools ── */
+const schoolInfo={
+  classic:{name:'مدرسة الكلاسيك',icon:'C',emoji:'',banner:'classic',desc:'أسس التداول الكلاسيكي — الشموع، الدعم والمقاومة، التحليل الفني'},
+  advanced:{name:'المدرسة المتقدمة',icon:'A',emoji:'',banner:'advanced',desc:'Smart Money Concepts — هيكلة السوق، السيولة، مناطق العرض والطلب'}
+};
+
+function renderSchools(){
+  const d=getData();const row=document.getElementById('schoolsRow');
+  row.innerHTML=Object.entries(schoolInfo).map(([key,info])=>{
+    const enrolled=(sub.schools||[]).includes(key);
+    const lCount=d?.content?.[key]?.lectures?.length||0;
+    const bCount=d?.content?.[key]?.books?.length||0;
+    return`<div class="school-card ${enrolled?'':'locked'}" id="sc-${key}">
+      <div class="sc-banner ${info.banner}">
+        <span style="font-size:.85rem;font-weight:900;color:rgba(255,255,255,.5);letter-spacing:1px">${info.name}</span>
+        <span class="sc-badge ${enrolled?'badge-enrolled':'badge-locked'}">${enrolled?'مسجّل':'غير متاح'}</span>
+      </div>
+      <div class="sc-body">
+        <div class="sc-name">${info.name}</div>
+        <div class="sc-desc">${info.desc}</div>
+        <div class="sc-meta"><span>${lCount} درس</span><span>${bCount} ملف</span></div>
+        ${enrolled
+          ?`<button class="sc-btn" onclick="openSchool('${key}')">فتح المدرسة</button>
+             <button class="sc-quiz-btn" onclick="startQuiz('${key}')">الاختبار العملي <span class="quiz-ai-badge">AI</span></button>
+             <div class="sc-sections">
+               <button class="sc-sec-btn" onclick="openSection('${key}','liquidity',this)">دروس السيولة</button>
+               <button class="sc-sec-btn" onclick="openSection('${key}','strategies',this)">الاستراتيجيات والمؤشرات</button>
+               <button class="sc-sec-btn" onclick="openSection('${key}','reviews',this)" style="grid-column:1/-1">المحاضرات والمراجعات</button>
+             </div>`
+          :`<button class="sc-btn-locked">غير متاح — تواصل مع المسؤول</button>`
+        }
+      </div>
+    </div>`;
+  }).join('');
+}
+
+let activeSchool=null,activeTab='lectures',activeSection=null;
+
+function startQuiz(key){
+  _internalNav=true;
+  window.location.href='quiz.html?school='+key;
+}
+
+function openSchool(key){
+  const d=getData();
+  const info=schoolInfo[key];
+  activeSchool=key;
+  activeSection=null;
+
+  // clear section button highlights
+  document.querySelectorAll('.sc-sec-btn').forEach(b=>b.classList.remove('active-sec'));
+
+  // Update card highlight
+  document.querySelectorAll('.school-card').forEach(c=>c.classList.remove('open'));
+  document.getElementById('sc-'+key)?.classList.add('open');
+
+  document.getElementById('cpTitle').innerHTML=info.emoji+' '+info.name;
+  document.querySelector('.tabs-bar').style.display='flex';
+
+  renderLectures(key,d,null);
+  renderBooks(key,d,null);
+
+  switchTab('lectures',document.getElementById('tab-lectures'));
+
+  const panel=document.getElementById('contentPanel');
+  panel.classList.add('show');
+  setTimeout(()=>panel.scrollIntoView({behavior:'smooth',block:'start'}),100);
+}
+
+const sectionMeta={
+  liquidity:{name:'دروس السيولة',icon:'💧'},
+  strategies:{name:'الاستراتيجيات والمؤشرات',icon:'📐'},
+  reviews:{name:'المحاضرات والمراجعات',icon:'🎥'}
+};
+
+function openSection(key,sec,btn){
+  const d=getData();
+  const info=schoolInfo[key];
+  const smeta=sectionMeta[sec];
+  activeSchool=key;
+  activeSection=sec;
+
+  // highlight active section button
+  document.querySelectorAll('.sc-sec-btn').forEach(b=>b.classList.remove('active-sec'));
+  if(btn)btn.classList.add('active-sec');
+
+  document.querySelectorAll('.school-card').forEach(c=>c.classList.remove('open'));
+  document.getElementById('sc-'+key)?.classList.add('open');
+
+  document.getElementById('cpTitle').innerHTML=
+    `${info.emoji} ${info.name} <span class="sec-panel-badge">${smeta.icon} ${smeta.name}</span>`;
+
+  const secObj=d?.content?.[key]?.[sec]||{};
+  const groups=secObj.groups||[];
+
+  if(groups.length>0){
+    // عرض الاستراتيجيات كبطاقات
+    renderGroups(key,sec,groups);
+    // إخفاء تبويبات المحاضرات/الكتب وعرض الجروبات
+    document.querySelector('.tabs-bar').style.display='none';
+    document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+    document.getElementById('tc-lectures').classList.add('active');
+  } else {
+    document.querySelector('.tabs-bar').style.display='flex';
+    const secData={content:{[key]:{lectures:secObj.lectures||[],books:secObj.books||[]}}};
+    renderLectures(key,secData,sec);
+    renderBooks(key,secData,sec);
+    switchTab('lectures',document.getElementById('tab-lectures'));
+  }
+
+  const panel=document.getElementById('contentPanel');
+  panel.classList.add('show');
+  setTimeout(()=>panel.scrollIntoView({behavior:'smooth',block:'start'}),100);
+}
+
+function renderGroups(key, sec, groups){
+  const el=document.getElementById('lecturesList');
+  if(!groups.length){
+    el.innerHTML='<div class="empty"><div class="empty-icon">📂</div><div class="empty-text">لا توجد استراتيجيات بعد</div></div>';
+    return;
+  }
+  el.innerHTML=`<div class="groups-grid">${groups.map(g=>{
+    const filesHtml=g.files.map(f=>{
+      const isVid=/\.(mp4|mov|avi|mkv|webm)$/i.test(f.filename);
+      const isImg=/\.(jpe?g|png|gif|webp|svg)$/i.test(f.filename);
+      const icon=isVid?'🎬':isImg?'🖼️':'📄';
+      const label=isVid?'مشاهدة':isImg?'عرض':'فتح';
+      const path=`files/${key}/${sec}/${encodeURIComponent(g.folder)}/${encodeURIComponent(f.filename)}`;
+      return`<div class="group-file-row">
+        <span class="gf-icon">${icon}</span>
+        <span class="gf-name">${f.title||f.filename}</span>
+        <a href="${path}" target="_blank" class="gf-btn has">▶ ${label}</a>
+      </div>`;
+    }).join('');
+    return`<div class="group-card">
+      <div class="group-header">
+        <div class="group-icon">📐</div>
+        <div class="group-name">${g.name}</div>
+      </div>
+      <div class="group-files">${filesHtml}</div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function filePath(key, section, filename){
+  // section=null → files/classic/filename
+  // section='liquidity' → files/classic/liquidity/filename
+  const base = section ? `files/${key}/${section}/` : `files/${key}/`;
+  return base + encodeURIComponent(filename);
+}
+
+function renderLectures(key,d,section){
+  const lectures=(d?.content?.[key]?.lectures||[]).sort((a,b)=>a.order-b.order);
+  const el=document.getElementById('lecturesList');
+  if(lectures.length===0){el.innerHTML='<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">لا توجد محاضرات بعد — ترقّب التحديثات!</div></div>';return;}
+  el.innerHTML=lectures.map(l=>{
+    const hasFile=!!l.filename;
+    return`<li class="lec-item">
+      <div class="lec-num">${l.order}</div>
+      <div class="lec-info">
+        <div class="lec-title">${l.title}</div>
+        <div class="lec-desc">${l.desc}</div>
+        <div class="lec-meta"><span>⏱ ${l.duration||''}</span><span>📅 ${l.date||''}</span></div>
+      </div>
+      ${hasFile
+        ?`<a href="${filePath(key,section,l.filename)}" target="_blank" class="lec-btn has-file">▶ مشاهدة</a>`
+        :`<button class="lec-btn no-file" disabled>⌛ قريباً</button>`
+      }
+    </li>`;
+  }).join('');
+}
+
+function renderBooks(key,d,section){
+  const books=(d?.content?.[key]?.books||[]).sort((a,b)=>a.order-b.order);
+  const el=document.getElementById('booksList');
+  if(books.length===0){el.innerHTML='<div class="empty"><div class="empty-icon">📚</div><div class="empty-text">لا توجد كتب أو ملخصات بعد</div></div>';return;}
+  el.innerHTML=books.map(b=>{
+    const isBook=b.type==='book'||!b.type;
+    const hasFile=!!b.filename;
+    const isImg=/\.(jpe?g|png|gif|webp|svg)$/i.test(b.filename||'');
+    const isPdfFile=/\.pdf$/i.test(b.filename||'');
+    const fIcon=isImg?'🖼️':isPdfFile?'📄':'📖';
+    const btnLabel=isImg?'🖼️ عرض الصورة':isPdfFile?'📄 فتح PDF':'📥 تحميل / فتح';
+    return`<div class="book-card">
+      <div class="book-top">
+        <div class="book-icon">${isBook?fIcon:'🗂️'}</div>
+        <span class="book-type-badge ${isBook?'type-book':'type-summary'}">${isBook?'كتاب':'ملخص مصوّر'}</span>
+      </div>
+      <div class="book-title">${b.title}</div>
+      <div class="book-desc">${b.desc}</div>
+      ${hasFile
+        ?`<a href="${filePath(key,section,b.filename)}" target="_blank" class="book-btn has-file">${btnLabel}</a>`
+        :`<button class="book-btn no-file" disabled>⌛ قريباً</button>`
+      }
+    </div>`;
+  }).join('');
+}
+
+function switchTab(name,btn){
+  activeTab=name;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tc-'+name).classList.add('active');
+}
+
+function closePanel(){
+  document.getElementById('contentPanel').classList.remove('show');
+  document.querySelectorAll('.school-card').forEach(c=>c.classList.remove('open'));
+  document.querySelectorAll('.sc-sec-btn').forEach(b=>b.classList.remove('active-sec'));
+  document.querySelector('.tabs-bar').style.display='flex';
+  activeSchool=null;activeSection=null;
+}
+
+/* ── Heartbeat ── */
+function heartbeat(){
+  function beat(){
+    const d=getData();if(!d)return;
+    const s=(d.subscribers||[]).find(x=>x.id===sub.id);
+    if(s){s.isOnline=true;s.lastSeen=Date.now();saveData(d);}
+  }
+  beat();setInterval(beat,30000);
+}
+
+/* ── Scheduled Sessions ── */
+function renderScheduledSessions(){
+  const d=getData();
+  const all=(d.scheduledSessions||[]);
+  const now=new Date();
+  const y=now.getFullYear(), m=now.getMonth();
+  const firstDay=new Date(y,m,1).toISOString().slice(0,10);
+  const lastDay=new Date(y,m+1,0).toISOString().slice(0,10);
+  const sub_=JSON.parse(sessionStorage.getItem('currentSubscriber')||'{}');
+  const mySchools=sub_.schools||[];
+  const sessions=all
+    .filter(s=>s.date>=firstDay&&s.date<=lastDay)
+    .filter(s=>s.school==='all'||mySchools.includes(s.school))
+    .sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time));
+  const container=document.getElementById('scheduleCards');
+  const empty=document.getElementById('scheduleEmpty');
+  const today=now.toISOString().slice(0,10);
+  const typeLabel={online:'🖥️ أونلاين',offline:'🏛️ حضوري',replay:'🎬 تسجيل مسبق'};
+  const schoolLabel={all:'لجميع المدارس',classic:'مدرسة الكلاسيك',advanced:'المدرسة المتقدمة'};
+  if(!sessions.length){container.style.display='none';empty.style.display='block';return;}
+  container.style.display='grid';empty.style.display='none';
+  container.innerHTML=sessions.map(s=>{
+    const dt=new Date(s.date+'T00:00');
+    const day=dt.getDate();
+    const monthName=dt.toLocaleDateString('ar-SA',{month:'short'});
+    const isToday=s.date===today;
+    const isPast=s.date<today;
+    const t=s.type||'online';
+    return `<div class="sched-card${isToday?' today':''}${isPast?' past':''}">
+      ${isToday?'<div class="sched-today-badge">⭐ اليوم</div>':''}
+      <div class="sched-date-box ${t}">
+        <span class="sched-day ${t}">${day}</span>
+        <span class="sched-month">${monthName}</span>
+      </div>
+      <div class="sched-info">
+        <div class="sched-title">${s.title}</div>
+        <div class="sched-meta">
+          <span class="sched-badge ${t}">${typeLabel[t]||t}</span>
+          <span class="sched-time">⏰ ${s.time}</span>
+        </div>
+        <div class="sched-school" style="margin-top:4px">🎓 ${schoolLabel[s.school]||s.school}</div>
+        ${s.notes?`<div style="font-size:.75rem;color:#6b7280;margin-top:4px">📝 ${s.notes}</div>`:''}
+        ${s.link?`<a class="sched-link" href="${s.link}" target="_blank">🔗 انضم للجلسة</a>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ── User Menu ── */
+function toggleUserMenu(){
+  const dd=document.getElementById('userDropdown');
+  const arrow=document.getElementById('menuArrow');
+  const open=dd.classList.toggle('open');
+  arrow.textContent=open?'▲':'▼';
+}
+function closeUserMenu(){
+  document.getElementById('userDropdown').classList.remove('open');
+  document.getElementById('menuArrow').textContent='▼';
+}
+document.addEventListener('click',function(e){
+  const wrap=document.querySelector('.user-menu-wrap');
+  if(wrap&&!wrap.contains(e.target))closeUserMenu();
+});
+
+/* ── Modals ── */
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+/* ── Theme ── */
+function setTheme(t){
+  document.body.classList.remove('light-theme','dark-theme');
+  document.body.classList.add(t+'-theme');
+  localStorage.setItem('uiTheme',t);
+  document.getElementById('themeLight').classList.toggle('active',t==='light');
+  document.getElementById('themeDark').classList.toggle('active',t==='dark');
+}
+(function(){
+  const saved=localStorage.getItem('uiTheme')||'light';
+  setTheme(saved);
+})();
+
+/* ── Support Request ── */
+function sendSupportRequest(){
+  const type=document.getElementById('sf-type').value.trim();
+  const desc=document.getElementById('sf-desc').value.trim();
+  const phone=document.getElementById('sf-phone').value.trim();
+  const errEl=document.getElementById('sf-err');
+  errEl.style.display='none';
+  if(!type||!desc||!phone){errEl.textContent='جميع الحقول مطلوبة';errEl.style.display='block';return;}
+  const btn=document.getElementById('sf-submit');
+  btn.disabled=true;btn.textContent='جاري الإرسال...';
+  const fd=new FormData();
+  fd.append('الاسم',sub.name);
+  fd.append('الإيميل',sub.email||'—');
+  fd.append('نوع الطلب',type);
+  fd.append('الشرح',desc);
+  fd.append('رقم التواصل',phone);
+  fd.append('_subject','طلب دعم فني — '+sub.name);
+  fd.append('_template','table');
+  fd.append('_captcha','false');
+  fetch('https://formsubmit.co/ajax/bd3trader@gmail.com',{method:'POST',body:fd,headers:{Accept:'application/json'}})
+  .then(()=>{}).catch(()=>{});
+  setTimeout(()=>{
+    document.getElementById('supportForm').style.display='none';
+    document.getElementById('supportSuccess').style.display='block';
+    setTimeout(()=>{
+      closeModal('supportModal');
+      document.getElementById('supportForm').style.display='block';
+      document.getElementById('supportSuccess').style.display='none';
+      document.getElementById('sf-type').value='';
+      document.getElementById('sf-desc').value='';
+      document.getElementById('sf-phone').value='';
+      btn.disabled=false;btn.textContent='إرسال الطلب';
+    },3000);
+  },600);
+}
+
+/* ── Logout ── */
+function logout(){
+  const d=getData();
+  if(d){
+    const s=(d.subscribers||[]).find(x=>x.id===sub.id);
+    if(s){s.isOnline=false;s.lastSeen=Date.now();}
+    const ses=(d.sessions||[]).find(x=>x.id===sesId);
+    if(ses)ses.logoutTime=Date.now();
+    saveData(d);
+  }
+  sessionStorage.clear();
+  window.location.href='login.html';
+}
+
+/* ── TradingView Dashboard Chart ── */
+const TV_SYMBOLS=['XAUUSD','EURUSD','GBPUSD','USDJPY','BTCUSD','NAS100'];
+let tvSym='XAUUSD', tvTF='60', tvOpen=false;
+
+function openTVPanel(){
+  tvOpen=true;
+  document.getElementById('tvTeaser').style.display='none';
+  const panel=document.getElementById('tvPanel');
+  panel.classList.add('show');
+  buildTVSymbolRow();
+  loadTVChart();
+  setTimeout(()=>panel.scrollIntoView({behavior:'smooth',block:'start'}),100);
+}
+
+function closeTVPanel(){
+  tvOpen=false;
+  document.getElementById('tvPanel').classList.remove('show');
+  document.getElementById('tvChartContainer').innerHTML='';
+  document.getElementById('tvTeaser').style.display='block';
+}
+
+function buildTVSymbolRow(){
+  document.getElementById('tvSymbolRow').innerHTML=TV_SYMBOLS.map(s=>
+    `<button class="tv-sym-btn ${s===tvSym?'active':''}" onclick="tvSwitchSym('${s}',this)">${s}</button>`
+  ).join('');
+}
+
+function tvSwitchSym(sym,btn){
+  tvSym=sym;
+  document.querySelectorAll('.tv-sym-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tvSymLabel').textContent=sym;
+  loadTVChart();
+}
+
+function tvSwitchTF(tf,btn){
+  tvTF=tf;
+  document.querySelectorAll('.tv-tf-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  loadTVChart();
+}
+
+function loadTVChart(){
+  const container=document.getElementById('tvChartContainer');
+  container.innerHTML='';
+  const wrapper=document.createElement('div');
+  wrapper.className='tradingview-widget-container';
+  wrapper.style.cssText='height:100%;width:100%';
+  const widgetDiv=document.createElement('div');
+  widgetDiv.className='tradingview-widget-container__widget';
+  widgetDiv.style.cssText='height:520px;width:100%';
+  const script=document.createElement('script');
+  script.type='text/javascript';
+  script.src='https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
+  script.async=true;
+  script.innerHTML=JSON.stringify({
+    autosize:true,
+    symbol:tvSym,
+    interval:tvTF,
+    timezone:'Asia/Riyadh',
+    theme:'light',
+    style:'1',
+    locale:'ar',
+    hide_top_toolbar:false,
+    hide_legend:false,
+    hide_side_toolbar:false,
+    allow_symbol_change:true,
+    withdateranges:true,
+    save_image:true,
+    studies:['STD;Bollinger_Bands','STD;RSI','STD;MACD'],
+    support_host:'https://www.tradingview.com'
+  });
+  wrapper.appendChild(widgetDiv);
+  wrapper.appendChild(script);
+  container.appendChild(wrapper);
+}
+
+/* ── Economic Calendar ── */
+const ECON_AR={
+  'Non-Farm Employment Change':'الوظائف غير الزراعية',
+  'Nonfarm Payrolls':'الوظائف غير الزراعية',
+  'Unemployment Rate':'معدل البطالة',
+  'CPI m/m':'مؤشر أسعار المستهلك (شهري)',
+  'CPI y/y':'مؤشر أسعار المستهلك (سنوي)',
+  'Core CPI m/m':'مؤشر أسعار المستهلك الأساسي (شهري)',
+  'Core CPI y/y':'مؤشر أسعار المستهلك الأساسي (سنوي)',
+  'PPI m/m':'مؤشر أسعار المنتجين (شهري)',
+  'Core PPI m/m':'مؤشر أسعار المنتجين الأساسي (شهري)',
+  'Federal Funds Rate':'سعر الفائدة الفيدرالية',
+  'FOMC Statement':'بيان الاحتياطي الفيدرالي',
+  'FOMC Meeting Minutes':'محضر اجتماع الفيدرالي',
+  'FOMC Press Conference':'مؤتمر صحفي للفيدرالي',
+  'FOMC Member Speaks':'تصريح عضو الفيدرالي',
+  'Fed Chair Powell Speaks':'خطاب رئيس الفيدرالي باول',
+  'GDP q/q':'الناتج المحلي الإجمالي (ربع سنوي)',
+  'Advance GDP q/q':'الناتج المحلي الأولي (ربع سنوي)',
+  'Final GDP q/q':'الناتج المحلي النهائي (ربع سنوي)',
+  'Prelim GDP q/q':'الناتج المحلي الأولي (ربع سنوي)',
+  'GDP Price Index q/q':'مؤشر أسعار الناتج المحلي',
+  'Core PCE Price Index m/m':'مؤشر نفقات الاستهلاك الأساسي (شهري)',
+  'Core PCE Price Index y/y':'مؤشر نفقات الاستهلاك الأساسي (سنوي)',
+  'PCE Price Index m/m':'مؤشر نفقات الاستهلاك (شهري)',
+  'PCE Price Index y/y':'مؤشر نفقات الاستهلاك (سنوي)',
+  'Retail Sales m/m':'مبيعات التجزئة (شهري)',
+  'Core Retail Sales m/m':'مبيعات التجزئة الأساسية (شهري)',
+  'ISM Manufacturing PMI':'مؤشر مديري المشتريات الصناعي',
+  'ISM Services PMI':'مؤشر مديري المشتريات الخدمي',
+  'ADP Non-Farm Employment Change':'وظائف القطاع الخاص ADP',
+  'Unemployment Claims':'طلبات إعانة البطالة',
+  'Trade Balance':'الميزان التجاري',
+  'Crude Oil Inventories':'مخزونات النفط الخام',
+  'Natural Gas Storage':'مخزونات الغاز الطبيعي',
+  'CB Consumer Confidence':'مؤشر ثقة المستهلك',
+  'Existing Home Sales':'مبيعات المنازل القائمة',
+  'New Home Sales':'مبيعات المنازل الجديدة',
+  'Building Permits':'تصاريح البناء',
+  'Durable Goods Orders m/m':'طلبات السلع المعمرة (شهري)',
+  'Core Durable Goods Orders m/m':'طلبات السلع المعمرة الأساسية',
+  'Industrial Production m/m':'الإنتاج الصناعي (شهري)',
+  'Philly Fed Manufacturing Index':'مؤشر فيلادلفيا الصناعي',
+  'Empire State Manufacturing Index':'مؤشر إمباير ستيت الصناعي',
+  'Personal Spending m/m':'الإنفاق الشخصي (شهري)',
+  'Personal Income m/m':'الدخل الشخصي (شهري)',
+  'JOLTS Job Openings':'فرص العمل المتاحة JOLTS',
+  'Average Hourly Earnings m/m':'متوسط الأجور بالساعة (شهري)',
+  'Consumer Credit m/m':'الائتمان الاستهلاكي',
+  'Prelim UoM Consumer Sentiment':'مؤشر ميشيغان لثقة المستهلك (أولي)',
+  'Revised UoM Consumer Sentiment':'مؤشر ميشيغان لثقة المستهلك (نهائي)',
+  'UoM Consumer Sentiment':'مؤشر ميشيغان لثقة المستهلك',
+  'President Trump Speaks':'خطاب الرئيس الأمريكي ترامب',
+  'Treasury Currency Report':'تقرير العملات للخزانة',
+  'S&P/CS Composite-20 HPI y/y':'مؤشر أسعار المنازل S&P',
+  'Chicago PMI':'مؤشر شيكاغو PMI',
+};
+
+function translateEvent(title){
+  if(ECON_AR[title])return ECON_AR[title];
+  for(const [en,ar] of Object.entries(ECON_AR)){
+    if(title.includes(en))return ar;
+  }
+  return title;
+}
+
+const DAYS_AR=['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+const MONTHS_AR=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+
+async function loadEconCalendar(){
+  const wrap=document.getElementById('econTableWrap');
+  try{
+    const res=await fetch('ff_calendar.json');
+    const data=await res.json();
+
+    const now=new Date();
+    const todayStr=now.toISOString().slice(0,10);
+
+    // فلتر: USD + High impact
+    const events=data.filter(e=>e.country==='USD'&&e.impact==='High');
+
+    if(events.length===0){
+      wrap.innerHTML=`<div class="econ-empty">
+        <div class="econ-empty-icon">📭</div>
+        <div class="econ-empty-text">لا توجد أخبار مهمة للدولار هذا الأسبوع</div>
+      </div>`;
+      return;
+    }
+
+    const day=DAYS_AR[now.getDay()];
+    const dateStr=`${day}، ${now.getDate()} ${MONTHS_AR[now.getMonth()]} ${now.getFullYear()}`;
+
+    let html=`<div style="padding:14px 20px;"><span class="econ-date-badge">📅 ${dateStr}</span></div>`;
+    html+=`<table class="econ-table"><thead><tr>
+      <th>اليوم</th><th>الوقت</th><th>العملة</th><th>الحدث</th><th>الأهمية</th>
+      <th>حالي</th><th>تقدير</th><th>سابق</th>
+    </tr></thead><tbody>`;
+
+    events.forEach(e=>{
+      const d=new Date(e.date);
+      const h=d.getHours().toString().padStart(2,'0');
+      const m=d.getMinutes().toString().padStart(2,'0');
+      const time=`${h}:${m}`;
+      const title=translateEvent(e.title);
+      const actual=e.actual||'—';
+      const forecast=e.forecast||'—';
+      const previous=e.previous||'—';
+
+      let actualClass='neutral';
+      if(e.actual && e.forecast){
+        const a=parseFloat(e.actual);
+        const f=parseFloat(e.forecast);
+        if(!isNaN(a)&&!isNaN(f)){
+          actualClass=a>f?'positive':a<f?'negative':'neutral';
+        }
+      }
+
+      const dayName=DAYS_AR[d.getDay()];
+      const dayDate=`${d.getDate()} ${MONTHS_AR[d.getMonth()]}`;
+
+      html+=`<tr>
+        <td style="text-align:center;font-size:.78rem;font-weight:800;line-height:1.4"><div>${dayName}</div><div style="color:var(--muted);font-size:.7rem">${dayDate}</div></td>
+        <td class="econ-time">${time}</td>
+        <td style="text-align:center"><span class="econ-flag">🇺🇸</span><div style="font-size:.68rem;font-weight:800;color:var(--muted)">USD</div></td>
+        <td class="econ-event">${title}</td>
+        <td style="text-align:center"><span class="econ-stars">★★★</span></td>
+        <td class="econ-val ${actualClass}">${actual}</td>
+        <td class="econ-val neutral">${forecast}</td>
+        <td class="econ-val neutral">${previous}</td>
+      </tr>`;
+    });
+
+    html+='</tbody></table>';
+    wrap.innerHTML=html;
+
+  }catch(e){
+    wrap.innerHTML=`<div class="econ-empty">
+      <div class="econ-empty-icon">⚠️</div>
+      <div class="econ-empty-text">تعذّر تحميل الأخبار — حاول تحديث الصفحة</div>
+    </div>`;
+  }
+}
+
+loadEconCalendar();
+
+/* ── Daily Tips ── */
+const TIPS=[
+'السوق يكافئ الصابر.','الانضباط قبل الأرباح.','لا تطارد السعر.','خطتك هي قوتك.','تعلم قبل أن تخاطر.',
+'رأس المال أمانة.','لا تدخل بلا سبب.','كل خسارة درس.','الصبر نصف النجاح.','الفرص لا تنتهي.',
+'لا تتداول بعاطفتك.','السوق لا يرحم المستعجل.','النجاح يحتاج تكرار.','ركز على الجودة.','القليل المستمر أفضل.',
+'لا تنتقم من السوق.','المخاطرة المحسوبة قوة.','الالتزام يصنع الفرق.','النجاح عادة.','ثق بخطتك.',
+'اجعل الأرقام تتكلم.','لا تستعجل النتائج.','السوق اختبار للصبر.','الربح يأتي للمنضبط.','لا تخف من البداية.',
+'استثمر في علمك.','كل يوم فرصة جديدة.','طور نفسك باستمرار.','ركز على العملية.','تجاهل الضوضاء.',
+'القرار الصحيح أهم من الربح.','الثبات يصنع الإنجاز.','لا تدخل كل صفقة.','انتظر إشارتك.','الانضباط يسبق الاحتراف.',
+'الخطة تحميك.','المخاطرة فن.','النجاح رحلة.','كن طالب علم دائمًا.','النتائج تحتاج وقتًا.',
+'لا تجعل الطمع يقودك.','اجعل العقل قائدك.','لا تخاطر بما لا تستطيع خسارته.','السوق يعلم المتواضع.','كل يوم تعلم جديد.',
+'النجاح يبدأ بقرار.','اجتهد بصمت.','دع النتائج تتحدث.','لا تستسلم بسرعة.','النجاح لمن يصبر.',
+'لا تقارن بدايتك بغيرك.','الإنجاز يحتاج التزامًا.','السوق يحب المنظم.','راقب أكثر مما تتداول.','حافظ على هدوئك.',
+'لا تجعل الخوف يمنعك.','ركز على هدفك.','لا تبحث عن الثراء السريع.','التعلم استثمار.','الانضباط يربح دائمًا.',
+'النجاح يبدأ بخطوة.','لا تهمل إدارة المخاطر.','اجعل الخسارة صغيرة.','اجعل الأرباح تكبر.','كل صفقة قرار.',
+'الثقة تأتي بالخبرة.','الخبرة تأتي بالممارسة.','لا تراهن على الحظ.','النجاح يحتاج صبرًا.','لا تكرر الخطأ.',
+'سجل ملاحظاتك.','تعلم من أخطائك.','لا تدخل بسبب التوصيات فقط.','افهم قبل أن تنفذ.','العقل الهادئ يرى الفرص.',
+'الاستمرارية سر النجاح.','النجاح لا يأتي صدفة.','اعمل بذكاء.','لا تتوقف عن التطور.','النجاح يبدأ من الداخل.',
+'ركز على ما تستطيع التحكم به.','النجاح قرار يومي.','الجودة أهم من الكثرة.','لا تضيع وقتك.','السوق يحتاج احترامًا.',
+'خطتك أهم من توقعاتك.','تحكم بنفسك أولًا.','كل دقيقة تعلم تساوي مستقبلًا أفضل.','لا تجعل الربح يغرّك.','ولا تجعل الخسارة تكسرك.',
+'اصنع فرصتك.','النجاح يحتاج تضحية.','التعب اليوم راحة غدًا.','لا يوجد نجاح بلا عمل.','استمر حتى تتقن.',
+'كن أفضل من الأمس.','الإنجازات الصغيرة تتراكم.','الصبر مفتاح الأرباح.','اجعل هدفك الاستمرارية.','من جدّ وجد، ومن صبر وصل.'
+];
+let tipIdx=Math.floor(Math.random()*TIPS.length);
+
+function showTip(){
+  const el=document.getElementById('tipText');
+  el.style.opacity='0';
+  setTimeout(()=>{el.textContent=TIPS[tipIdx];el.style.opacity='1';},200);
+}
+
+function nextTip(){
+  tipIdx=(tipIdx+1)%TIPS.length;
+  showTip();
+}
+
+showTip();
+
+/* ── WhatsApp Contact ── */
+function toggleWaForm(){
+  const form=document.getElementById('waForm');
+  form.classList.toggle('show');
+  if(form.classList.contains('show'))
+    setTimeout(()=>document.getElementById('waMsg').focus(),200);
+}
+
+function sendToWhatsApp(){
+  const msg=document.getElementById('waMsg').value.trim();
+  if(!msg){document.getElementById('waMsg').focus();return;}
+  const name=sub?.name||'طالب';
+  const schools=(sub?.schools||[]).map(k=>k==='classic'?'الكلاسيك':'المتقدمة').join(' و ');
+  const fullMsg=`مرحباً، أنا ${name} (${schools})\n\n${msg}`;
+  const phone='96879303776';
+
+  // افتح رابط واتساب
+  const a=document.createElement('a');
+  a.href=`https://wa.me/${phone}?text=${encodeURIComponent(fullMsg)}`;
+  a.target='_blank';
+  a.rel='noopener noreferrer';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  // أغلق الفورم وأظهر رسالة نجاح
+  document.getElementById('waMsg').value='';
+  document.getElementById('waForm').classList.remove('show');
+  showWaSuccess();
+}
+
+function showWaSuccess(){
+  // أزل أي رسالة سابقة
+  document.getElementById('waSuccessMsg')?.remove();
+  const div=document.createElement('div');
+  div.id='waSuccessMsg';
+  div.style.cssText='margin-top:12px;padding:13px 18px;background:rgba(37,211,102,.12);border:1px solid rgba(37,211,102,.3);border-radius:12px;color:#128C7E;font-weight:800;font-size:.88rem;display:flex;align-items:center;gap:8px';
+  div.innerHTML='✅ تم فتح واتساب — أرسل رسالتك للمدرب وسيرد عليك قريباً';
+  document.querySelector('.wa-card').appendChild(div);
+  setTimeout(()=>div.remove(), 5000);
+}
+
+/* ── AI Chat (ChatGPT) ── */
+const OPENAI_KEY='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';
+let chatOpen=false;
+let chatHistory=[];
+let aiTyping=false;
+
+function getSystemPrompt(){
+  const schools=(sub?.schools||[]).map(k=>k==='classic'?'مدرسة الكلاسيك':'المدرسة المتقدمة SMC').join(' و ');
+  return `أنت مساعد ذكي متخصص حصراً في تداول الأسواق المالية (فوركس، ذهب، عملات رقمية، مؤشرات).
+اسم المتدرب: ${sub?.name||'المتدرب'}
+المدارس المسجّل فيها: ${schools||'غير محدد'}
+
+قواعد صارمة يجب اتباعها:
+1. أجب فقط على الأسئلة المتعلقة بالتداول والأسواق المالية.
+2. إذا سألك المتدرب عن أي موضوع آخر (طبخ، رياضة، أخبار، ترفيه...الخ) رد بلطف: "أنا متخصص فقط في التداول، تفضّل اسألني عن أي شيء يخص الأسواق المالية 📈"
+3. إذا أُرفقت معك بيانات أسعار حية ابدأ إجابتك بتحليلها قبل الشرح.
+4. الإجابات مختصرة ومفيدة (3-6 أسطر).
+5. استخدم اللغة العربية دائماً.
+6. شجّع المتدرب وكن إيجابياً.
+
+مجالات إجابتك:
+- الشموع اليابانية وأنماطها
+- الدعم والمقاومة والترند
+- Smart Money Concepts: Order Block، FVG، السيولة، الاندوسمنت، BOS، CHOCH
+- الفيبوناتشي وأدوات التحليل
+- إدارة المخاطر ورأس المال
+- أزواج العملات والذهب والمؤشرات
+- تحليل الأسعار الحية عند توفرها`;
+}
+
+// كشف هل السؤال يحتاج سعر حي
+function needsLivePrice(text){
+  const keywords=['سعر','الآن','الحين','حالياً','اتجاه السوق','يرتفع','ينخفض','هل يصعد','هل ينزل','توصية','فرصة الآن','دخل الآن'];
+  return keywords.some(k=>text.includes(k));
+}
+
+// جلب أسعار حية
+async function fetchLivePrices(){
+  try{
+    // ذهب من metals.live
+    const goldRes=await fetch('https://api.metals.live/v1/spot/gold');
+    const goldData=await goldRes.json();
+    const goldPrice=goldData?.[0]?.price?.toFixed(2)||null;
+
+    // فوركس من frankfurter
+    const fxRes=await fetch('https://api.frankfurter.app/latest?from=USD&to=EUR,GBP,JPY');
+    const fxData=await fxRes.json();
+    const eur=fxData?.rates?.EUR?(1/fxData.rates.EUR).toFixed(5):null;
+    const gbp=fxData?.rates?.GBP?(1/fxData.rates.GBP).toFixed(5):null;
+    const jpy=fxData?.rates?.JPY?fxData.rates.JPY.toFixed(3):null;
+
+    let priceStr='📊 بيانات السوق الحية:\n';
+    if(goldPrice) priceStr+=`• الذهب XAUUSD: $${goldPrice}\n`;
+    if(eur)       priceStr+=`• يورو EURUSD: ${eur}\n`;
+    if(gbp)       priceStr+=`• جنيه GBPUSD: ${gbp}\n`;
+    if(jpy)       priceStr+=`• ين USDJPY: ${jpy}\n`;
+    priceStr+=`• (تحديث: ${new Date().toLocaleTimeString('ar')})\n\n`;
+    return priceStr;
+  }catch(e){return '';}
+}
+
+function toggleChat(){
+  chatOpen=!chatOpen;
+  const panel=document.getElementById('aiChatPanel');
+  const fab=document.getElementById('aiFab');
+  if(chatOpen){
+    panel.classList.add('open');
+    fab.style.display='none';
+    if(chatHistory.length===0) addWelcomeMsg();
+    setTimeout(()=>document.getElementById('aiInput').focus(),300);
+  } else {
+    panel.classList.remove('open');
+    fab.style.display='flex';
+  }
+}
+
+function addWelcomeMsg(){
+  const name=sub?.name?.split(' ')[0]||'طالبنا';
+  appendMsg('bot',`أهلاً ${name}! 👋\nأنا مساعدك الذكي في التداول.\nاسألني عن أي مفهوم في التداول وسأشرحه لك فوراً! 📈`);
+}
+
+function quickAsk(text){
+  document.getElementById('aiInput').value=text;
+  sendAiMsg();
+}
+
+function appendMsg(role, text){
+  const msgs=document.getElementById('aiMessages');
+  const isBot=role==='bot';
+  const initials=isBot?'🤖':(sub?.name?.charAt(0)||'أ');
+  const div=document.createElement('div');
+  div.className=`ai-msg ${role}`;
+  div.innerHTML=`
+    <div class="ai-msg-avatar">${initials}</div>
+    <div class="ai-msg-bubble">${text.replace(/\n/g,'<br>')}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop=msgs.scrollHeight;
+  return div;
+}
+
+function showTyping(){
+  const msgs=document.getElementById('aiMessages');
+  const div=document.createElement('div');
+  div.className='ai-msg bot';
+  div.id='aiTypingIndicator';
+  div.innerHTML=`<div class="ai-msg-avatar">🤖</div>
+    <div class="ai-typing"><span></span><span></span><span></span></div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+function hideTyping(){
+  document.getElementById('aiTypingIndicator')?.remove();
+}
+
+/* ── Image handling ── */
+let aiImageBase64=null;
+
+function handleAiImage(input){
+  const file=input.files[0];
+  if(!file)return;
+  if(file.size>5*1024*1024){alert('الصورة كبيرة جداً — الحد الأقصى 5 ميجابايت');input.value='';return;}
+  const reader=new FileReader();
+  reader.onload=function(e){
+    aiImageBase64=e.target.result; // data:image/...;base64,...
+    document.getElementById('aiImgThumb').src=aiImageBase64;
+    document.getElementById('aiImgName').textContent=file.name.length>22?file.name.slice(0,22)+'...':file.name;
+    document.getElementById('aiImgPreview').classList.add('show');
+    document.getElementById('aiInput').placeholder='اكتب سؤالك عن الصورة أو اضغط إرسال للتحليل الفوري...';
+    document.getElementById('aiInput').focus();
+  };
+  reader.readAsDataURL(file);
+  input.value='';
+}
+
+function removeAiImage(){
+  aiImageBase64=null;
+  document.getElementById('aiImgPreview').classList.remove('show');
+  document.getElementById('aiImgThumb').src='';
+  document.getElementById('aiInput').placeholder='اسأل أي سؤال عن التداول...';
+}
+
+async function sendAiMsg(){
+  if(aiTyping)return;
+  const inp=document.getElementById('aiInput');
+  const text=inp.value.trim();
+  const hasImage=!!aiImageBase64;
+  if(!text&&!hasImage)return;
+
+  const displayText=text||(hasImage?'📊 تحليل الصورة':'');
+  inp.value='';inp.style.height='auto';
+  document.getElementById('aiSendBtn').disabled=true;
+  aiTyping=true;
+
+  // عرض رسالة المستخدم مع preview الصورة
+  if(hasImage){
+    const msgs=document.getElementById('aiMessages');
+    const div=document.createElement('div');
+    div.className='ai-msg user';
+    div.innerHTML=`<div class="ai-msg-avatar">${sub?.name?.charAt(0)||'أ'}</div>
+      <div class="ai-msg-bubble" style="padding:8px">
+        <img src="${aiImageBase64}" style="max-width:180px;border-radius:8px;display:block;margin-bottom:${text?'8px':'0'}"/>
+        ${text?`<span>${text}</span>`:''}
+      </div>`;
+    msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;
+  } else {
+    appendMsg('user',displayText);
+  }
+  showTyping();
+
+  // بناء محتوى الرسالة
+  let userContent;
+  if(hasImage){
+    const imgData=aiImageBase64.split(',')[1];
+    const mimeMatch=aiImageBase64.match(/data:(image\/\w+);/);
+    const mime=mimeMatch?mimeMatch[1]:'image/jpeg';
+    userContent=[
+      {type:'image_url',image_url:{url:`data:${mime};base64,${imgData}`,detail:'high'}},
+      {type:'text',text:text||'حلل هذه الصورة: هل هي صحيحة من منظور التداول؟ وضح ما يحتاج تعديل.'}
+    ];
+    // لا نضيف للـ chatHistory لأن الصور لا تُرسل في المحادثات السابقة
+    removeAiImage();
+  } else {
+    let finalText=text;
+    if(needsLivePrice(text)){
+      const prices=await fetchLivePrices();
+      if(prices) finalText=prices+text;
+    }
+    chatHistory.push({role:'user',content:finalText});
+    userContent=finalText;
+  }
+
+  try{
+    const messages=[{role:'system',content:getSystemPrompt()}];
+    if(!hasImage) messages.push(...chatHistory.slice(-10));
+    else messages.push({role:'user',content:userContent});
+
+    const res=await fetch('https://api.openai.com/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+OPENAI_KEY},
+      body:JSON.stringify({
+        model: hasImage ? 'gpt-4o' : 'gpt-4o-mini',
+        messages,
+        max_tokens: hasImage ? 1000 : 600,
+        temperature:0.7
+      })
+    });
+    const data=await res.json();
+    hideTyping();
+    if(data.choices?.[0]?.message?.content){
+      const reply=data.choices[0].message.content.trim();
+      if(!hasImage) chatHistory.push({role:'assistant',content:reply});
+      appendMsg('bot',reply);
+    } else if(data.error){
+      appendMsg('bot','⚠️ حدث خطأ: '+data.error.message);
+    }
+  } catch(e){
+    hideTyping();
+    appendMsg('bot','⚠️ تعذّر الاتصال — تحقق من الإنترنت وحاول مجدداً.');
+  }
+
+  aiTyping=false;
+  document.getElementById('aiSendBtn').disabled=false;
+  document.getElementById('aiInput').focus();
+}
+
+let _internalNav=false;
+window.addEventListener('beforeunload',()=>{ if(!_internalNav) logout(); });
+migrateAndSync();
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <title>مزامنة الملفات | منصة تعليم التداول</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Cairo',sans-serif;background:#0f172a;color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+    .card{background:#1e293b;border-radius:20px;padding:36px;max-width:780px;width:100%;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+    h1{font-size:1.3rem;font-weight:900;margin-bottom:6px;color:#E8C547}
+    p{color:rgba(255,255,255,.6);font-size:.85rem;margin-bottom:24px}
+    .file-list{background:#0f172a;border-radius:12px;padding:20px;margin-bottom:20px;max-height:420px;overflow-y:auto}
+    .section-header{padding:8px 12px;font-size:.72rem;font-weight:900;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.08em;margin-top:8px;margin-bottom:2px}
+    .section-header:first-child{margin-top:0}
+    .file-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;margin-bottom:5px;font-size:.84rem}
+    .file-item.new{background:rgba(5,150,105,.12);border:1px solid rgba(5,150,105,.2)}
+    .file-item.exists{background:rgba(184,134,11,.08);border:1px solid rgba(184,134,11,.15)}
+    .file-icon{font-size:1.1rem;flex-shrink:0}
+    .file-name{flex:1;color:#fff;word-break:break-all}
+    .file-school{font-size:.7rem;padding:2px 7px;border-radius:6px;font-weight:800;white-space:nowrap}
+    .s-classic{background:rgba(59,130,246,.2);color:#60a5fa}
+    .s-advanced{background:rgba(184,134,11,.2);color:#E8C547}
+    .file-section{font-size:.68rem;padding:2px 7px;border-radius:6px;font-weight:800;white-space:nowrap;background:rgba(255,255,255,.08);color:rgba(255,255,255,.5)}
+    .file-status{font-size:.72rem;font-weight:800;white-space:nowrap}
+    .status-new{color:#10b981}
+    .status-exists{color:#f59e0b}
+    .btn{width:100%;padding:14px;background:linear-gradient(135deg,#B8860B,#D4A017);color:#fff;font-family:'Cairo',sans-serif;font-weight:900;font-size:1rem;border:none;border-radius:12px;cursor:pointer;transition:all .25s;box-shadow:0 6px 20px rgba(184,134,11,.3)}
+    .btn:hover{box-shadow:0 10px 28px rgba(184,134,11,.5);transform:translateY(-1px)}
+    .btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+    .result{display:none;margin-top:16px;padding:16px;border-radius:12px;text-align:center;font-weight:800}
+    .result.success{background:rgba(5,150,105,.15);border:1px solid rgba(5,150,105,.3);color:#10b981}
+    .back-btn{display:block;text-align:center;margin-top:14px;color:rgba(255,255,255,.5);font-size:.83rem;text-decoration:none}
+    .back-btn:hover{color:#E8C547}
+    .count-row{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+    .count-box{flex:1;min-width:80px;background:#0f172a;border-radius:10px;padding:12px;text-align:center}
+    .count-num{font-size:1.5rem;font-weight:900;color:#E8C547}
+    .count-lbl{font-size:.68rem;color:rgba(255,255,255,.45)}
+  </style>
+</head>
+<body>
+<div class="card">
+  <h1>🔄 مزامنة ملفات المحاضرات</h1>
+  <p>تكتشف الأداة كل الملفات في مجلدات المدارس والأقسام وتضيفها تلقائياً في قاعدة البيانات</p>
+
+  <div class="count-row">
+    <div class="count-box"><div class="count-num" id="cNew">0</div><div class="count-lbl">جديد</div></div>
+    <div class="count-box"><div class="count-num" id="cExists">0</div><div class="count-lbl">موجود</div></div>
+    <div class="count-box"><div class="count-num" id="cTotal">0</div><div class="count-lbl">الإجمالي</div></div>
+  </div>
+
+  <div class="file-list" id="fileList">
+    <div style="text-align:center;color:rgba(255,255,255,.4);padding:20px">جاري فحص الملفات...</div>
+  </div>
+
+  <button class="btn" id="syncBtn" onclick="doSync()" disabled>⟳ مزامنة وإضافة للنظام</button>
+  <div class="result" id="result"></div>
+  <a href="admin-panel.html" class="back-btn">← العودة للوحة التحكم</a>
+</div>
+
+<script>
+const STORE='tradingPlatform_v1';
+function getData(){try{const r=localStorage.getItem(STORE);if(r)return JSON.parse(r);}catch(e){}return null;}
+function saveData(d){localStorage.setItem(STORE,JSON.stringify(d));}
+
+// جميع الملفات المعروفة مرتّبة حسب المدرسة والقسم
+// section: null = المجلد الرئيسي للمدرسة
+const KNOWN_FILES = [
+  // ── مدرسة الكلاسيك — رئيسي ──
+  {school:'classic', section:null, filename:'الدرس الاول .mp4'},
+  {school:'classic', section:null, filename:'الدرس الثاني .mp4'},
+  {school:'classic', section:null, filename:'الدرس الثالث .mp4'},
+  {school:'classic', section:null, filename:'الدرس الرابع.mp4'},
+  {school:'classic', section:null, filename:'الدرس الخامس.mp4'},
+  {school:'classic', section:null, filename:'الدرس السادس .mp4'},
+  {school:'classic', section:null, filename:'شموع الهايكناشي .mov'},
+  {school:'classic', section:null, filename:'دخول الصفقات بشموع الهايكناشي.mp4'},
+  {school:'classic', section:null, filename:'دخول الصفقات.mp4'},
+  {school:'classic', section:null, filename:'شرح الاساسيات والشموع اليابانية.pdf'},
+  {school:'classic', section:null, filename:'شرح الترند ومناطق الدعوم والمقاومات والكسر .pdf'},
+  {school:'classic', section:null, filename:'اداة الفيبوناتشي شرح 2.pdf'},
+  {school:'classic', section:null, filename:'الاشكال الهندسية ومناطق الدخول فيها.JPEG'},
+  {school:'classic', section:null, filename:'الاشكال الهندسية ١.JPEG'},
+  {school:'classic', section:null, filename:'الاشكال الهندسية ٢.JPEG'},
+  {school:'classic', section:null, filename:'العملات المستخدمة في سوق الفوركس للتداول.JPEG'},
+  {school:'classic', section:null, filename:'نموذج شموع البرايس اكشن .JPEG'},
+  {school:'classic', section:null, filename:'شموع البرايس اكشن ٢ .JPEG'},
+
+  // ── المدرسة المتقدمة — رئيسي ──
+  {school:'advanced', section:null, filename:'مقدمة في مدرسة smc .mp4'},
+  {school:'advanced', section:null, filename:'الدرس الاول (هيكلة السوق ).mp4'},
+  {school:'advanced', section:null, filename:'الدرس الثاني ( تغير اتجاه حركة السوق ) .mov'},
+  {school:'advanced', section:null, filename:'الدرس الثاني ( الاندوسمنت ) .mov'},
+  {school:'advanced', section:null, filename:'الاوردر بلوك .mov'},
+  {school:'advanced', section:null, filename:'الاوردر فلو.mp4'},
+  {school:'advanced', section:null, filename:'الريجكشن بلوك.mp4'},
+  {school:'advanced', section:null, filename:'BB.mp4'},
+  {school:'advanced', section:null, filename:'شمعة BCD.mp4'},
+  {school:'advanced', section:null, filename:'شمعة IFC.mp4'},
+  {school:'advanced', section:null, filename:'الفيبو.mp4'},
+  {school:'advanced', section:null, filename:'التصحيح لتحديد القمم والقيعان.mp4'},
+  {school:'advanced', section:null, filename:'مقدمة في المرحلة الثانية.mp4'},
+  {school:'advanced', section:null, filename:'دمج الفريمات ودخول الصفقات .mov'},
+  {school:'advanced', section:null, filename:'دخول الصفقات ٢ .mov'},
+  {school:'advanced', section:null, filename:'كتاب ملخص مدرسة smc للمرحلة الاولى.pdf'},
+  {school:'advanced', section:null, filename:'الاوردر بلوك .png'},
+  {school:'advanced', section:null, filename:'تغير الاتجاه الشوك.png'},
+  {school:'advanced', section:null, filename:'شرح ال idm الاندوسمنت.png'},
+  {school:'advanced', section:null, filename:'شموع البرايس اكشن ١.JPG'},
+  {school:'advanced', section:null, filename:'شموع البرايس اكشن ٢.JPG'},
+
+  // ── أقسام كلاسيك ──
+  {school:'classic', section:'liquidity',  filename:'clssic .mov'},
+  {school:'classic', section:'liquidity',  filename:'المقدمة smc & clssic.mp4'},
+  {school:'classic', section:'liquidity',  filename:'تطبيق كلاسيك .mp4'},
+  {school:'classic', section:'reviews',    filename:'تطبيق كلاسيك .mp4'},
+
+  // ── أقسام متقدمة ──
+  {school:'advanced', section:'liquidity', filename:'السيولة الهندسية.mp4'},
+  {school:'advanced', section:'liquidity', filename:'المقدمة smc & clssic.mp4'},
+  {school:'advanced', section:'liquidity', filename:'تطبيق smc.mp4'},
+  {school:'advanced', section:'liquidity', filename:'سيولة الجلسات smc.mp4'},
+  {school:'advanced', section:'reviews',   filename:'تطبيق smc.mp4'},
+  {school:'advanced', section:'reviews',   filename:'دخول الصفقات ٢ .mov'},
+
+  // ── استراتيجيات كلاسيك ── (مجلدات)
+  {school:'classic', section:'strategies', group:'استراتيجية مؤشر ORB', filename:'شرح الاستراتيجية.mp4',  title:'شرح الاستراتيجية',  order:1},
+  {school:'classic', section:'strategies', group:'استراتيجية مؤشر ORB', filename:'محاضرة مراجعة .mp4',   title:'محاضرة مراجعة',    order:2},
+  {school:'classic', section:'strategies', group:'استراتيجية مؤشر ORB', filename:'اعدادات المؤشر.png',   title:'إعدادات المؤشر',   order:3},
+  {school:'classic', section:'strategies', group:'استراتيجية مؤشر ORB', filename:'نقاط مهمة.png',        title:'نقاط مهمة',        order:4},
+];
+
+const SECTION_LABELS = {
+  null:       'المحتوى الرئيسي',
+  liquidity:  'دروس السيولة',
+  strategies: 'الاستراتيجيات والمؤشرات',
+  reviews:    'المحاضرات والمراجعات'
+};
+
+function prettyName(f){return f.replace(/\.(mp4|mov|avi|mkv|pdf|jpe?g|png|gif|webp)$/i,'').replace(/_/g,' ').trim();}
+function isVideo(f){return /\.(mp4|mov|avi|mkv|webm)$/i.test(f);}
+function isPdf(f){return /\.pdf$/i.test(f);}
+function fileIcon(f){return isVideo(f)?'🎬':isPdf(f)?'📄':'🖼️';}
+
+let pendingFiles=[];
+
+function getStorePath(school, section){
+  if(!section) return ['content', school, isVideo ? 'lectures' : null]; // handled per-file
+  return ['content', school, section];
+}
+
+function existsInStore(d, school, section, filename, group){
+  if(!section){
+    return (d.content?.[school]?.lectures||[]).some(l=>l.filename===filename)
+        || (d.content?.[school]?.books||[]).some(b=>b.filename===filename);
+  }
+  if(group){
+    // ابحث في groups
+    const grp=(d.content?.[school]?.[section]?.groups||[]).find(g=>g.folder===group);
+    return grp ? (grp.files||[]).some(f=>f.filename===filename) : false;
+  }
+  return (d.content?.[school]?.[section]?.lectures||[]).some(l=>l.filename===filename)
+      || (d.content?.[school]?.[section]?.books||[]).some(b=>b.filename===filename);
+}
+
+function scanFiles(){
+  const d=getData();
+  if(!d){document.getElementById('fileList').innerHTML='<div style="color:#f87171;text-align:center;padding:20px">⚠️ لا توجد بيانات — افتح الموقع أولاً</div>';return;}
+
+  pendingFiles=[];
+  let newCount=0, existsCount=0;
+
+  // تجميع حسب (school + section)
+  const groups={};
+  KNOWN_FILES.forEach(f=>{
+    const key=f.school+'|'+(f.section||'__root__');
+    if(!groups[key])groups[key]={school:f.school,section:f.section,files:[]};
+    // إذا كان له group نحتفظ بالكائن كاملاً، وإلا نحتفظ بالاسم فقط
+    groups[key].files.push(f.group ? f : f.filename);
+  });
+
+  let html='';
+  Object.values(groups).forEach(g=>{
+    const schoolLabel=g.school==='classic'?'كلاسيك':'متقدمة';
+    const secLabel=SECTION_LABELS[g.section]||g.section;
+    html+=`<div class="section-header">${schoolLabel} ← ${secLabel}</div>`;
+
+    g.files.forEach(f=>{
+      const filename=typeof f==='string'?f:f.filename;
+      const group=typeof f==='object'?f.group:null;
+      const exists=existsInStore(d,g.school,g.section,filename,group);
+      if(exists)existsCount++;else newCount++;
+      pendingFiles.push({school:g.school,section:g.section,filename,group:group||null,title:f.title||null,order:f.order||null,isNew:!exists});
+      const groupLabel=group?` ← ${group}`:'';
+      html+=`<div class="file-item ${exists?'exists':'new'}">
+        <span class="file-icon">${fileIcon(filename)}</span>
+        <span class="file-name">${filename}</span>
+        <span class="file-school ${g.school==='classic'?'s-classic':'s-advanced'}">${schoolLabel}</span>
+        <span class="file-section">${secLabel}${groupLabel}</span>
+        <span class="file-status ${exists?'status-exists':'status-new'}">${exists?'✓ موجود':'✚ جديد'}</span>
+      </div>`;
+    });
+  });
+
+  document.getElementById('fileList').innerHTML=html||'<div style="color:rgba(255,255,255,.4);text-align:center;padding:20px">لا توجد ملفات</div>';
+  document.getElementById('cNew').textContent=newCount;
+  document.getElementById('cExists').textContent=existsCount;
+  document.getElementById('cTotal').textContent=newCount+existsCount;
+  document.getElementById('syncBtn').disabled=(newCount===0);
+  if(newCount===0)document.getElementById('syncBtn').textContent='✓ كل الملفات مزامَنة بالفعل';
+}
+
+function doSync(){
+  const d=getData();
+  if(!d)return;
+
+  // تأكد من وجود البنية الكاملة
+  if(!d.content)d.content={};
+  ['classic','advanced'].forEach(school=>{
+    if(!d.content[school])d.content[school]={lectures:[],books:[]};
+    if(!d.content[school].lectures)d.content[school].lectures=[];
+    if(!d.content[school].books)d.content[school].books=[];
+    ['liquidity','strategies','reviews'].forEach(sec=>{
+      if(!d.content[school][sec])d.content[school][sec]={lectures:[],books:[],groups:[]};
+      if(!d.content[school][sec].lectures)d.content[school][sec].lectures=[];
+      if(!d.content[school][sec].books)d.content[school][sec].books=[];
+      if(!d.content[school][sec].groups)d.content[school][sec].groups=[];
+    });
+  });
+
+  let added=0;
+  const today=new Date().toISOString().slice(0,10);
+
+  pendingFiles.filter(f=>f.isNew).forEach(f=>{
+    const {school,section,filename,group,title,order}=f;
+    const name=title||prettyName(filename);
+    const vid=isVideo(filename);
+
+    if(group && section){
+      // مجلد استراتيجية — أضفه لمصفوفة groups
+      const secObj=d.content[school][section];
+      let grp=secObj.groups.find(g=>g.folder===group);
+      if(!grp){
+        grp={id:'grp_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),name:group,folder:group,files:[]};
+        secObj.groups.push(grp);
+      }
+      const ftype=vid?'video':/\.(jpe?g|png|gif|webp|svg)$/i.test(filename)?'image':'doc';
+      const nextOrd=order||(grp.files.length+1);
+      grp.files.push({filename,title:name,type:ftype,order:nextOrd});
+    } else if(!section){
+      if(vid){
+        const list=d.content[school].lectures;
+        const nextOrder=(list.length?Math.max(...list.map(l=>l.order)):0)+1;
+        list.push({id:'lec_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),order:nextOrder,title:name,desc:'',duration:'',filename,date:today});
+      } else {
+        const list=d.content[school].books;
+        const nextOrder=(list.length?Math.max(...list.map(b=>b.order)):0)+1;
+        const isSum=name.includes('ملخص')||name.includes('summary')||name.includes('مختصر');
+        list.push({id:'book_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),order:nextOrder,title:name,desc:'',type:isSum?'summary':'book',filename,date:today});
+      }
+    } else {
+      if(vid){
+        const list=d.content[school][section].lectures;
+        const nextOrder=(list.length?Math.max(...list.map(l=>l.order)):0)+1;
+        list.push({id:'lec_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),order:nextOrder,title:name,desc:'',duration:'',filename,date:today});
+      } else {
+        const list=d.content[school][section].books;
+        const nextOrder=(list.length?Math.max(...list.map(b=>b.order)):0)+1;
+        const isSum=name.includes('ملخص')||name.includes('summary')||name.includes('مختصر');
+        list.push({id:'book_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),order:nextOrder,title:name,desc:'',type:isSum?'summary':'book',filename,date:today});
+      }
+    }
+    added++;
+  });
+
+  saveData(d);
+
+  const res=document.getElementById('result');
+  res.style.display='block';res.className='result success';
+  res.innerHTML=`✅ تمت المزامنة — تم إضافة ${added} ملف للنظام`;
+  document.getElementById('syncBtn').disabled=true;
+  document.getElementById('syncBtn').textContent='✓ تمت المزامنة';
+  setTimeout(scanFiles,800);
+}
+
+if(sessionStorage.getItem('adminLoggedIn')!=='true'){window.location.href='admin.html';}
+scanFiles();
+</script>
+</body>
+</html>
