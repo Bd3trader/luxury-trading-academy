@@ -250,7 +250,7 @@ document.getElementById('loginForm').addEventListener('submit',async function(e)
   if(sub.active===false){showAlert('suspMsg');return;}
 
   currentSub=sub;
-  await sendOTP(sub);
+  doLogin(); // OTP disabled temporarily
 });
 
 /* ─── Generate & Send OTP ─── */
