@@ -859,13 +859,19 @@ function handleBookFile(input){
 }
 
 /* ── Lecture CRUD ── */
-/* تحويل رابط Google Drive العادي إلى رابط preview */
+/* تحويل الروابط إلى روابط embed */
 function normalizeDriveUrl(url){
   if(!url) return url;
   url = url.trim();
-  // drive.google.com/file/d/ID/view → /preview
-  const m = url.match(/drive\.google\.com\/file\/d\/([^\/\?]+)/);
-  if(m) return `https://drive.google.com/file/d/${m[1]}/preview`;
+  // Google Drive
+  const dm = url.match(/drive\.google\.com\/file\/d\/([^\/\?]+)/);
+  if(dm) return `https://drive.google.com/file/d/${dm[1]}/preview`;
+  // Vimeo: vimeo.com/ID أو player.vimeo.com/video/ID
+  const vm = url.match(/(?:vimeo\.com\/|player\.vimeo\.com\/video\/)(\d+)/);
+  if(vm) return `https://player.vimeo.com/video/${vm[1]}`;
+  // YouTube
+  const ym = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\?]+)/);
+  if(ym) return `https://www.youtube.com/embed/${ym[1]}`;
   return url;
 }
 
