@@ -741,12 +741,34 @@
   </div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script>
-const STORE='tradingPlatform_v1';
-function getData(){try{const r=localStorage.getItem(STORE);if(r)return JSON.parse(r);}catch(e){}return null;}
-function saveData(d){localStorage.setItem(STORE,JSON.stringify(d));}
+/* ── Firebase ── */
+const firebaseConfig={apiKey:"AIzaSyCp4YfzewPiH6XkVHo6Sp86hyy5gB-eUSY",authDomain:"luxury-trading-academy.firebaseapp.com",projectId:"luxury-trading-academy",storageBucket:"luxury-trading-academy.firebasestorage.app",messagingSenderId:"247439882691",appId:"1:247439882691:web:46a1a83ebceb96596fe576"};
+if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+const db=firebase.firestore();
 
-/* ── ترحيل وإضافة الملفات الحقيقية تلقائياً ── */
+let firestoreContent={content:{classic:{lectures:[],books:[]},advanced:{lectures:[],books:[]}},scheduledSessions:[]};
+function getData(){return firestoreContent;}
+function saveData(d){}  // no-op — Firestore is the source of truth
+
+/* ── Load content from Firestore ── */
+async function loadFirestoreContent(){
+  const schools=sub?.schools||[];
+  const tasks=[];
+  if(schools.includes('classic')){
+    tasks.push(db.collection('lectures_classic').orderBy('order').get().then(s=>{firestoreContent.content.classic.lectures=s.docs.map(d=>({id:d.id,...d.data()}));}));
+    tasks.push(db.collection('books_classic').orderBy('order').get().then(s=>{firestoreContent.content.classic.books=s.docs.map(d=>({id:d.id,...d.data()}));}));
+  }
+  if(schools.includes('advanced')){
+    tasks.push(db.collection('lectures_advanced').orderBy('order').get().then(s=>{firestoreContent.content.advanced.lectures=s.docs.map(d=>({id:d.id,...d.data()}));}));
+    tasks.push(db.collection('books_advanced').orderBy('order').get().then(s=>{firestoreContent.content.advanced.books=s.docs.map(d=>({id:d.id,...d.data()}));}));
+  }
+  tasks.push(db.collection('scheduled_sessions').get().then(s=>{firestoreContent.scheduledSessions=s.docs.map(d=>({id:d.id,...d.data()}));}));
+  await Promise.all(tasks).catch(console.error);
+}
+
 function migrateAndSync(){
   let d=getData();
   if(!d){return;}
@@ -945,7 +967,7 @@ function migrateAndSync(){
 
 /* ── Session Check ── */
 let sub=null,sesId=null;
-function init(){
+async function init(){
   const raw=sessionStorage.getItem('currentSubscriber');
   sesId=sessionStorage.getItem('sessionId');
   if(!raw){window.location.href='login.html';return;}
@@ -981,6 +1003,7 @@ function init(){
   else if(totalLecs>=10){level='متوسط';stars='⭐⭐';}
   document.getElementById('levelText').textContent=level;
   document.getElementById('levelStars').textContent=stars;
+  await loadFirestoreContent();
   renderSchools();
   renderScheduledSessions();
   heartbeat();
@@ -1142,7 +1165,8 @@ function renderLectures(key,d,section){
   const el=document.getElementById('lecturesList');
   if(lectures.length===0){el.innerHTML='<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">لا توجد محاضرات بعد — ترقّب التحديثات!</div></div>';return;}
   el.innerHTML=lectures.map(l=>{
-    const hasFile=!!l.filename;
+    const href=l.fileURL||(l.filename?filePath(key,section,l.filename):'');
+    const hasFile=!!href;
     return`<li class="lec-item">
       <div class="lec-num">${l.order}</div>
       <div class="lec-info">
@@ -1151,7 +1175,7 @@ function renderLectures(key,d,section){
         <div class="lec-meta"><span>⏱ ${l.duration||''}</span><span>📅 ${l.date||''}</span></div>
       </div>
       ${hasFile
-        ?`<a href="${filePath(key,section,l.filename)}" target="_blank" class="lec-btn has-file">▶ مشاهدة</a>`
+        ?`<a href="${href}" target="_blank" class="lec-btn has-file">▶ مشاهدة</a>`
         :`<button class="lec-btn no-file" disabled>⌛ قريباً</button>`
       }
     </li>`;
@@ -1164,9 +1188,10 @@ function renderBooks(key,d,section){
   if(books.length===0){el.innerHTML='<div class="empty"><div class="empty-icon">📚</div><div class="empty-text">لا توجد كتب أو ملخصات بعد</div></div>';return;}
   el.innerHTML=books.map(b=>{
     const isBook=b.type==='book'||!b.type;
-    const hasFile=!!b.filename;
-    const isImg=/\.(jpe?g|png|gif|webp|svg)$/i.test(b.filename||'');
-    const isPdfFile=/\.pdf$/i.test(b.filename||'');
+    const href=b.fileURL||(b.filename?filePath(key,section,b.filename):'');
+    const hasFile=!!href;
+    const isImg=/\.(jpe?g|png|gif|webp|svg)$/i.test(b.filename||b.fileURL||'');
+    const isPdfFile=/\.pdf$/i.test(b.filename||b.fileURL||'');
     const fIcon=isImg?'🖼️':isPdfFile?'📄':'📖';
     const btnLabel=isImg?'🖼️ عرض الصورة':isPdfFile?'📄 فتح PDF':'📥 تحميل / فتح';
     return`<div class="book-card">
@@ -1177,7 +1202,7 @@ function renderBooks(key,d,section){
       <div class="book-title">${b.title}</div>
       <div class="book-desc">${b.desc}</div>
       ${hasFile
-        ?`<a href="${filePath(key,section,b.filename)}" target="_blank" class="book-btn has-file">${btnLabel}</a>`
+        ?`<a href="${href}" target="_blank" class="book-btn has-file">${btnLabel}</a>`
         :`<button class="book-btn no-file" disabled>⌛ قريباً</button>`
       }
     </div>`;
@@ -1203,9 +1228,8 @@ function closePanel(){
 /* ── Heartbeat ── */
 function heartbeat(){
   function beat(){
-    const d=getData();if(!d)return;
-    const s=(d.subscribers||[]).find(x=>x.id===sub.id);
-    if(s){s.isOnline=true;s.lastSeen=Date.now();saveData(d);}
+    if(!sub?.id)return;
+    db.collection('subscribers').doc(sub.id).update({isOnline:true,lastSeen:Date.now()}).catch(()=>{});
   }
   beat();setInterval(beat,30000);
 }
@@ -1329,13 +1353,10 @@ function sendSupportRequest(){
 
 /* ── Logout ── */
 function logout(){
-  const d=getData();
-  if(d){
-    const s=(d.subscribers||[]).find(x=>x.id===sub.id);
-    if(s){s.isOnline=false;s.lastSeen=Date.now();}
-    const ses=(d.sessions||[]).find(x=>x.id===sesId);
-    if(ses)ses.logoutTime=Date.now();
-    saveData(d);
+  if(sub?.id){
+    db.collection('subscribers').doc(sub.id).update({isOnline:false,lastSeen:Date.now()}).catch(()=>{});
+    db.collection('login_sessions').where('studentId','==',sub.id).orderBy('loginTime','desc').limit(1).get()
+      .then(snap=>{if(!snap.empty)snap.docs[0].ref.update({logoutTime:Date.now()});}).catch(()=>{});
   }
   sessionStorage.clear();
   window.location.href='login.html';
@@ -1871,7 +1892,6 @@ async function sendAiMsg(){
 
 let _internalNav=false;
 window.addEventListener('beforeunload',()=>{ if(!_internalNav) logout(); });
-migrateAndSync();
 init();
 </script>
 </body>
