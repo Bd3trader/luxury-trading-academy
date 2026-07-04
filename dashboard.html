@@ -516,6 +516,39 @@
     </div>
   </div>
 
+  <!-- Live Prices (moved above schools) -->
+  <div style="margin-bottom:28px">
+    <div class="sec-title"><div class="sec-title-bar"></div> أسعار السوق المباشرة</div>
+    <div style="border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.08);border:1px solid rgba(0,0,0,.06)">
+      <div class="tradingview-widget-container">
+        <div class="tradingview-widget-container__widget"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+        {
+          "symbols": [
+            {"proName":"FOREXCOM:XAUUSD","title":"الذهب"},
+            {"proName":"FX_IDC:EURUSD","title":"يورو/دولار"},
+            {"proName":"FX_IDC:GBPUSD","title":"إسترليني/دولار"},
+            {"proName":"FX_IDC:USDJPY","title":"دولار/ين"},
+            {"proName":"FX_IDC:USDCHF","title":"دولار/فرنك"},
+            {"proName":"FX_IDC:AUDUSD","title":"أسترالي/دولار"},
+            {"proName":"FX_IDC:USDCAD","title":"دولار/كندي"},
+            {"proName":"FX_IDC:NZDUSD","title":"نيوزيلندي/دولار"},
+            {"proName":"FOREXCOM:XAGUSD","title":"الفضة"},
+            {"proName":"NASDAQ:NDX","title":"ناسداك"},
+            {"proName":"SP:SPX","title":"S&P 500"},
+            {"proName":"BITSTAMP:BTCUSD","title":"بيتكوين"}
+          ],
+          "showSymbolLogo": true,
+          "isTransparent": false,
+          "displayMode": "adaptive",
+          "colorTheme": "dark",
+          "locale": "ar_AE"
+        }
+        </script>
+      </div>
+    </div>
+  </div>
+
   <!-- Schools -->
   <div class="sec-title"><div class="sec-title-bar"></div> مدارسك التعليمية</div>
   <div class="schools-row" id="schoolsRow"></div>
@@ -634,39 +667,6 @@
     <div id="scheduleEmpty" style="display:none;background:#fff;border-radius:14px;padding:32px;text-align:center;color:#6b7280;font-size:.88rem;border:1px solid rgba(0,0,0,.06)">
       <div style="font-size:2rem;margin-bottom:8px">📅</div>
       لا توجد جلسات مجدولة هذا الشهر
-    </div>
-  </div>
-
-  <!-- Live Prices -->
-  <div style="margin-bottom:28px">
-    <div class="sec-title"><div class="sec-title-bar"></div> أسعار السوق المباشرة</div>
-    <div style="border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.08);border:1px solid rgba(0,0,0,.06)">
-      <div class="tradingview-widget-container">
-        <div class="tradingview-widget-container__widget"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
-        {
-          "symbols": [
-            {"proName":"FOREXCOM:XAUUSD","title":"الذهب"},
-            {"proName":"FX_IDC:EURUSD","title":"يورو/دولار"},
-            {"proName":"FX_IDC:GBPUSD","title":"إسترليني/دولار"},
-            {"proName":"FX_IDC:USDJPY","title":"دولار/ين"},
-            {"proName":"FX_IDC:USDCHF","title":"دولار/فرنك"},
-            {"proName":"FX_IDC:AUDUSD","title":"أسترالي/دولار"},
-            {"proName":"FX_IDC:USDCAD","title":"دولار/كندي"},
-            {"proName":"FX_IDC:NZDUSD","title":"نيوزيلندي/دولار"},
-            {"proName":"FOREXCOM:XAGUSD","title":"الفضة"},
-            {"proName":"NASDAQ:NDX","title":"ناسداك"},
-            {"proName":"SP:SPX","title":"S&P 500"},
-            {"proName":"BITSTAMP:BTCUSD","title":"بيتكوين"}
-          ],
-          "showSymbolLogo": true,
-          "isTransparent": false,
-          "displayMode": "adaptive",
-          "colorTheme": "dark",
-          "locale": "ar_AE"
-        }
-        </script>
-      </div>
     </div>
   </div>
 
