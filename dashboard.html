@@ -1160,22 +1160,34 @@ function filePath(key, section, filename){
   return base + encodeURIComponent(filename);
 }
 
+function getViewerUrl(url){
+  if(!url) return '';
+  // Google Drive: تأكد أنه preview
+  if(url.includes('drive.google.com')){
+    const m=url.match(/\/d\/([^\/\?]+)/);
+    if(m) return `https://drive.google.com/file/d/${m[1]}/preview`;
+  }
+  return url;
+}
+
 function renderLectures(key,d,section){
   const lectures=(d?.content?.[key]?.lectures||[]).sort((a,b)=>a.order-b.order);
   const el=document.getElementById('lecturesList');
   if(lectures.length===0){el.innerHTML='<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">لا توجد محاضرات بعد — ترقّب التحديثات!</div></div>';return;}
   el.innerHTML=lectures.map(l=>{
-    const href=l.fileURL||(l.filename?filePath(key,section,l.filename):'');
-    const hasFile=!!href;
+    const rawHref=l.fileURL||(l.filename?filePath(key,section,l.filename):'');
+    const viewUrl=getViewerUrl(rawHref);
+    const hasFile=!!viewUrl;
+    const titleEsc=l.title.replace(/'/g,"\\'");
     return`<li class="lec-item">
       <div class="lec-num">${l.order}</div>
       <div class="lec-info">
         <div class="lec-title">${l.title}</div>
-        <div class="lec-desc">${l.desc}</div>
+        <div class="lec-desc">${l.desc||''}</div>
         <div class="lec-meta"><span>⏱ ${l.duration||''}</span><span>📅 ${l.date||''}</span></div>
       </div>
       ${hasFile
-        ?`<a href="${href}" target="_blank" class="lec-btn has-file">▶ مشاهدة</a>`
+        ?`<button class="lec-btn has-file" onclick="openViewer('${viewUrl}','${titleEsc}')">▶ مشاهدة</button>`
         :`<button class="lec-btn no-file" disabled>⌛ قريباً</button>`
       }
     </li>`;
@@ -1188,21 +1200,23 @@ function renderBooks(key,d,section){
   if(books.length===0){el.innerHTML='<div class="empty"><div class="empty-icon">📚</div><div class="empty-text">لا توجد كتب أو ملخصات بعد</div></div>';return;}
   el.innerHTML=books.map(b=>{
     const isBook=b.type==='book'||!b.type;
-    const href=b.fileURL||(b.filename?filePath(key,section,b.filename):'');
-    const hasFile=!!href;
-    const isImg=/\.(jpe?g|png|gif|webp|svg)$/i.test(b.filename||b.fileURL||'');
-    const isPdfFile=/\.pdf$/i.test(b.filename||b.fileURL||'');
+    const rawHref=b.fileURL||(b.filename?filePath(key,section,b.filename):'');
+    const viewUrl=getViewerUrl(rawHref);
+    const hasFile=!!viewUrl;
+    const isImg=/\.(jpe?g|png|gif|webp|svg)$/i.test(rawHref);
+    const isPdfFile=/\.pdf$/i.test(rawHref);
     const fIcon=isImg?'🖼️':isPdfFile?'📄':'📖';
-    const btnLabel=isImg?'🖼️ عرض الصورة':isPdfFile?'📄 فتح PDF':'📥 تحميل / فتح';
+    const btnLabel=isImg?'🖼️ عرض':isPdfFile?'📄 فتح PDF':'▶ فتح';
+    const titleEsc=b.title.replace(/'/g,"\\'");
     return`<div class="book-card">
       <div class="book-top">
         <div class="book-icon">${isBook?fIcon:'🗂️'}</div>
         <span class="book-type-badge ${isBook?'type-book':'type-summary'}">${isBook?'كتاب':'ملخص مصوّر'}</span>
       </div>
       <div class="book-title">${b.title}</div>
-      <div class="book-desc">${b.desc}</div>
+      <div class="book-desc">${b.desc||''}</div>
       ${hasFile
-        ?`<a href="${href}" target="_blank" class="book-btn has-file">${btnLabel}</a>`
+        ?`<button class="book-btn has-file" onclick="openViewer('${viewUrl}','${titleEsc}')">${btnLabel}</button>`
         :`<button class="book-btn no-file" disabled>⌛ قريباً</button>`
       }
     </div>`;
@@ -1893,6 +1907,38 @@ async function sendAiMsg(){
 let _internalNav=false;
 window.addEventListener('beforeunload',()=>{ if(!_internalNav) logout(); });
 init();
+</script>
+
+<!-- File Viewer Modal -->
+<div id="fileViewer" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:99999;flex-direction:column;align-items:center;justify-content:center;padding:16px">
+  <div style="width:100%;max-width:900px;display:flex;flex-direction:column;gap:10px;height:100%">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div id="viewerTitle" style="color:#fff;font-weight:800;font-size:1rem;font-family:'Cairo',sans-serif"></div>
+      <div style="display:flex;gap:8px">
+        <a id="viewerExtLink" href="#" target="_blank" style="background:rgba(255,255,255,.15);color:#fff;text-decoration:none;padding:6px 14px;border-radius:8px;font-size:.82rem;font-family:'Cairo',sans-serif">↗ فتح في تبويب</a>
+        <button onclick="closeViewer()" style="background:rgba(255,255,255,.15);border:none;color:#fff;padding:6px 14px;border-radius:8px;cursor:pointer;font-family:'Cairo',sans-serif;font-size:.82rem">✕ إغلاق</button>
+      </div>
+    </div>
+    <iframe id="viewerFrame" src="" style="flex:1;width:100%;border:none;border-radius:12px;background:#000" allowfullscreen></iframe>
+  </div>
+</div>
+
+<script>
+function openViewer(url, title){
+  document.getElementById('viewerTitle').textContent = title||'';
+  document.getElementById('viewerFrame').src = url;
+  document.getElementById('viewerExtLink').href = url.replace('/preview','\/view');
+  document.getElementById('fileViewer').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function closeViewer(){
+  document.getElementById('fileViewer').style.display = 'none';
+  document.getElementById('viewerFrame').src = '';
+  document.body.style.overflow = '';
+}
+document.getElementById('fileViewer').addEventListener('click', function(e){
+  if(e.target===this) closeViewer();
+});
 </script>
 </body>
 </html>

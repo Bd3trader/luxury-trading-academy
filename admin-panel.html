@@ -380,9 +380,14 @@
       <div class="field"><label>عنوان المحاضرة *</label><input type="text" id="l-title" placeholder="عنوان المحاضرة"/></div>
       <div class="field"><label>الوصف</label><textarea id="l-desc" placeholder="وصف مختصر..."></textarea></div>
       <div class="field">
-        <label>رفع ملف المحاضرة (فيديو / PDF / صورة)</label>
+        <label>🔗 رابط Google Drive أو YouTube</label>
+        <input type="text" id="l-driveurl" placeholder="https://drive.google.com/file/d/.../view" dir="ltr" style="font-size:.82rem"/>
+        <div style="font-size:.76rem;color:#6b7280;margin-top:4px">للفيديوهات الكبيرة: ارفع على Google Drive ← مشاركة ← أي شخص لديه الرابط ← انسخ الرابط</div>
+      </div>
+      <div class="field">
+        <label>📎 أو ارفع ملف PDF / صورة (أقل من 10MB)</label>
         <div class="file-upload-wrap" onclick="document.getElementById('l-file').click()">
-          <input type="file" id="l-file" accept="video/*,application/pdf,image/*" style="display:none" onchange="handleLectureFile(this)"/>
+          <input type="file" id="l-file" accept="application/pdf,image/*" style="display:none" onchange="handleLectureFile(this)"/>
           <div class="file-upload-text">📂 اضغط لاختيار ملف أو اسحبه هنا</div>
           <div class="upload-progress" id="l-progress"><div class="upload-progress-fill" id="l-progress-fill"></div></div>
           <div id="l-file-label" class="current-file none">لم يتم اختيار ملف</div>
@@ -420,9 +425,14 @@
       <div class="field"><label>العنوان *</label><input type="text" id="b-title" placeholder="عنوان الكتاب أو الملخص"/></div>
       <div class="field"><label>الوصف</label><textarea id="b-desc" placeholder="وصف مختصر..."></textarea></div>
       <div class="field">
-        <label>رفع الملف (PDF / صورة / فيديو)</label>
+        <label>🔗 رابط Google Drive أو أي رابط</label>
+        <input type="text" id="b-driveurl" placeholder="https://drive.google.com/file/d/.../view" dir="ltr" style="font-size:.82rem"/>
+        <div style="font-size:.76rem;color:#6b7280;margin-top:4px">للملفات الكبيرة: ارفع على Google Drive وانسخ رابط المشاركة</div>
+      </div>
+      <div class="field">
+        <label>📎 أو ارفع ملف PDF / صورة (أقل من 10MB)</label>
         <div class="file-upload-wrap" onclick="document.getElementById('b-file').click()">
-          <input type="file" id="b-file" accept="application/pdf,image/*,video/*" style="display:none" onchange="handleBookFile(this)"/>
+          <input type="file" id="b-file" accept="application/pdf,image/*" style="display:none" onchange="handleBookFile(this)"/>
           <div class="file-upload-text">📂 اضغط لاختيار ملف أو اسحبه هنا</div>
           <div class="upload-progress" id="b-progress"><div class="upload-progress-fill" id="b-progress-fill"></div></div>
           <div id="b-file-label" class="current-file none">لم يتم اختيار ملف</div>
@@ -849,11 +859,22 @@ function handleBookFile(input){
 }
 
 /* ── Lecture CRUD ── */
+/* تحويل رابط Google Drive العادي إلى رابط preview */
+function normalizeDriveUrl(url){
+  if(!url) return url;
+  url = url.trim();
+  // drive.google.com/file/d/ID/view → /preview
+  const m = url.match(/drive\.google\.com\/file\/d\/([^\/\?]+)/);
+  if(m) return `https://drive.google.com/file/d/${m[1]}/preview`;
+  return url;
+}
+
 function openAddLecture(key){
   document.getElementById('lectureModalTitle').textContent = 'إضافة محاضرة جديدة';
   document.getElementById('editLectureId').value = '';
   document.getElementById('editLectureSchool').value = key;
   document.getElementById('l-fileurl').value = '';
+  document.getElementById('l-driveurl').value = '';
   ['l-order','l-title','l-desc','l-duration'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('l-file-label').textContent = 'لم يتم اختيار ملف';
   document.getElementById('l-file-label').className = 'current-file none';
@@ -873,9 +894,10 @@ function openEditLecture(key, id){
   document.getElementById('l-title').value = l.title;
   document.getElementById('l-desc').value = l.desc||'';
   document.getElementById('l-duration').value = l.duration||'';
-  document.getElementById('l-fileurl').value = l.fileURL||'';
+  document.getElementById('l-fileurl').value = '';
+  document.getElementById('l-driveurl').value = l.fileURL||'';
   const label = document.getElementById('l-file-label');
-  label.textContent = l.fileURL ? '✅ ملف مرفوع بالفعل — اختر ملفاً جديداً للاستبدال' : 'لم يتم اختيار ملف';
+  label.textContent = l.fileURL ? '✅ يوجد رابط/ملف — اختر ملفاً جديداً للاستبدال' : 'لم يتم اختيار ملف';
   label.className = l.fileURL ? 'current-file has' : 'current-file none';
   document.getElementById('l-progress').style.display = 'none';
   document.getElementById('l-progress-fill').style.width = '0%';
@@ -894,7 +916,8 @@ async function saveLecture(){
   const btn = document.getElementById('saveLecBtn');
   btn.disabled = true; btn.textContent = 'جاري الحفظ...';
 
-  let fileURL = document.getElementById('l-fileurl').value;
+  // الأولوية: رابط Drive > رفع ملف > الرابط القديم
+  let fileURL = normalizeDriveUrl(document.getElementById('l-driveurl').value) || document.getElementById('l-fileurl').value;
   if(pendingLectureFile){
     try {
       btn.textContent = 'جاري رفع الملف...';
@@ -937,6 +960,7 @@ function openAddBook(key){
   document.getElementById('editBookId').value = '';
   document.getElementById('editBookSchool').value = key;
   document.getElementById('b-fileurl').value = '';
+  document.getElementById('b-driveurl').value = '';
   ['b-order','b-title','b-desc'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('b-type').value = 'book';
   document.getElementById('b-file-label').textContent = 'لم يتم اختيار ملف';
@@ -957,9 +981,10 @@ function openEditBook(key, id){
   document.getElementById('b-type').value = b.type||'book';
   document.getElementById('b-title').value = b.title;
   document.getElementById('b-desc').value = b.desc||'';
-  document.getElementById('b-fileurl').value = b.fileURL||'';
+  document.getElementById('b-fileurl').value = '';
+  document.getElementById('b-driveurl').value = b.fileURL||'';
   const label = document.getElementById('b-file-label');
-  label.textContent = b.fileURL ? '✅ ملف مرفوع — اختر ملفاً جديداً للاستبدال' : 'لم يتم اختيار ملف';
+  label.textContent = b.fileURL ? '✅ يوجد رابط/ملف — اختر ملفاً جديداً للاستبدال' : 'لم يتم اختيار ملف';
   label.className = b.fileURL ? 'current-file has' : 'current-file none';
   document.getElementById('b-progress').style.display = 'none';
   pendingBookFile = null;
@@ -977,7 +1002,7 @@ async function saveBook(){
   const btn = document.getElementById('saveBookBtn');
   btn.disabled = true; btn.textContent = 'جاري الحفظ...';
 
-  let fileURL = document.getElementById('b-fileurl').value;
+  let fileURL = normalizeDriveUrl(document.getElementById('b-driveurl').value) || document.getElementById('b-fileurl').value;
   if(pendingBookFile){
     try {
       btn.textContent = 'جاري رفع الملف...';
