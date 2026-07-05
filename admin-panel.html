@@ -387,7 +387,7 @@
       <div class="field">
         <label>📎 أو ارفع ملف PDF / صورة (أقل من 10MB)</label>
         <div class="file-upload-wrap" onclick="document.getElementById('l-file').click()">
-          <input type="file" id="l-file" accept="application/pdf,image/*" style="display:none" onchange="handleLectureFile(this)"/>
+          <input type="file" id="l-file" accept="video/*,application/pdf,image/*" style="display:none" onchange="handleLectureFile(this)"/>
           <div class="file-upload-text">📂 اضغط لاختيار ملف أو اسحبه هنا</div>
           <div class="upload-progress" id="l-progress"><div class="upload-progress-fill" id="l-progress-fill"></div></div>
           <div id="l-file-label" class="current-file none">لم يتم اختيار ملف</div>
@@ -432,7 +432,7 @@
       <div class="field">
         <label>📎 أو ارفع ملف PDF / صورة (أقل من 10MB)</label>
         <div class="file-upload-wrap" onclick="document.getElementById('b-file').click()">
-          <input type="file" id="b-file" accept="application/pdf,image/*" style="display:none" onchange="handleBookFile(this)"/>
+          <input type="file" id="b-file" accept="video/*,application/pdf,image/*" style="display:none" onchange="handleBookFile(this)"/>
           <div class="file-upload-text">📂 اضغط لاختيار ملف أو اسحبه هنا</div>
           <div class="upload-progress" id="b-progress"><div class="upload-progress-fill" id="b-progress-fill"></div></div>
           <div id="b-file-label" class="current-file none">لم يتم اختيار ملف</div>
@@ -492,6 +492,7 @@
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
 
 <script>
 /* ═══ Firebase Init ═══ */
@@ -505,6 +506,7 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+const storage = firebase.storage();
 
 /* ═══ Auth ═══ */
 if(sessionStorage.getItem('adminLoggedIn') !== 'true'){ window.location.href = 'admin.html'; }
@@ -813,27 +815,24 @@ function renderSubTab(key, tab){
   }
 }
 
-/* ── File Upload via Cloudinary ── */
+/* ── File Upload via Firebase Storage ── */
 async function uploadFile(file, path, progressFill, progressBar){
   progressBar.style.display = 'block';
-  progressFill.style.width = '10%';
-  const fd = new FormData();
-  fd.append('file', file);
-  fd.append('upload_preset', 'trading');
-
+  progressFill.style.width = '0%';
   return new Promise((resolve, reject)=>{
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'https://api.cloudinary.com/v1_1/jyp6xz10/auto/upload');
-    xhr.upload.onprogress = e => {
-      if(e.lengthComputable) progressFill.style.width = (e.loaded/e.total*100).toFixed(0)+'%';
-    };
-    xhr.onload = () => {
-      const res = JSON.parse(xhr.responseText);
-      if(res.secure_url) resolve(res.secure_url);
-      else reject(new Error(res.error?.message || 'Upload failed'));
-    };
-    xhr.onerror = () => reject(new Error('Network error'));
-    xhr.send(fd);
+    const ref = storage.ref(path);
+    const task = ref.put(file);
+    task.on('state_changed',
+      snap => {
+        const pct = (snap.bytesTransferred / snap.totalBytes * 100).toFixed(0);
+        progressFill.style.width = pct + '%';
+      },
+      err => reject(err),
+      async () => {
+        const url = await ref.getDownloadURL();
+        resolve(url);
+      }
+    );
   });
 }
 
