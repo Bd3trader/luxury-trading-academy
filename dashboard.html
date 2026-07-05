@@ -596,9 +596,11 @@
     <div class="tabs-bar">
       <button class="tab-btn active" id="tab-lectures" onclick="switchTab('lectures',this)">الدروس والمحاضرات</button>
       <button class="tab-btn" id="tab-books" onclick="switchTab('books',this)">الكتب والملخصات</button>
+      <button class="tab-btn" id="tab-images" onclick="switchTab('images',this)">🖼️ الصور</button>
     </div>
     <div class="tab-content active" id="tc-lectures"><ul class="lectures-list" id="lecturesList"></ul></div>
     <div class="tab-content" id="tc-books"><div class="books-grid" id="booksList"></div></div>
+    <div class="tab-content" id="tc-images"><div class="books-grid" id="imagesList"></div></div>
   </div>
 
   <!-- Economic Calendar Section -->
@@ -749,7 +751,7 @@ const firebaseConfig={apiKey:"AIzaSyCp4YfzewPiH6XkVHo6Sp86hyy5gB-eUSY",authDomai
 if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db=firebase.firestore();
 
-let firestoreContent={content:{classic:{lectures:[],books:[]},advanced:{lectures:[],books:[]}},scheduledSessions:[]};
+let firestoreContent={content:{classic:{lectures:[],books:[],images:[]},advanced:{lectures:[],books:[],images:[]}},scheduledSessions:[]};
 function getData(){return firestoreContent;}
 function saveData(d){}  // no-op — Firestore is the source of truth
 
@@ -760,10 +762,12 @@ async function loadFirestoreContent(){
   if(schools.includes('classic')){
     tasks.push(db.collection('lectures_classic').orderBy('order').get().then(s=>{firestoreContent.content.classic.lectures=s.docs.map(d=>({id:d.id,...d.data()}));}));
     tasks.push(db.collection('books_classic').orderBy('order').get().then(s=>{firestoreContent.content.classic.books=s.docs.map(d=>({id:d.id,...d.data()}));}));
+    tasks.push(db.collection('images_classic').orderBy('order').get().then(s=>{firestoreContent.content.classic.images=s.docs.map(d=>({id:d.id,...d.data()}));}));
   }
   if(schools.includes('advanced')){
     tasks.push(db.collection('lectures_advanced').orderBy('order').get().then(s=>{firestoreContent.content.advanced.lectures=s.docs.map(d=>({id:d.id,...d.data()}));}));
     tasks.push(db.collection('books_advanced').orderBy('order').get().then(s=>{firestoreContent.content.advanced.books=s.docs.map(d=>({id:d.id,...d.data()}));}));
+    tasks.push(db.collection('images_advanced').orderBy('order').get().then(s=>{firestoreContent.content.advanced.images=s.docs.map(d=>({id:d.id,...d.data()}));}));
   }
   tasks.push(db.collection('scheduled_sessions').get().then(s=>{firestoreContent.scheduledSessions=s.docs.map(d=>({id:d.id,...d.data()}));}));
   await Promise.all(tasks).catch(console.error);
@@ -1070,6 +1074,7 @@ function openSchool(key){
 
   renderLectures(key,d,null);
   renderBooks(key,d,null);
+  renderImages(key,d,null);
 
   switchTab('lectures',document.getElementById('tab-lectures'));
 
@@ -1223,6 +1228,22 @@ function renderBooks(key,d,section){
         ?`<button class="book-btn has-file" onclick="openViewer('${viewUrl}','${titleEsc}')">${btnLabel}</button>`
         :`<button class="book-btn no-file" disabled>⌛ قريباً</button>`
       }
+    </div>`;
+  }).join('');
+}
+
+function renderImages(key,d,section){
+  const el=document.getElementById('imagesList');
+  const images=(d?.content?.[key]?.images||[]).sort((a,b)=>a.order-b.order);
+  if(images.length===0){el.innerHTML='<div class="empty"><div class="empty-icon">🖼️</div><div class="empty-text">لا توجد صور بعد</div></div>';return;}
+  el.innerHTML=images.map(img=>{
+    const titleEsc=(img.title||'').replace(/'/g,"\\'");
+    return`<div class="book-card">
+      <div class="book-top"><div class="book-icon">🖼️</div></div>
+      <img src="${img.fileURL||''}" alt="${img.title||''}" style="width:100%;border-radius:10px;object-fit:cover;max-height:160px;margin:8px 0" loading="lazy"/>
+      <div class="book-title">${img.title||''}</div>
+      <div class="book-desc">${img.desc||''}</div>
+      ${img.fileURL?`<button class="book-btn has-file" onclick="openViewer('${img.fileURL}','${titleEsc}')">🖼️ عرض</button>`:`<button class="book-btn no-file" disabled>⌛ قريباً</button>`}
     </div>`;
   }).join('');
 }
@@ -1946,14 +1967,12 @@ function openViewer(url, title){
   const vid = document.getElementById('viewerVideo');
   const frm = document.getElementById('viewerFrame');
   const img = document.getElementById('viewerImg');
-  const ext = document.getElementById('viewerExtLink');
 
   // إخفاء كل العناصر
   vid.style.display = frm.style.display = img.style.display = 'none';
   vid.src = ''; frm.src = ''; img.src = '';
 
   document.getElementById('viewerTitle').textContent = title||'';
-  ext.href = url;
 
   if(isVideoUrl(url)){
     vid.src = url;

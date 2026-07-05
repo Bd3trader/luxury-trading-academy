@@ -387,7 +387,7 @@
       <div class="field">
         <label>📎 أو ارفع ملف PDF / صورة (أقل من 10MB)</label>
         <div class="file-upload-wrap" onclick="document.getElementById('l-file').click()">
-          <input type="file" id="l-file" accept="video/*,application/pdf,image/*" style="display:none" onchange="handleLectureFile(this)"/>
+          <input type="file" id="l-file" accept="video/*" style="display:none" onchange="handleLectureFile(this)"/>
           <div class="file-upload-text">📂 اضغط لاختيار ملف أو اسحبه هنا</div>
           <div class="upload-progress" id="l-progress"><div class="upload-progress-fill" id="l-progress-fill"></div></div>
           <div id="l-file-label" class="current-file none">لم يتم اختيار ملف</div>
@@ -432,7 +432,7 @@
       <div class="field">
         <label>📎 أو ارفع ملف PDF / صورة (أقل من 10MB)</label>
         <div class="file-upload-wrap" onclick="document.getElementById('b-file').click()">
-          <input type="file" id="b-file" accept="video/*,application/pdf,image/*" style="display:none" onchange="handleBookFile(this)"/>
+          <input type="file" id="b-file" accept="application/pdf" style="display:none" onchange="handleBookFile(this)"/>
           <div class="file-upload-text">📂 اضغط لاختيار ملف أو اسحبه هنا</div>
           <div class="upload-progress" id="b-progress"><div class="upload-progress-fill" id="b-progress-fill"></div></div>
           <div id="b-file-label" class="current-file none">لم يتم اختيار ملف</div>
@@ -442,6 +442,37 @@
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('bookModal')">إلغاء</button>
       <button class="btn-primary" id="saveBookBtn" onclick="saveBook()">💾 حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- Image Modal -->
+<div class="modal-overlay" id="imageModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="imageModalTitle">إضافة صورة</div>
+      <button class="modal-close" onclick="closeModal('imageModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editImageId"/>
+      <input type="hidden" id="editImageSchool"/>
+      <input type="hidden" id="i-fileurl"/>
+      <div class="field"><label>الترتيب *</label><input type="number" id="i-order" min="1" placeholder="1"/></div>
+      <div class="field"><label>عنوان الصورة *</label><input type="text" id="i-title" placeholder="عنوان الصورة"/></div>
+      <div class="field"><label>الوصف</label><textarea id="i-desc" placeholder="وصف مختصر..."></textarea></div>
+      <div class="field">
+        <label>📎 رفع صورة (JPG / PNG / WebP)</label>
+        <div class="file-upload-wrap" onclick="document.getElementById('i-file').click()">
+          <input type="file" id="i-file" accept="image/*" style="display:none" onchange="handleImageFile(this)"/>
+          <div class="file-upload-text">🖼️ اضغط لاختيار صورة أو اسحبها هنا</div>
+          <div class="upload-progress" id="i-progress"><div class="upload-progress-fill" id="i-progress-fill"></div></div>
+          <div id="i-file-label" class="current-file none">لم يتم اختيار صورة</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('imageModal')">إلغاء</button>
+      <button class="btn-primary" id="saveImgBtn" onclick="saveImage()">💾 حفظ الصورة</button>
     </div>
   </div>
 </div>
@@ -520,6 +551,7 @@ let cache = {
   subscribers: [],
   lectures: { classic: [], advanced: [] },
   books: { classic: [], advanced: [] },
+  images: { classic: [], advanced: [] },
   sessions: [],
   scheduledSessions: [],
   adminPassword: 'Admin@2025'
@@ -536,12 +568,14 @@ function toggleSubPwd(){ const i=document.getElementById('f-password'); i.type=i
 /* ═══ Load Data from Firebase ═══ */
 async function loadData(){
   try {
-    const [subsSnap, classicLecsSnap, advancedLecsSnap, classicBooksSnap, advancedBooksSnap, sesSnap, schedSnap, settingsSnap] = await Promise.all([
+    const [subsSnap, classicLecsSnap, advancedLecsSnap, classicBooksSnap, advancedBooksSnap, classicImgsSnap, advancedImgsSnap, sesSnap, schedSnap, settingsSnap] = await Promise.all([
       db.collection('subscribers').get(),
       db.collection('lectures_classic').orderBy('order').get(),
       db.collection('lectures_advanced').orderBy('order').get(),
       db.collection('books_classic').orderBy('order').get(),
       db.collection('books_advanced').orderBy('order').get(),
+      db.collection('images_classic').orderBy('order').get(),
+      db.collection('images_advanced').orderBy('order').get(),
       db.collection('login_sessions').orderBy('loginTime','desc').limit(100).get(),
       db.collection('scheduled_sessions').get(),
       db.collection('settings').doc('admin').get()
@@ -551,6 +585,8 @@ async function loadData(){
     cache.lectures.advanced = advancedLecsSnap.docs.map(d=>({id:d.id,...d.data()}));
     cache.books.classic = classicBooksSnap.docs.map(d=>({id:d.id,...d.data()}));
     cache.books.advanced = advancedBooksSnap.docs.map(d=>({id:d.id,...d.data()}));
+    cache.images.classic = classicImgsSnap.docs.map(d=>({id:d.id,...d.data()}));
+    cache.images.advanced = advancedImgsSnap.docs.map(d=>({id:d.id,...d.data()}));
     cache.sessions = sesSnap.docs.map(d=>({id:d.id,...d.data()}));
     cache.scheduledSessions = schedSnap.docs.map(d=>({id:d.id,...d.data()}));
     if(settingsSnap.exists) cache.adminPassword = settingsSnap.data().password || cache.adminPassword;
@@ -760,6 +796,7 @@ function renderSchool(key){
     <div class="sub-tabs">
       <button class="sub-tab ${currentSubTab==='lectures'?'active':''}" onclick="switchSubTab('lectures',this)">📹 الدروس والمحاضرات (${lecs.length})</button>
       <button class="sub-tab ${currentSubTab==='books'?'active':''}" onclick="switchSubTab('books',this)">📚 الكتب والملخصات (${books.length})</button>
+      <button class="sub-tab ${currentSubTab==='images'?'active':''}" onclick="switchSubTab('images',this)">🖼️ الصور (${(cache.images&&cache.images[key]||[]).length})</button>
     </div>
     <div id="schoolSubContent"></div>`;
   renderSubTab(key, currentSubTab);
@@ -814,6 +851,27 @@ function renderSubTab(key, tab){
             </div>
             <button class="action-btn btn-edit" onclick="openEditBook('${key}','${b.id}')">✏️ تعديل</button>
             <button class="action-btn btn-del" onclick="deleteBook('${key}','${b.id}')">🗑</button>
+          </div>`).join('')}
+      </div>`;
+  } else {
+    const items = (cache.images&&cache.images[key]||[]).sort((a,b)=>a.order-b.order);
+    div.innerHTML=`
+      <div class="sec-hd">
+        <div class="sec-hd-title">صور ${key==='classic'?'مدرسة الكلاسيك':'المدرسة المتقدمة'}</div>
+        <button class="btn-add" onclick="openAddImage('${key}')">+ إضافة صورة</button>
+      </div>
+      <div id="imgList">
+        ${items.length===0?'<div class="no-online">لا توجد صور — أضف أول صورة الآن</div>':
+          items.map(img=>`<div class="lec-card">
+            <div class="lec-order">${img.order}</div>
+            <div class="lec-info">
+              <div class="lec-title">${img.title}</div>
+              <div class="lec-meta">
+                <span class="lec-file ${img.fileURL?'file-ok':'file-none'}">${img.fileURL?'✅ صورة مرفوعة':'⌛ لا توجد صورة'}</span>
+              </div>
+            </div>
+            <button class="action-btn btn-edit" onclick="openEditImage('${key}','${img.id}')">✏️ تعديل</button>
+            <button class="action-btn btn-del" onclick="deleteImage('${key}','${img.id}')">🗑</button>
           </div>`).join('')}
       </div>`;
   }
@@ -1062,6 +1120,97 @@ async function deleteBook(key, id){
   if(!confirm('هل تريد حذف هذا الكتاب؟')) return;
   await db.collection('books_'+key).doc(id).delete();
   cache.books[key] = (cache.books[key]||[]).filter(x=>x.id!==id);
+  renderSchool(key);
+  toast('🗑 تم الحذف','error');
+}
+
+/* ═══ Images CRUD ═══ */
+let pendingImageFile = null;
+
+function handleImageFile(input){
+  const file = input.files[0];
+  if(!file) return;
+  pendingImageFile = file;
+  const label = document.getElementById('i-file-label');
+  label.textContent = '🖼️ ' + file.name + ' (' + (file.size/1024/1024).toFixed(1) + ' MB)';
+  label.className = 'current-file has';
+}
+
+function openAddImage(key){
+  document.getElementById('imageModalTitle').textContent = 'إضافة صورة جديدة';
+  document.getElementById('editImageId').value = '';
+  document.getElementById('editImageSchool').value = key;
+  document.getElementById('i-fileurl').value = '';
+  ['i-order','i-title','i-desc'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('i-file-label').textContent = 'لم يتم اختيار صورة';
+  document.getElementById('i-file-label').className = 'current-file none';
+  document.getElementById('i-progress').style.display = 'none';
+  document.getElementById('i-progress-fill').style.width = '0%';
+  pendingImageFile = null;
+  openModal('imageModal');
+}
+
+function openEditImage(key, id){
+  const img = (cache.images[key]||[]).find(x=>x.id===id);
+  if(!img) return;
+  document.getElementById('imageModalTitle').textContent = 'تعديل الصورة';
+  document.getElementById('editImageId').value = id;
+  document.getElementById('editImageSchool').value = key;
+  document.getElementById('i-order').value = img.order;
+  document.getElementById('i-title').value = img.title;
+  document.getElementById('i-desc').value = img.desc||'';
+  document.getElementById('i-fileurl').value = img.fileURL||'';
+  const label = document.getElementById('i-file-label');
+  label.textContent = img.fileURL ? '✅ صورة مرفوعة — اختر صورة جديدة للاستبدال' : 'لم يتم اختيار صورة';
+  label.className = img.fileURL ? 'current-file has' : 'current-file none';
+  document.getElementById('i-progress').style.display = 'none';
+  pendingImageFile = null;
+  openModal('imageModal');
+}
+
+async function saveImage(){
+  const key = document.getElementById('editImageSchool').value;
+  const order = parseInt(document.getElementById('i-order').value);
+  const title = document.getElementById('i-title').value.trim();
+  if(!title||!order){ toast('يرجى إدخال العنوان والترتيب','error'); return; }
+  const desc = document.getElementById('i-desc').value.trim();
+  const editId = document.getElementById('editImageId').value;
+  const btn = document.getElementById('saveImgBtn');
+  btn.disabled = true; btn.textContent = 'جاري الحفظ...';
+
+  let fileURL = document.getElementById('i-fileurl').value;
+  if(pendingImageFile){
+    try {
+      btn.textContent = 'جاري رفع الصورة...';
+      const safeName = Date.now() + '_' + pendingImageFile.name.replace(/[^\w.\-]/g,'_');
+      const path = `images/${key}/${safeName}`;
+      fileURL = await uploadFile(pendingImageFile, path, document.getElementById('i-progress-fill'), document.getElementById('i-progress'));
+    } catch(err){ toast('فشل رفع الصورة: '+err.message,'error'); btn.disabled=false; btn.textContent='💾 حفظ الصورة'; return; }
+  }
+
+  const data = {order, title, desc, fileURL};
+  try {
+    if(editId){
+      await db.collection('images_'+key).doc(editId).update(data);
+      const idx = (cache.images[key]||[]).findIndex(x=>x.id===editId);
+      if(idx>=0) cache.images[key][idx] = {...cache.images[key][idx],...data};
+      toast('✅ تم تحديث الصورة');
+    } else {
+      const ref = await db.collection('images_'+key).add(data);
+      if(!cache.images[key]) cache.images[key]=[];
+      cache.images[key].push({id:ref.id,...data});
+      toast('✅ تمت إضافة الصورة');
+    }
+    closeModal('imageModal');
+    renderSchool(key);
+  } catch(err){ toast('خطأ: '+err.message,'error'); }
+  btn.disabled=false; btn.textContent='💾 حفظ الصورة';
+}
+
+async function deleteImage(key, id){
+  if(!confirm('هل تريد حذف هذه الصورة؟')) return;
+  await db.collection('images_'+key).doc(id).delete();
+  cache.images[key] = (cache.images[key]||[]).filter(x=>x.id!==id);
   renderSchool(key);
   toast('🗑 تم الحذف','error');
 }
