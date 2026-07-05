@@ -239,26 +239,9 @@ if(!(SUB.schools||[]).includes(SCHOOL)){window.location.href='dashboard.html';}
 /* ════════════════════════════════
    API KEY
 ════════════════════════════════ */
-function saveApiKey(){
-  const k=document.getElementById('apiKeyInp').value.trim();
-  if(!k.startsWith('sk-ant-')){alert('المفتاح يجب أن يبدأ بـ sk-ant-');return;}
-  localStorage.setItem('aiApiKey',k);
-  document.getElementById('apiSaved').classList.add('show');
-  document.getElementById('apiKeyInp').value='';
-  document.getElementById('apiSetup').style.borderColor='rgba(5,150,105,.3)';
-}
-function getApiKey(){return localStorage.getItem('aiApiKey')||'';}
-
-// Default API key — pre-configured
 const DEFAULT_KEY='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';
-if(!getApiKey()){localStorage.setItem('aiApiKey',DEFAULT_KEY);}
-
-// Load saved key state
-if(getApiKey()){
-  document.getElementById('apiSaved').classList.add('show');
-  document.getElementById('apiSetup').style.borderColor='rgba(5,150,105,.3)';
-  document.getElementById('apiSetup').querySelector('h3').textContent='✅ الذكاء الاصطناعي مفعّل ومتصل';
-}
+function getApiKey(){return localStorage.getItem('aiApiKey')||DEFAULT_KEY;}
+if(!localStorage.getItem('aiApiKey')){localStorage.setItem('aiApiKey',DEFAULT_KEY);}
 
 /* ════════════════════════════════
    QUESTION BANKS
