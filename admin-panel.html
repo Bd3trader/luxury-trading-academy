@@ -492,6 +492,7 @@
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tus-js-client@3.1.0/dist/tus.min.js"></script>
 
 <script>
 /* ═══ Firebase Init ═══ */
@@ -818,33 +819,40 @@ function renderSubTab(key, tab){
   }
 }
 
-/* ── File Upload via Supabase Storage ── */
+/* ── File Upload via Supabase Resumable (TUS) ── */
 async function uploadFile(file, path, progressFill, progressBar){
   progressBar.style.display = 'block';
   progressFill.style.width = '0%';
 
-  const uploadPath = `${SUPA_URL}/storage/v1/object/${SUPA_BUCKET}/${path}`;
-  const publicUrl  = `${SUPA_URL}/storage/v1/object/public/${SUPA_BUCKET}/${path}`;
+  const publicUrl = `${SUPA_URL}/storage/v1/object/public/${SUPA_BUCKET}/${path}`;
 
   return new Promise((resolve, reject)=>{
-    const xhr = new XMLHttpRequest();
-    xhr.upload.onprogress = e => {
-      if(e.lengthComputable) progressFill.style.width = (e.loaded/e.total*100).toFixed(0)+'%';
-    };
-    xhr.onload = () => {
-      if(xhr.status === 200 || xhr.status === 201){
+    const upload = new tus.Upload(file, {
+      endpoint: `${SUPA_URL}/storage/v1/upload/resumable`,
+      retryDelays: [0, 3000, 5000, 10000],
+      headers: {
+        authorization: 'Bearer ' + SUPA_KEY,
+        'x-upsert': 'true'
+      },
+      uploadDataDuringCreation: true,
+      removeFingerprintOnSuccess: true,
+      metadata: {
+        bucketName: SUPA_BUCKET,
+        objectName: path,
+        contentType: file.type || 'application/octet-stream',
+        cacheControl: '3600'
+      },
+      chunkSize: 6 * 1024 * 1024,
+      onError: err => reject(new Error(err.message || 'فشل الرفع')),
+      onProgress: (uploaded, total) => {
+        progressFill.style.width = (uploaded / total * 100).toFixed(0) + '%';
+      },
+      onSuccess: () => {
         progressFill.style.width = '100%';
         resolve(publicUrl);
-      } else {
-        reject(new Error('فشل الرفع: ' + xhr.status + ' ' + xhr.responseText));
       }
-    };
-    xhr.onerror = () => reject(new Error('Network error'));
-    xhr.open('POST', uploadPath);
-    xhr.setRequestHeader('Authorization', 'Bearer ' + SUPA_KEY);
-    xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
-    xhr.setRequestHeader('x-upsert', 'true');
-    xhr.send(file);
+    });
+    upload.start();
   });
 }
 
