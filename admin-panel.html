@@ -372,7 +372,6 @@
     <div class="modal-body">
       <input type="hidden" id="editLectureId"/>
       <input type="hidden" id="editLectureSchool"/>
-      <input type="hidden" id="l-fileurl"/>
       <div class="field-row">
         <div class="field"><label>الترتيب *</label><input type="number" id="l-order" min="1" placeholder="1"/></div>
         <div class="field"><label>المدة</label><input type="text" id="l-duration" placeholder="45 دقيقة"/></div>
@@ -380,18 +379,9 @@
       <div class="field"><label>عنوان المحاضرة *</label><input type="text" id="l-title" placeholder="عنوان المحاضرة"/></div>
       <div class="field"><label>الوصف</label><textarea id="l-desc" placeholder="وصف مختصر..."></textarea></div>
       <div class="field">
-        <label>🔗 رابط Google Drive أو YouTube</label>
-        <input type="text" id="l-driveurl" placeholder="https://drive.google.com/file/d/.../view" dir="ltr" style="font-size:.82rem"/>
-        <div style="font-size:.76rem;color:#6b7280;margin-top:4px">للفيديوهات الكبيرة: ارفع على Google Drive ← مشاركة ← أي شخص لديه الرابط ← انسخ الرابط</div>
-      </div>
-      <div class="field">
-        <label>📎 أو ارفع ملف PDF / صورة (أقل من 10MB)</label>
-        <div class="file-upload-wrap" onclick="document.getElementById('l-file').click()">
-          <input type="file" id="l-file" accept="video/*" style="display:none" onchange="handleLectureFile(this)"/>
-          <div class="file-upload-text">📂 اضغط لاختيار ملف أو اسحبه هنا</div>
-          <div class="upload-progress" id="l-progress"><div class="upload-progress-fill" id="l-progress-fill"></div></div>
-          <div id="l-file-label" class="current-file none">لم يتم اختيار ملف</div>
-        </div>
+        <label>🔗 رابط YouTube أو Google Drive *</label>
+        <input type="text" id="l-driveurl" placeholder="https://youtu.be/... أو https://drive.google.com/..." dir="ltr" style="font-size:.88rem"/>
+        <div style="font-size:.76rem;color:#6b7280;margin-top:4px">الصق رابط YouTube (Unlisted) أو رابط Google Drive</div>
       </div>
     </div>
     <div class="modal-footer">
@@ -411,7 +401,6 @@
     <div class="modal-body">
       <input type="hidden" id="editBookId"/>
       <input type="hidden" id="editBookSchool"/>
-      <input type="hidden" id="b-fileurl"/>
       <div class="field-row">
         <div class="field"><label>الترتيب *</label><input type="number" id="b-order" min="1" placeholder="1"/></div>
         <div class="field">
@@ -425,15 +414,10 @@
       <div class="field"><label>العنوان *</label><input type="text" id="b-title" placeholder="عنوان الكتاب أو الملخص"/></div>
       <div class="field"><label>الوصف</label><textarea id="b-desc" placeholder="وصف مختصر..."></textarea></div>
       <div class="field">
-        <label>🔗 رابط Google Drive أو أي رابط</label>
-        <input type="text" id="b-driveurl" placeholder="https://drive.google.com/file/d/.../view" dir="ltr" style="font-size:.82rem"/>
-        <div style="font-size:.76rem;color:#6b7280;margin-top:4px">للملفات الكبيرة: ارفع على Google Drive وانسخ رابط المشاركة</div>
-      </div>
-      <div class="field">
-        <label>📎 أو ارفع ملف PDF / صورة (أقل من 10MB)</label>
+        <label>📎 ارفع ملف PDF من الجهاز</label>
         <div class="file-upload-wrap" onclick="document.getElementById('b-file').click()">
           <input type="file" id="b-file" accept="application/pdf" style="display:none" onchange="handleBookFile(this)"/>
-          <div class="file-upload-text">📂 اضغط لاختيار ملف أو اسحبه هنا</div>
+          <div class="file-upload-text">📂 اضغط لاختيار ملف PDF أو اسحبه هنا</div>
           <div class="upload-progress" id="b-progress"><div class="upload-progress-fill" id="b-progress-fill"></div></div>
           <div id="b-file-label" class="current-file none">لم يتم اختيار ملف</div>
         </div>
@@ -914,17 +898,7 @@ async function uploadFile(file, path, progressFill, progressBar){
   });
 }
 
-let pendingLectureFile = null;
 let pendingBookFile = null;
-
-function handleLectureFile(input){
-  const file = input.files[0];
-  if(!file) return;
-  pendingLectureFile = file;
-  const label = document.getElementById('l-file-label');
-  label.textContent = '📎 ' + file.name + ' (' + (file.size/1024/1024).toFixed(1) + ' MB)';
-  label.className = 'current-file has';
-}
 
 function handleBookFile(input){
   const file = input.files[0];
@@ -956,14 +930,8 @@ function openAddLecture(key){
   document.getElementById('lectureModalTitle').textContent = 'إضافة محاضرة جديدة';
   document.getElementById('editLectureId').value = '';
   document.getElementById('editLectureSchool').value = key;
-  document.getElementById('l-fileurl').value = '';
   document.getElementById('l-driveurl').value = '';
   ['l-order','l-title','l-desc','l-duration'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('l-file-label').textContent = 'لم يتم اختيار ملف';
-  document.getElementById('l-file-label').className = 'current-file none';
-  document.getElementById('l-progress').style.display = 'none';
-  document.getElementById('l-progress-fill').style.width = '0%';
-  pendingLectureFile = null;
   openModal('lectureModal');
 }
 
@@ -977,14 +945,7 @@ function openEditLecture(key, id){
   document.getElementById('l-title').value = l.title;
   document.getElementById('l-desc').value = l.desc||'';
   document.getElementById('l-duration').value = l.duration||'';
-  document.getElementById('l-fileurl').value = '';
   document.getElementById('l-driveurl').value = l.fileURL||'';
-  const label = document.getElementById('l-file-label');
-  label.textContent = l.fileURL ? '✅ يوجد رابط/ملف — اختر ملفاً جديداً للاستبدال' : 'لم يتم اختيار ملف';
-  label.className = l.fileURL ? 'current-file has' : 'current-file none';
-  document.getElementById('l-progress').style.display = 'none';
-  document.getElementById('l-progress-fill').style.width = '0%';
-  pendingLectureFile = null;
   openModal('lectureModal');
 }
 
@@ -999,16 +960,8 @@ async function saveLecture(){
   const btn = document.getElementById('saveLecBtn');
   btn.disabled = true; btn.textContent = 'جاري الحفظ...';
 
-  // الأولوية: رابط Drive > رفع ملف > الرابط القديم
-  let fileURL = normalizeDriveUrl(document.getElementById('l-driveurl').value) || document.getElementById('l-fileurl').value;
-  if(pendingLectureFile){
-    try {
-      btn.textContent = 'جاري رفع الملف...';
-      const safeName = Date.now() + '_' + pendingLectureFile.name.replace(/[^\w.\-]/g, '_');
-      const path = `${key}/${safeName}`;
-      fileURL = await uploadFile(pendingLectureFile, path, document.getElementById('l-progress-fill'), document.getElementById('l-progress'));
-    } catch(err){ toast('فشل رفع الملف: '+err.message,'error'); btn.disabled=false; btn.textContent='💾 حفظ المحاضرة'; return; }
-  }
+  const fileURL = normalizeDriveUrl(document.getElementById('l-driveurl').value.trim());
+  if(!fileURL){ toast('يرجى إدخال رابط YouTube أو Drive','error'); btn.disabled=false; btn.textContent='💾 حفظ المحاضرة'; return; }
 
   const today = new Date().toISOString().slice(0,10);
   const data = {order, title, desc, duration, fileURL, date: today};
@@ -1043,8 +996,6 @@ function openAddBook(key){
   document.getElementById('bookModalTitle').textContent = 'إضافة كتاب / ملخص';
   document.getElementById('editBookId').value = '';
   document.getElementById('editBookSchool').value = key;
-  document.getElementById('b-fileurl').value = '';
-  document.getElementById('b-driveurl').value = '';
   ['b-order','b-title','b-desc'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('b-type').value = 'book';
   document.getElementById('b-file-label').textContent = 'لم يتم اختيار ملف';
@@ -1065,12 +1016,11 @@ function openEditBook(key, id){
   document.getElementById('b-type').value = b.type||'book';
   document.getElementById('b-title').value = b.title;
   document.getElementById('b-desc').value = b.desc||'';
-  document.getElementById('b-fileurl').value = '';
-  document.getElementById('b-driveurl').value = b.fileURL||'';
   const label = document.getElementById('b-file-label');
-  label.textContent = b.fileURL ? '✅ يوجد رابط/ملف — اختر ملفاً جديداً للاستبدال' : 'لم يتم اختيار ملف';
+  label.textContent = b.fileURL ? '✅ يوجد ملف — اختر ملفاً جديداً للاستبدال' : 'لم يتم اختيار ملف';
   label.className = b.fileURL ? 'current-file has' : 'current-file none';
   document.getElementById('b-progress').style.display = 'none';
+  document.getElementById('b-progress-fill').style.width = '0%';
   pendingBookFile = null;
   openModal('bookModal');
 }
@@ -1086,7 +1036,7 @@ async function saveBook(){
   const btn = document.getElementById('saveBookBtn');
   btn.disabled = true; btn.textContent = 'جاري الحفظ...';
 
-  let fileURL = normalizeDriveUrl(document.getElementById('b-driveurl').value) || document.getElementById('b-fileurl').value;
+  let fileURL = '';
   if(pendingBookFile){
     try {
       btn.textContent = 'جاري رفع الملف...';
@@ -1094,6 +1044,10 @@ async function saveBook(){
       const path = `${key}/${safeName}`;
       fileURL = await uploadFile(pendingBookFile, path, document.getElementById('b-progress-fill'), document.getElementById('b-progress'));
     } catch(err){ toast('فشل رفع الملف: '+err.message,'error'); btn.disabled=false; btn.textContent='💾 حفظ'; return; }
+  } else {
+    // الاحتفاظ بالرابط القديم عند التعديل بدون رفع ملف جديد
+    const editId = document.getElementById('editBookId').value;
+    if(editId){ const old = (cache.books[key]||[]).find(x=>x.id===editId); fileURL = old?.fileURL||''; }
   }
 
   const today = new Date().toISOString().slice(0,10);
