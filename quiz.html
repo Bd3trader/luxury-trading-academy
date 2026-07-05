@@ -186,7 +186,6 @@
             </div>
             <!-- Feedback -->
             <div class="ai-feedback" id="aiFeedback">
-              <div class="aif-header" id="aifHeader"></div>
               <div class="aif-body" id="aifBody"></div>
             </div>
             <!-- Actions -->
@@ -568,12 +567,8 @@ async function submitAnswer(){
 
 function showMCQFeedback(q,correct){
   const fb=document.getElementById('aiFeedback');
-  const hdr=document.getElementById('aifHeader');
   const body=document.getElementById('aifBody');
-  hdr.className='aif-header '+(correct?'great':'review');
-  hdr.innerHTML=(correct?'✅ إجابة صحيحة! +1 نقطة':'❌ إجابة غير صحيحة')+
-    `<span class="aif-score" style="background:${correct?'rgba(5,150,105,.15)':'rgba(220,38,38,.1)'};color:${correct?'var(--green)':'var(--red)'}">${correct?'✓':'✗'}</span>`;
-  body.innerHTML=`<strong>💡 الشرح:</strong><br>${q.explanation}`;
+  body.innerHTML=`<strong>${correct?'✅ إجابة صحيحة!':'❌ إجابة غير صحيحة'}</strong><br><br>💡 ${q.explanation}`;
   fb.classList.add('show');
 }
 
@@ -617,11 +612,7 @@ async function evaluateOpenAnswer(q,ans){
 
   document.getElementById('aiLoading').classList.remove('show');
   const fb=document.getElementById('aiFeedback');
-  const hdr=document.getElementById('aifHeader');
   const body=document.getElementById('aifBody');
-  const grade=isGood?'great':'review';
-  hdr.className='aif-header '+grade;
-  hdr.innerHTML=(isGood?'🤖 ذكاء اصطناعي: إجابة جيدة!':'🤖 ذكاء اصطناعي: تحتاج مراجعة');
   body.innerHTML=feedback.replace(/\n/g,'<br>');
   fb.classList.add('show');
 }
