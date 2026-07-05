@@ -946,7 +946,8 @@ async function saveLecture(){
   if(pendingLectureFile){
     try {
       btn.textContent = 'جاري رفع الملف...';
-      const path = `lectures/${key}/${Date.now()}_${pendingLectureFile.name}`;
+      const safeName = Date.now() + '_' + pendingLectureFile.name.replace(/[^\w.\-]/g, '_');
+      const path = `${key}/${safeName}`;
       fileURL = await uploadFile(pendingLectureFile, path, document.getElementById('l-progress-fill'), document.getElementById('l-progress'));
     } catch(err){ toast('فشل رفع الملف: '+err.message,'error'); btn.disabled=false; btn.textContent='💾 حفظ المحاضرة'; return; }
   }
@@ -1031,7 +1032,8 @@ async function saveBook(){
   if(pendingBookFile){
     try {
       btn.textContent = 'جاري رفع الملف...';
-      const path = `books/${key}/${Date.now()}_${pendingBookFile.name}`;
+      const safeName = Date.now() + '_' + pendingBookFile.name.replace(/[^\w.\-]/g, '_');
+      const path = `${key}/${safeName}`;
       fileURL = await uploadFile(pendingBookFile, path, document.getElementById('b-progress-fill'), document.getElementById('b-progress'));
     } catch(err){ toast('فشل رفع الملف: '+err.message,'error'); btn.disabled=false; btn.textContent='💾 حفظ'; return; }
   }
