@@ -444,6 +444,8 @@ async function initQuiz(){
   try{
     questions=await generateQuestions();
   } catch(e){
+    console.error('GPT generation failed:',e);
+    document.querySelector('#genOverlay div:nth-child(2)').textContent='⚠️ '+e.message+' — جاري تحميل الأسئلة الاحتياطية';
     questions=QUESTIONS[SCHOOL]||[];
   }
   clearInterval(timer);
