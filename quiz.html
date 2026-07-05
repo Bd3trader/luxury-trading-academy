@@ -153,8 +153,16 @@
   </div>
 
 
+  <!-- AI Loading Overlay -->
+  <div id="genOverlay" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:60px 20px;background:#fff;border-radius:18px;border:1.5px solid var(--border);margin-bottom:24px">
+    <div style="font-size:3rem">🤖</div>
+    <div style="font-size:1.1rem;font-weight:800;background:var(--gold-g);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">الذكاء الاصطناعي يولّد أسئلتك...</div>
+    <div style="color:var(--muted);font-size:.85rem">أسئلة جديدة ومختلفة في كل مرة</div>
+    <div style="width:60px;height:4px;background:rgba(184,134,11,.15);border-radius:999px;overflow:hidden"><div id="genBar" style="height:100%;width:0%;background:var(--gold-g);border-radius:999px;transition:width .3s"></div></div>
+  </div>
+
   <!-- Quiz Area -->
-  <div id="quizArea">
+  <div id="quizArea" style="display:none">
     <div class="quiz-grid">
 
       <!-- Question Panel -->
@@ -239,12 +247,56 @@ if(!(SUB.schools||[]).includes(SCHOOL)){window.location.href='dashboard.html';}
 /* ════════════════════════════════
    API KEY
 ════════════════════════════════ */
-const DEFAULT_KEY='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';
-function getApiKey(){return localStorage.getItem('aiApiKey')||DEFAULT_KEY;}
-if(!localStorage.getItem('aiApiKey')){localStorage.setItem('aiApiKey',DEFAULT_KEY);}
+const OPENAI_KEY='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';
 
 /* ════════════════════════════════
-   QUESTION BANKS
+   AI QUESTION GENERATION
+════════════════════════════════ */
+async function generateQuestions(){
+  const topicPrompts={
+    classic:`أنت مدرب خبير في التحليل الكلاسيكي للأسواق المالية. ولّد 6 أسئلة اختبار متنوعة باللغة العربية عن: الشموع اليابانية، الدعم والمقاومة، الأنماط الكلاسيكية، إدارة المخاطر، الترند. يجب أن تكون الأسئلة مختلفة في كل مرة تُطلب.`,
+    advanced:`أنت مدرب خبير في Smart Money Concepts (SMC). ولّد 6 أسئلة اختبار متنوعة باللغة العربية عن: Order Blocks، Fair Value Gaps، CHOCH، BOS، السيولة، Premium وDiscount Zones. يجب أن تكون الأسئلة مختلفة في كل مرة تُطلب.`
+  };
+
+  const prompt=`${topicPrompts[SCHOOL]||topicPrompts.classic}
+
+أنشئ مزيجاً من 4 أسئلة اختيار من متعدد (mcq) و2 أسئلة مفتوحة (open).
+
+أعد الرد كـ JSON array فقط بهذا الشكل بدون أي نص إضافي:
+[
+  {
+    "type": "mcq",
+    "text": "نص السؤال",
+    "options": ["الخيار أ","الخيار ب","الخيار ج","الخيار د"],
+    "correct": 0,
+    "explanation": "شرح الإجابة الصحيحة"
+  },
+  {
+    "type": "open",
+    "text": "نص السؤال المفتوح",
+    "correctKeywords": ["كلمة1","كلمة2","كلمة3"],
+    "modelAnswer": "الإجابة النموذجية الكاملة"
+  }
+]`;
+
+  const res=await fetch('https://api.openai.com/v1/chat/completions',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+OPENAI_KEY},
+    body:JSON.stringify({
+      model:'gpt-4o-mini',
+      temperature:0.9,
+      messages:[{role:'user',content:prompt}]
+    })
+  });
+  const data=await res.json();
+  const text=data.choices?.[0]?.message?.content||'';
+  const match=text.match(/\[[\s\S]*\]/);
+  if(!match) throw new Error('invalid response');
+  return JSON.parse(match[0]);
+}
+
+/* ════════════════════════════════
+   FALLBACK QUESTION BANKS
 ════════════════════════════════ */
 const QUESTIONS={
   classic:[
@@ -382,8 +434,26 @@ const QUESTIONS={
 /* ════════════════════════════════
    QUIZ ENGINE
 ════════════════════════════════ */
-const questions=QUESTIONS[SCHOOL]||[];
+let questions=[];
 let qIdx=0,score=0,wrongCount=0,selectedOpt=null,mcqAnswered=false;
+
+async function initQuiz(){
+  const bar=document.getElementById('genBar');
+  let pct=0;
+  const timer=setInterval(()=>{pct=Math.min(pct+8,90);bar.style.width=pct+'%';},300);
+  try{
+    questions=await generateQuestions();
+  } catch(e){
+    questions=QUESTIONS[SCHOOL]||[];
+  }
+  clearInterval(timer);
+  bar.style.width='100%';
+  setTimeout(()=>{
+    document.getElementById('genOverlay').style.display='none';
+    document.getElementById('quizArea').style.display='block';
+    loadQuestion();
+  },400);
+}
 
 function loadQuestion(){
   if(qIdx>=questions.length){showResults();return;}
@@ -463,55 +533,36 @@ function showMCQFeedback(q,correct){
 
 async function evaluateOpenAnswer(q,ans){
   document.getElementById('aiLoading').classList.add('show');
-  const apiKey=getApiKey();
   let feedback,isGood=false;
 
-  if(apiKey){
-    try{
-      const keywords=(q.correctKeywords||[]).join('، ');
-      const prompt=`أنت مدرب خبير في التداول. المتدرب أجاب على سؤال تعليمي.
+  try{
+    const keywords=(q.correctKeywords||[]).join('، ');
+    const prompt=`أنت مدرب خبير في التداول. قيّم إجابة المتدرب.
 
 السؤال: ${q.text}
 إجابة المتدرب: ${ans}
 النموذج الصحيح: ${q.modelAnswer}
-الكلمات المفتاحية المطلوبة: ${keywords}
+الكلمات المفتاحية: ${keywords}
 
-قيّم الإجابة بـ:
+قيّم بـ:
 1. الدرجة: (ممتاز/جيد/يحتاج مراجعة)
-2. نقاط القوة في الإجابة
-3. ما ينقص الإجابة
-4. الشرح الصحيح الكامل
+2. نقاط القوة
+3. ما ينقص
+4. الشرح الكامل
 
-اكتب بالعربية بشكل مشجع وتعليمي. اجعل ردك موجزاً (5-6 أسطر).`;
+اكتب بالعربية بشكل مشجع وموجز (5-6 أسطر).`;
 
-      const res=await fetch('https://api.anthropic.com/v1/messages',{
-        method:'POST',
-        headers:{
-          'Content-Type':'application/json',
-          'x-api-key':apiKey,
-          'anthropic-version':'2023-06-01',
-          'anthropic-dangerous-direct-browser-access':'true'
-        },
-        body:JSON.stringify({
-          model:'claude-3-5-haiku-20241022',
-          max_tokens:400,
-          messages:[{role:'user',content:prompt}]
-        })
-      });
-      const data=await res.json();
-      if(data.content?.[0]?.text){
-        feedback=data.content[0].text;
-        isGood=feedback.includes('ممتاز')||feedback.includes('جيد')||feedback.includes('صحيح');
-        if(isGood)score++;else wrongCount++;
-      } else throw new Error('no response');
-    } catch(e){
-      feedback=fallbackEvaluate(q,ans);
-      const pts=evalKeywords(q,ans);
-      if(pts>=0.5)score++;else wrongCount++;
-      isGood=pts>=0.5;
-    }
-  } else {
-    // Offline evaluation
+    const res=await fetch('https://api.openai.com/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+OPENAI_KEY},
+      body:JSON.stringify({model:'gpt-4o-mini',max_tokens:400,messages:[{role:'user',content:prompt}]})
+    });
+    const data=await res.json();
+    feedback=data.choices?.[0]?.message?.content||'';
+    if(!feedback) throw new Error('no response');
+    isGood=feedback.includes('ممتاز')||feedback.includes('جيد')||feedback.includes('صحيح');
+    if(isGood)score++;else wrongCount++;
+  } catch(e){
     feedback=fallbackEvaluate(q,ans);
     const pts=evalKeywords(q,ans);
     if(pts>=0.5)score++;else wrongCount++;
@@ -602,7 +653,7 @@ document.getElementById('schoolBanner').classList.add(meta.bannerClass);
 document.title=`اختبار ${meta.name} | منصة تعليم التداول`;
 
 // Init
-loadQuestion();
+initQuiz();
 </script>
 </body>
 </html>
