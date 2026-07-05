@@ -1921,7 +1921,7 @@ async function sendAiMsg(){
     }
   } catch(e){
     hideTyping();
-    appendMsg('bot','⚠️ تعذّر الاتصال — تحقق من الإنترنت وحاول مجدداً.');
+    appendMsg('bot','⚠️ خطأ: '+e.message);
   }
 
   aiTyping=false;
