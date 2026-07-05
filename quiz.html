@@ -474,24 +474,15 @@ function pickRandom(arr,n){
 }
 
 async function initQuiz(){
-  const bar=document.getElementById('genBar');
-  let pct=0;
-  const timer=setInterval(()=>{pct=Math.min(pct+15,85);bar.style.width=pct+'%';},200);
-
-  // أولاً: اختر عشوائياً من البنك فوراً
-  const bank=QUESTIONS[SCHOOL]||[];
-  questions=pickRandom(bank, Math.min(6,bank.length));
-
-  // حاول GPT في الخلفية (إذا نجح استبدل الأسئلة)
-  generateQuestions().then(aiQ=>{ questions=aiQ; }).catch(()=>{});
-
-  clearInterval(timer);
-  bar.style.width='100%';
-  setTimeout(()=>{
-    document.getElementById('genOverlay').style.display='none';
-    document.getElementById('quizArea').style.display='block';
-    loadQuestion();
-  },600);
+  try{
+    questions=await generateQuestions();
+  } catch(e){
+    const bank=QUESTIONS[SCHOOL]||[];
+    questions=pickRandom(bank,Math.min(6,bank.length));
+  }
+  document.getElementById('genOverlay').style.display='none';
+  document.getElementById('quizArea').style.display='block';
+  loadQuestion();
 }
 
 function loadQuestion(){
