@@ -832,7 +832,7 @@ function renderSubTab(key, tab){
             <button class="action-btn btn-del" onclick="deleteLecture('${key}','${l.id}')">🗑</button>
           </div>`).join('')}
       </div>`;
-  } else {
+  } else if(tab==='books'){
     const items = (cache.books[key]||[]).sort((a,b)=>a.order-b.order);
     div.innerHTML=`
       <div class="sec-hd">
