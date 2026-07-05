@@ -418,13 +418,51 @@ const QUESTIONS={
     },
     {
       id:'a6',type:'open',
-      chartFocus:'انظر للهيكل الكامل وحدد: أين يكون السعر الآن في دورة السوق؟',
       text:'اشرح مفهوم Premium وDiscount Zones في SMC وكيف تستخدمهما لتحديد نقاط الدخول المثلى؟',
       correctKeywords:['50%','فيبوناتشي','أعلى','أدنى','premium','discount','نصف','مثلى','شراء','بيع'],
       modelAnswer:'Premium Zone = السعر أعلى من 50% من آخر حركة (باهظ — يُفضّل البيع). Discount Zone = السعر أدنى من 50% (رخيص — يُفضّل الشراء). يُستخدم مستوى فيبوناتشي 50% كخط الفصل. القاعدة: ابحث عن Buy في Discount عند OB أو FVG، وعن Sell في Premium عند OB أو FVG.'
+    },
+    {
+      id:'a7',type:'mcq',
+      text:'ما الفرق بين BOS (Break of Structure) وCHOCH (Change of Character)؟',
+      options:['لا فرق بينهما','BOS يكسر في اتجاه الترند، CHOCH يكسر عكس الترند ويشير للانعكاس','BOS للترند الصاعد فقط','CHOCH مؤشر تقني وليس حركة سعرية'],
+      correct:1,
+      explanation:'BOS = كسر هيكلي في نفس اتجاه الترند (استمرار). CHOCH = أول كسر عكس الترند الرئيسي (إشارة انعكاس محتملة). المتداولون يبحثون عن CHOCH كأول إشارة لتغيير الاتجاه ثم يدخلون عند أول BOS في الاتجاه الجديد.'
+    },
+    {
+      id:'a8',type:'mcq',
+      text:'ما هو Inducement في SMC ولماذا تصنعه المؤسسات؟',
+      options:['نمط شمعاني عكسي','منطقة وهمية تجذب المتداولين الصغار قبل عكس حاد لاصطياد أوامر وقفهم','مستوى فيبوناتشي مهم','مؤشر للزخم'],
+      correct:1,
+      explanation:'Inducement هو حركة وهمية تصنعها المؤسسات لإغراء المتداولين الصغار بالدخول في الاتجاه الخاطئ، ثم اصطياد أوامر وقف خسارتهم لتجميع السيولة اللازمة قبل الحركة الحقيقية.'
+    },
+    {
+      id:'a9',type:'open',
+      text:'ما هو مفهوم Mitigation في SMC وكيف تستخدم مناطق Order Block بعد كسرها؟',
+      correctKeywords:['كسر','انعكاس','دخول','تخفيف','OB','order block','اختبار','إعادة'],
+      modelAnswer:'Mitigation يعني أن السعر بعد كسر منطقة OB يعود لاختبارها من الجهة الأخرى. مثلاً: OB صاعد يُكسر للأسفل، يصبح منطقة مقاومة — المؤسسات تبيع عند عودة السعر إليها. هذا المفهوم يُستخدم لتحديد نقاط دخول دقيقة في اتجاه الكسر.'
+    },
+    {
+      id:'a10',type:'mcq',
+      text:'ما هي Equal Highs/Lows في SMC ولماذا تُعتبر مناطق سيولة؟',
+      options:['قمم وقيعان عشوائية لا أهمية لها','مستويات يتجمع عندها كثير من أوامر وقف الخسارة وتستهدفها المؤسسات','مستويات فيبوناتشي مهمة','مناطق دعم ومقاومة تقليدية'],
+      correct:1,
+      explanation:'القمم أو القيعان المتساوية تجذب المتداولين لوضع أوامر وقف خسارتهم خلفها مباشرة. المؤسسات تستهدف هذه المناطق لاصطياد هذه الأوامر والحصول على السيولة اللازمة لتنفيذ صفقاتهم الكبيرة.'
     }
   ]
 };
+
+/* ════════════════════════════════
+   CLASSIC EXTRA QUESTIONS
+════════════════════════════════ */
+QUESTIONS.classic.push(
+  {id:'c7',type:'mcq',text:'ما هو نمط الرأس والكتفين (Head & Shoulders) ومتى يكتمل؟',options:['نمط استمراري يظهر في منتصف الترند','نمط انعكاسي يكتمل عند كسر خط العنق بحجم تداول مرتفع','نمط شمعاني يتكون من 3 شموع','مؤشر لقياس الزخم'],correct:1,explanation:'نمط الرأس والكتفين انعكاسي كلاسيكي. يتكون من كتف أيسر + رأس (القمة الأعلى) + كتف أيمن. يكتمل عند كسر خط العنق مع حجم تداول مرتفع، والهدف السعري = المسافة من خط العنق للرأس مطروحة من نقطة الكسر.'},
+  {id:'c8',type:'open',text:'ما هو الفرق بين الترند الصاعد والترند الجانبي وكيف تتداول كل منهما؟',correctKeywords:['قمم','قيعان','اختراق','ارتداد','قناة','نطاق','صعود','هبوط','Buy','Sell'],modelAnswer:'الترند الصاعد: HH+HL — تشتري عند كل HL. الترند الجانبي: السعر محصور بين دعم ومقاومة — تشتري عند الدعم وتبيع عند المقاومة أو تنتظر الاختراق. الخطأ الشائع: التداول عكس الترند الصاعد.'},
+  {id:'c9',type:'mcq',text:'ما هو نمط المثلث المتماثل وما دلالته؟',options:['نمط انعكاسي دائماً','نمط استمراري محايد — ينتظر اختراق أحد الضلعين','نمط شمعاني يتكون من شمعتين','مستوى دعم ومقاومة أفقي'],correct:1,explanation:'المثلث المتماثل نمط محايد يعكس صراع بين البائعين والمشترين. لا اتجاه مرجح حتى يحدث الاختراق. التداول: انتظر الاختراق مع حجم تداول + استهدف مسافة تساوي قاعدة المثلث.'},
+  {id:'c10',type:'mcq',text:'ما الفرق بين المتوسط المتحرك البسيط (SMA) والمتوسط المتحرك الأسي (EMA)؟',options:['لا فرق بينهما','EMA يعطي وزناً أكبر للأسعار الأخيرة فيستجيب أسرع للتغيرات','SMA أسرع من EMA دائماً','EMA يحسب فقط آخر 10 شموع'],correct:1,explanation:'SMA يحسب متوسطاً بسيطاً لجميع الأسعار في الفترة. EMA يعطي وزناً أكبر للأسعار الحديثة فيكون أسرع استجابةً للتغيرات — مفيد في الأسواق المتحركة. SMA أبطأ لكن أقل حساسية للضوضاء.'},
+  {id:'c11',type:'open',text:'اشرح كيف تستخدم مستويات فيبوناتشي في التداول وما أهم المستويات؟',correctKeywords:['0.618','0.5','0.382','ارتداد','امتداد','دخول','هدف','تصحيح'],modelAnswer:'فيبوناتشي يُستخدم لتحديد مناطق التصحيح والأهداف. أهم مستويات التصحيح: 38.2% و50% و61.8% (الذهبي). التطبيق: بعد حركة واضحة، ارسم فيبوناتشي من القاع للقمة، ابحث عن دخول عند المستويات مع تأكيد (OB أو نمط شمعاني).'},
+  {id:'c12',type:'mcq',text:'متى يُعتبر الاختراق (Breakout) صحيحاً وليس وهمياً؟',options:['عند أي كسر للمستوى مهما كان صغيراً','عند الإغلاق بوضوح فوق/تحت المستوى مع حجم تداول مرتفع وإعادة اختبار ناجحة','عند فتح الشمعة فوق المستوى فقط','كل الاختراقات صحيحة'],correct:1,explanation:'الاختراق الصحيح: 1) الإغلاق بوضوح فوق المقاومة أو تحت الدعم 2) حجم تداول مرتفع يؤكد الاهتمام 3) إعادة اختبار المستوى المكسور (يصبح دعماً إذا كان مقاومة). الاختراق الوهمي يُغلق راجعاً داخل النطاق.'}
+);
 
 /* ════════════════════════════════
    TRADINGVIEW CHART
@@ -437,24 +475,30 @@ const QUESTIONS={
 let questions=[];
 let qIdx=0,score=0,wrongCount=0,selectedOpt=null,mcqAnswered=false;
 
+function pickRandom(arr,n){
+  const shuffled=[...arr].sort(()=>Math.random()-0.5);
+  return shuffled.slice(0,n);
+}
+
 async function initQuiz(){
   const bar=document.getElementById('genBar');
   let pct=0;
-  const timer=setInterval(()=>{pct=Math.min(pct+8,90);bar.style.width=pct+'%';},300);
-  try{
-    questions=await generateQuestions();
-  } catch(e){
-    console.error('GPT generation failed:',e);
-    document.querySelector('#genOverlay div:nth-child(2)').textContent='⚠️ '+e.message+' — جاري تحميل الأسئلة الاحتياطية';
-    questions=QUESTIONS[SCHOOL]||[];
-  }
+  const timer=setInterval(()=>{pct=Math.min(pct+15,85);bar.style.width=pct+'%';},200);
+
+  // أولاً: اختر عشوائياً من البنك فوراً
+  const bank=QUESTIONS[SCHOOL]||[];
+  questions=pickRandom(bank, Math.min(6,bank.length));
+
+  // حاول GPT في الخلفية (إذا نجح استبدل الأسئلة)
+  generateQuestions().then(aiQ=>{ questions=aiQ; }).catch(()=>{});
+
   clearInterval(timer);
   bar.style.width='100%';
   setTimeout(()=>{
     document.getElementById('genOverlay').style.display='none';
     document.getElementById('quizArea').style.display='block';
     loadQuestion();
-  },400);
+  },600);
 }
 
 function loadQuestion(){
@@ -635,6 +679,9 @@ function showResults(){
 
 function retakeQuiz(){
   qIdx=0;score=0;wrongCount=0;selectedOpt=null;mcqAnswered=false;
+  const bank=QUESTIONS[SCHOOL]||[];
+  questions=pickRandom(bank,Math.min(6,bank.length));
+  generateQuestions().then(aiQ=>{questions=aiQ;}).catch(()=>{});
   document.getElementById('resultsCard').classList.remove('show');
   document.getElementById('quizArea').style.display='block';
   loadQuestion();
