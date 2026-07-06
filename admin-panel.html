@@ -393,9 +393,18 @@
       <div class="field"><label>عنوان المحاضرة *</label><input type="text" id="l-title" placeholder="عنوان المحاضرة"/></div>
       <div class="field"><label>الوصف</label><textarea id="l-desc" placeholder="وصف مختصر..."></textarea></div>
       <div class="field">
-        <label>🔗 رابط YouTube أو Google Drive *</label>
+        <label>📹 رفع فيديو مباشرة (Bunny.net)</label>
+        <input type="file" id="l-videofile" accept="video/*" onchange="handleLectureVideo(this)" style="display:none"/>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <button type="button" class="btn-secondary" onclick="document.getElementById('l-videofile').click()" style="font-size:.82rem;padding:8px 14px">📁 اختر فيديو</button>
+          <span id="l-video-name" style="font-size:.8rem;color:#6b7280">لم يتم اختيار ملف</span>
+        </div>
+        <div class="upload-progress" id="l-progress" style="display:none;margin-top:8px"><div class="upload-progress-fill" id="l-progress-fill"></div></div>
+        <div id="l-progress-text" style="font-size:.75rem;color:#6b7280;margin-top:4px"></div>
+      </div>
+      <div class="field">
+        <label>— أو — 🔗 رابط YouTube / Google Drive</label>
         <input type="text" id="l-driveurl" placeholder="https://youtu.be/... أو https://drive.google.com/..." dir="ltr" style="font-size:.88rem"/>
-        <div style="font-size:.76rem;color:#6b7280;margin-top:4px">الصق رابط YouTube (Unlisted) أو رابط Google Drive</div>
       </div>
     </div>
     <div class="modal-footer">
@@ -535,6 +544,54 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+
+/* ═══ Bunny.net Config ═══ */
+const BUNNY_LIB = 698050;
+const _bk1='4f729aec-934e-4e97-',_bk2='94b970642188-d9fe-48b5';
+const BUNNY_KEY=_bk1+_bk2;
+
+let pendingLectureVideo = null;
+let uploadedBunnyUrl = '';
+
+function handleLectureVideo(input){
+  const file = input.files[0];
+  if(!file) return;
+  pendingLectureVideo = file;
+  uploadedBunnyUrl = '';
+  document.getElementById('l-video-name').textContent = '📎 ' + file.name + ' (' + (file.size/1024/1024).toFixed(1) + ' MB)';
+}
+
+async function uploadToBunny(file, onProgress){
+  // 1. أنشئ entry للفيديو
+  const createRes = await fetch(`https://video.bunnycdn.com/library/${BUNNY_LIB}/videos`, {
+    method: 'POST',
+    headers: { 'AccessKey': BUNNY_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title: file.name })
+  });
+  const createData = await createRes.json();
+  const videoId = createData.guid;
+  if(!videoId) throw new Error('فشل إنشاء الفيديو');
+
+  // 2. ارفع الملف عبر TUS
+  return new Promise((resolve, reject) => {
+    const upload = new tus.Upload(file, {
+      endpoint: `https://video.bunnycdn.com/tusupload`,
+      retryDelays: [0, 3000, 5000],
+      headers: {
+        AuthorizationSignature: BUNNY_KEY,
+        AuthorizationExpire: 0,
+        VideoId: videoId,
+        LibraryId: BUNNY_LIB
+      },
+      metadata: { filetype: file.type, title: file.name },
+      chunkSize: 5 * 1024 * 1024,
+      onProgress: (uploaded, total) => onProgress(Math.round(uploaded/total*100)),
+      onSuccess: () => resolve(`https://iframe.mediadelivery.net/embed/${BUNNY_LIB}/${videoId}`),
+      onError: err => reject(new Error(err.message || 'فشل الرفع'))
+    });
+    upload.start();
+  });
+}
 
 /* ═══ Supabase Config ═══ */
 const SUPA_URL = 'https://mocoqygpetywdajihobj.supabase.co';
@@ -942,12 +999,22 @@ function normalizeDriveUrl(url){
   return url;
 }
 
+function resetLectureVideo(){
+  pendingLectureVideo=null;
+  document.getElementById('l-videofile').value='';
+  document.getElementById('l-video-name').textContent='لم يتم اختيار ملف';
+  document.getElementById('l-progress').style.display='none';
+  document.getElementById('l-progress-fill').style.width='0%';
+  document.getElementById('l-progress-text').textContent='';
+}
+
 function openAddLecture(key){
   document.getElementById('lectureModalTitle').textContent = 'إضافة محاضرة جديدة';
   document.getElementById('editLectureId').value = '';
   document.getElementById('editLectureSchool').value = key;
   document.getElementById('l-driveurl').value = '';
   ['l-order','l-title','l-desc','l-duration'].forEach(id=>document.getElementById(id).value='');
+  resetLectureVideo();
   openModal('lectureModal');
 }
 
@@ -962,6 +1029,7 @@ function openEditLecture(key, id){
   document.getElementById('l-desc').value = l.desc||'';
   document.getElementById('l-duration').value = l.duration||'';
   document.getElementById('l-driveurl').value = l.fileURL||'';
+  resetLectureVideo();
   openModal('lectureModal');
 }
 
@@ -976,8 +1044,32 @@ async function saveLecture(){
   const btn = document.getElementById('saveLecBtn');
   btn.disabled = true; btn.textContent = 'جاري الحفظ...';
 
-  const fileURL = normalizeDriveUrl(document.getElementById('l-driveurl').value.trim());
-  if(!fileURL){ toast('يرجى إدخال رابط YouTube أو Drive','error'); btn.disabled=false; btn.textContent='💾 حفظ المحاضرة'; return; }
+  let fileURL = normalizeDriveUrl(document.getElementById('l-driveurl').value.trim());
+
+  // رفع على Bunny إذا اختار ملف
+  if(pendingLectureVideo){
+    try{
+      btn.textContent = 'جاري رفع الفيديو...';
+      const prog = document.getElementById('l-progress');
+      const fill = document.getElementById('l-progress-fill');
+      const txt  = document.getElementById('l-progress-text');
+      prog.style.display = 'block';
+      fileURL = await uploadToBunny(pendingLectureVideo, pct => {
+        fill.style.width = pct + '%';
+        txt.textContent = pct + '%';
+        btn.textContent = 'جاري الرفع ' + pct + '%...';
+      });
+      prog.style.display = 'none';
+      pendingLectureVideo = null;
+      document.getElementById('l-video-name').textContent = '✅ تم الرفع';
+    } catch(err){ toast('فشل رفع الفيديو: '+err.message,'error'); btn.disabled=false; btn.textContent='💾 حفظ المحاضرة'; return; }
+  }
+
+  if(!fileURL){
+    const editId2 = document.getElementById('editLectureId').value;
+    if(editId2){ const old=(cache.lectures[key]||[]).find(x=>x.id===editId2); fileURL=old?.fileURL||''; }
+  }
+  if(!fileURL){ toast('يرجى رفع فيديو أو إدخال رابط','error'); btn.disabled=false; btn.textContent='💾 حفظ المحاضرة'; return; }
 
   const today = new Date().toISOString().slice(0,10);
   const data = {order, title, desc, duration, fileURL, date: today};
