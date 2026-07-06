@@ -1945,6 +1945,9 @@ init();
 </div>
 
 <script>
+function isBunnyEmbed(url){
+  return url && url.includes('iframe.mediadelivery.net/embed/');
+}
 function isVideoUrl(url){
   return /\.(mp4|webm|ogg|mov|m4v|mkv)(\?|$)/i.test(url);
 }
@@ -1966,7 +1969,12 @@ function openViewer(url, title){
 
   document.getElementById('viewerTitle').textContent = title||'';
 
-  if(isVideoUrl(url)){
+  if(isBunnyEmbed(url)){
+    // Bunny Stream embed — force HD quality
+    const sep = url.includes('?') ? '&' : '?';
+    frm.src = url + sep + 'autoplay=true&defaultQuality=1080p&responsive=true';
+    frm.style.display = 'block';
+  } else if(isVideoUrl(url)){
     vid.src = url;
     vid.style.display = 'block';
   } else if(isImageUrl(url)){
