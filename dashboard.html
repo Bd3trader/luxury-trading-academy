@@ -687,13 +687,10 @@
 <div class="ai-fab" id="aiFab" onclick="toggleChat()">
   <div class="ai-fab-label">مساعد المتداول الذكي</div>
   <button class="ai-fab-btn">
-    <svg width="28" height="28" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <polyline points="4,30 12,22 18,26 28,12 36,16" stroke="white" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-      <circle cx="12" cy="22" r="2" fill="white"/>
-      <circle cx="18" cy="26" r="2" fill="white"/>
-      <circle cx="28" cy="12" r="2" fill="white"/>
-      <circle cx="33" cy="33" r="7" fill="white"/>
-      <text x="33" y="37" text-anchor="middle" font-size="7" font-weight="900" font-family="Arial" fill="#10a37f">AI</text>
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="rgba(255,255,255,0.15)"/>
+      <path d="M8 12h1.5l1.5-4 2 8 1.5-4H16" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="12" cy="12" r="10" stroke="white" stroke-width="1.5" fill="none"/>
     </svg>
   </button>
 </div>
@@ -1036,7 +1033,7 @@ function renderSchools(){
         <div class="sc-meta"><span>${lCount} درس</span><span>${bCount} ملف</span></div>
         ${enrolled
           ?`<button class="sc-btn" onclick="openSchool('${key}')">فتح المدرسة</button>
-             <button class="sc-quiz-btn" onclick="startQuiz('${key}')">الاختبار العملي <span class="quiz-ai-badge">AI</span></button>
+             <button class="sc-quiz-btn" onclick="startQuiz('${key}')">الاختبار العملي</button>
              <div class="sc-sections">
                <button class="sc-sec-btn" onclick="openSection('${key}','liquidity',this)">دروس السيولة</button>
                <button class="sc-sec-btn" onclick="openSection('${key}','strategies',this)">الاستراتيجيات والمؤشرات</button>
