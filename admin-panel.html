@@ -614,6 +614,7 @@ function showPanel(name){
   document.querySelectorAll('.sb-link').forEach(l=>{ if(l.getAttribute('onclick')===`showPanel('${name}')`) l.classList.add('active'); });
   document.getElementById('pageTitle').textContent = panelTitles[name]||name;
   renderPanel(name);
+  if(name==='settings') loadOpenAIKeyStatus();
 }
 
 function renderPanel(name){
@@ -1329,11 +1330,6 @@ document.querySelectorAll('.modal-overlay').forEach(o=>{
 function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); }
 function adminLogout(){ sessionStorage.removeItem('adminLoggedIn'); window.location.href='admin.html'; }
 
-const _origShowPanel=showPanel;
-function showPanel(name){
-  _origShowPanel(name);
-  if(name==='settings') loadOpenAIKeyStatus();
-}
 
 /* ═══ Init ═══ */
 loadAndRender();
