@@ -484,6 +484,37 @@
   </div>
 </div>
 
+
+<!-- Section Modal (Liquidity / Reviews) -->
+<div class="modal-overlay" id="sectionModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="secModalTitle">إضافة فيديو</div>
+      <button class="modal-close" onclick="closeModal('sectionModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field"><label>الترتيب *</label><input type="number" id="sv-order" min="1" value="1"/></div>
+      <div class="field"><label>عنوان الفيديو *</label><input type="text" id="sv-title" placeholder="عنوان الفيديو"/></div>
+      <div class="field"><label>المدة (مثال: 45 دقيقة)</label><input type="text" id="sv-duration" placeholder="45 دقيقة"/></div>
+      <div class="field">
+        <label>📎 رفع فيديو عبر Bunny</label>
+        <div class="file-upload-wrap" onclick="document.getElementById('sv-videofile').click()">
+          <input type="file" id="sv-videofile" accept="video/*" style="display:none" onchange="handleSectionVideo(this)"/>
+          <div class="file-upload-text">🎬 اضغط لاختيار ملف الفيديو أو اسحبه هنا</div>
+          <div id="sv-video-name" style="margin-top:6px;font-size:.8rem;color:var(--muted)">لم يتم اختيار ملف</div>
+          <div class="upload-progress" id="sv-progress" style="display:none"><div class="upload-progress-fill" id="sv-progress-fill"></div></div>
+          <div id="sv-progress-text" style="font-size:.75rem;color:var(--muted);text-align:center"></div>
+        </div>
+      </div>
+      <div class="field"><label>أو رابط YouTube / Drive</label><input type="text" id="sv-driveurl" placeholder="https://youtu.be/..."/></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('sectionModal')">إلغاء</button>
+      <button class="btn-primary" id="saveSectionBtn" onclick="saveSection()">💾 حفظ</button>
+    </div>
+  </div>
+</div>
+
 <!-- Session Modal -->
 <div class="modal-overlay" id="sessionModal">
   <div class="modal" style="max-width:500px">
@@ -616,6 +647,8 @@ let cache = {
   lectures: { classic: [], advanced: [] },
   books: { classic: [], advanced: [] },
   images: { classic: [], advanced: [] },
+  liquidity: { classic: [], advanced: [] },
+  reviews: { classic: [], advanced: [] },
   sessions: [],
   scheduledSessions: [],
   adminPassword: 'Admin@2025'
@@ -632,7 +665,7 @@ function toggleSubPwd(){ const i=document.getElementById('f-password'); i.type=i
 /* ═══ Load Data from Firebase ═══ */
 async function loadData(){
   try {
-    const [subsSnap, classicLecsSnap, advancedLecsSnap, classicBooksSnap, advancedBooksSnap, classicImgsSnap, advancedImgsSnap, sesSnap, schedSnap, settingsSnap] = await Promise.all([
+    const [subsSnap, classicLecsSnap, advancedLecsSnap, classicBooksSnap, advancedBooksSnap, classicImgsSnap, advancedImgsSnap, liqClassicSnap, liqAdvancedSnap, revClassicSnap, revAdvancedSnap, sesSnap, schedSnap, settingsSnap] = await Promise.all([
       db.collection('subscribers').get(),
       db.collection('lectures_classic').orderBy('order').get(),
       db.collection('lectures_advanced').orderBy('order').get(),
@@ -640,6 +673,10 @@ async function loadData(){
       db.collection('books_advanced').orderBy('order').get(),
       db.collection('images_classic').orderBy('order').get(),
       db.collection('images_advanced').orderBy('order').get(),
+      db.collection('liquidity_classic').orderBy('order').get(),
+      db.collection('liquidity_advanced').orderBy('order').get(),
+      db.collection('reviews_classic').orderBy('order').get(),
+      db.collection('reviews_advanced').orderBy('order').get(),
       db.collection('login_sessions').orderBy('loginTime','desc').limit(100).get(),
       db.collection('scheduled_sessions').get(),
       db.collection('settings').doc('admin').get()
@@ -651,6 +688,10 @@ async function loadData(){
     cache.books.advanced = advancedBooksSnap.docs.map(d=>({id:d.id,...d.data()}));
     cache.images.classic = classicImgsSnap.docs.map(d=>({id:d.id,...d.data()}));
     cache.images.advanced = advancedImgsSnap.docs.map(d=>({id:d.id,...d.data()}));
+    cache.liquidity.classic = liqClassicSnap.docs.map(d=>({id:d.id,...d.data()}));
+    cache.liquidity.advanced = liqAdvancedSnap.docs.map(d=>({id:d.id,...d.data()}));
+    cache.reviews.classic = revClassicSnap.docs.map(d=>({id:d.id,...d.data()}));
+    cache.reviews.advanced = revAdvancedSnap.docs.map(d=>({id:d.id,...d.data()}));
     cache.sessions = sesSnap.docs.map(d=>({id:d.id,...d.data()}));
     cache.scheduledSessions = schedSnap.docs.map(d=>({id:d.id,...d.data()}));
     if(settingsSnap.exists) cache.adminPassword = settingsSnap.data().password || cache.adminPassword;
@@ -862,6 +903,8 @@ function renderSchool(key){
       <button class="sub-tab ${currentSubTab==='lectures'?'active':''}" onclick="switchSubTab('lectures',this)">📹 الدروس والمحاضرات (${lecs.length})</button>
       <button class="sub-tab ${currentSubTab==='books'?'active':''}" onclick="switchSubTab('books',this)">📚 الكتب والملخصات (${books.length})</button>
       <button class="sub-tab ${currentSubTab==='images'?'active':''}" onclick="switchSubTab('images',this)">🖼️ الصور (${(cache.images&&cache.images[key]||[]).length})</button>
+      <button class="sub-tab ${currentSubTab==='liquidity'?'active':''}" onclick="switchSubTab('liquidity',this)">💧 دروس السيولة (${(cache.liquidity&&cache.liquidity[key]||[]).length})</button>
+      <button class="sub-tab ${currentSubTab==='reviews'?'active':''}" onclick="switchSubTab('reviews',this)">🎥 المراجعات (${(cache.reviews&&cache.reviews[key]||[]).length})</button>
     </div>
     <div id="schoolSubContent"></div>`;
   renderSubTab(key, currentSubTab);
@@ -918,7 +961,7 @@ function renderSubTab(key, tab){
             <button class="action-btn btn-del" onclick="deleteBook('${key}','${b.id}')">🗑</button>
           </div>`).join('')}
       </div>`;
-  } else {
+  } else if(tab==='images'){
     const items = (cache.images&&cache.images[key]||[]).sort((a,b)=>a.order-b.order);
     div.innerHTML=`
       <div class="sec-hd">
@@ -937,6 +980,29 @@ function renderSubTab(key, tab){
             </div>
             <button class="action-btn btn-edit" onclick="openEditImage('${key}','${img.id}')">✏️ تعديل</button>
             <button class="action-btn btn-del" onclick="deleteImage('${key}','${img.id}')">🗑</button>
+          </div>`).join('')}
+      </div>`;
+  } else if(tab==='liquidity' || tab==='reviews'){
+    const colName = tab+'_'+key;
+    const labelMap = {liquidity:'💧 دروس السيولة', reviews:'🎥 المراجعات'};
+    const items = (cache[tab]&&cache[tab][key]||[]).sort((a,b)=>a.order-b.order);
+    div.innerHTML=`
+      <div class="sec-hd">
+        <div class="sec-hd-title">${labelMap[tab]} — ${key==='classic'?'مدرسة الكلاسيك':'المدرسة المتقدمة'}</div>
+        <button class="btn-add" onclick="openAddSection('${key}','${tab}')">+ إضافة فيديو</button>
+      </div>
+      <div id="secList">
+        ${items.length===0?'<div class="no-online">لا توجد فيديوهات — أضف أول فيديو الآن</div>':
+          items.map(l=>`<div class="lec-card">
+            <div class="lec-order">${l.order}</div>
+            <div class="lec-info">
+              <div class="lec-title">${l.title}</div>
+              <div class="lec-meta"><span>⏱ ${l.duration||'—'}</span>
+                <span class="lec-file ${l.fileURL?'file-ok':'file-none'}">${l.fileURL?'✅ فيديو مرفوع':'⌛ لا يوجد فيديو'}</span>
+              </div>
+            </div>
+            <button class="action-btn btn-edit" onclick="openEditSection('${key}','${tab}','${l.id}')">✏️ تعديل</button>
+            <button class="action-btn btn-del" onclick="deleteSection('${key}','${tab}','${l.id}')">🗑</button>
           </div>`).join('')}
       </div>`;
   }
@@ -1281,6 +1347,100 @@ async function deleteImage(key, id){
   if(!confirm('هل تريد حذف هذه الصورة؟')) return;
   await db.collection('images_'+key).doc(id).delete();
   cache.images[key] = (cache.images[key]||[]).filter(x=>x.id!==id);
+  renderSchool(key);
+  toast('🗑 تم الحذف','error');
+}
+
+
+/* ═══ Section Videos (Liquidity / Reviews) ═══ */
+let editingSectionId = null;
+let currentSectionType = null;
+let pendingSectionVideo = null;
+
+function openAddSection(key, secType){
+  editingSectionId = null;
+  currentSectionType = secType;
+  const label = secType==='liquidity'?'💧 دروس السيولة':'🎥 المراجعات';
+  document.getElementById('secModalTitle').textContent = 'إضافة — '+label;
+  ['sv-title','sv-duration','sv-driveurl'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('sv-order').value = (cache[secType][key]||[]).length+1;
+  document.getElementById('sv-video-name').textContent = 'لم يتم اختيار ملف';
+  document.getElementById('sv-progress').style.display='none';
+  pendingSectionVideo = null;
+  openModal('sectionModal');
+}
+
+function openEditSection(key, secType, id){
+  const item = (cache[secType][key]||[]).find(x=>x.id===id);
+  if(!item) return;
+  editingSectionId = id;
+  currentSectionType = secType;
+  const label = secType==='liquidity'?'💧 دروس السيولة':'🎥 المراجعات';
+  document.getElementById('secModalTitle').textContent = 'تعديل — '+label;
+  document.getElementById('sv-title').value = item.title||'';
+  document.getElementById('sv-duration').value = item.duration||'';
+  document.getElementById('sv-order').value = item.order||1;
+  document.getElementById('sv-driveurl').value = item.fileURL&&!item.fileURL.includes('mediadelivery')?item.fileURL:'';
+  document.getElementById('sv-video-name').textContent = item.fileURL?'✅ يوجد فيديو — اختر ملفاً جديداً للاستبدال':'لم يتم اختيار ملف';
+  document.getElementById('sv-progress').style.display='none';
+  pendingSectionVideo = null;
+  openModal('sectionModal');
+}
+
+function handleSectionVideo(input){
+  pendingSectionVideo = input.files[0];
+  if(pendingSectionVideo)
+    document.getElementById('sv-video-name').textContent = '📎 '+pendingSectionVideo.name+' ('+(pendingSectionVideo.size/1024/1024).toFixed(1)+' MB)';
+}
+
+async function saveSection(){
+  const key = currentSchool;
+  const secType = currentSectionType;
+  const title = document.getElementById('sv-title').value.trim();
+  if(!title){ toast('عنوان الفيديو مطلوب','error'); return; }
+  const order = parseInt(document.getElementById('sv-order').value)||1;
+  const duration = document.getElementById('sv-duration').value.trim();
+  let fileURL = editingSectionId ? (cache[secType][key]||[]).find(x=>x.id===editingSectionId)?.fileURL||'' : '';
+  const manualUrl = document.getElementById('sv-driveurl').value.trim();
+
+  const btn = document.getElementById('saveSectionBtn');
+  btn.disabled = true; btn.textContent = '⏳ جاري الحفظ...';
+
+  try {
+    if(pendingSectionVideo){
+      document.getElementById('sv-progress').style.display='block';
+      fileURL = await uploadToBunny(pendingSectionVideo, pct=>{
+        document.getElementById('sv-progress-fill').style.width=pct+'%';
+        document.getElementById('sv-progress-text').textContent=pct+'%';
+      });
+      pendingSectionVideo = null;
+    } else if(manualUrl){
+      fileURL = manualUrl;
+    }
+    const data = {title, order, duration, fileURL, updatedAt: Date.now()};
+    if(editingSectionId){
+      await db.collection(secType+'_'+key).doc(editingSectionId).update(data);
+      const idx = cache[secType][key].findIndex(x=>x.id===editingSectionId);
+      if(idx>=0) cache[secType][key][idx]={...cache[secType][key][idx],...data};
+    } else {
+      const ref = await db.collection(secType+'_'+key).add({...data, createdAt:Date.now()});
+      cache[secType][key].push({id:ref.id,...data});
+    }
+    closeModal('sectionModal');
+    currentSubTab = secType;
+    renderSchool(key);
+    toast('✅ تم الحفظ بنجاح');
+  } catch(e){
+    toast('خطأ: '+e.message,'error');
+  } finally {
+    btn.disabled=false; btn.textContent='💾 حفظ';
+  }
+}
+
+async function deleteSection(key, secType, id){
+  if(!confirm('هل تريد حذف هذا الفيديو؟')) return;
+  await db.collection(secType+'_'+key).doc(id).delete();
+  cache[secType][key] = (cache[secType][key]||[]).filter(x=>x.id!==id);
   renderSchool(key);
   toast('🗑 تم الحذف','error');
 }

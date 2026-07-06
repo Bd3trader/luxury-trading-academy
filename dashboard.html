@@ -747,7 +747,7 @@ const firebaseConfig={apiKey:"AIzaSyCp4YfzewPiH6XkVHo6Sp86hyy5gB-eUSY",authDomai
 if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db=firebase.firestore();
 
-let firestoreContent={content:{classic:{lectures:[],books:[],images:[]},advanced:{lectures:[],books:[],images:[]}},scheduledSessions:[]};
+let firestoreContent={content:{classic:{lectures:[],books:[],images:[],liquidity:[],reviews:[]},advanced:{lectures:[],books:[],images:[],liquidity:[],reviews:[]}},scheduledSessions:[]};
 function getData(){return firestoreContent;}
 function saveData(d){}  // no-op — Firestore is the source of truth
 
@@ -764,6 +764,10 @@ async function loadFirestoreContent(){
     tasks.push(db.collection('lectures_advanced').orderBy('order').get().then(s=>{firestoreContent.content.advanced.lectures=s.docs.map(d=>({id:d.id,...d.data()}));}));
     tasks.push(db.collection('books_advanced').orderBy('order').get().then(s=>{firestoreContent.content.advanced.books=s.docs.map(d=>({id:d.id,...d.data()}));}));
     tasks.push(db.collection('images_advanced').orderBy('order').get().then(s=>{firestoreContent.content.advanced.images=s.docs.map(d=>({id:d.id,...d.data()}));}));
+    tasks.push(db.collection('liquidity_classic').orderBy('order').get().then(s=>{firestoreContent.content.classic.liquidity=s.docs.map(d=>({id:d.id,...d.data()}));}));
+    tasks.push(db.collection('liquidity_advanced').orderBy('order').get().then(s=>{firestoreContent.content.advanced.liquidity=s.docs.map(d=>({id:d.id,...d.data()}));}));
+    tasks.push(db.collection('reviews_classic').orderBy('order').get().then(s=>{firestoreContent.content.classic.reviews=s.docs.map(d=>({id:d.id,...d.data()}));}));
+    tasks.push(db.collection('reviews_advanced').orderBy('order').get().then(s=>{firestoreContent.content.advanced.reviews=s.docs.map(d=>({id:d.id,...d.data()}));}));
   }
   tasks.push(db.collection('scheduled_sessions').get().then(s=>{firestoreContent.scheduledSessions=s.docs.map(d=>({id:d.id,...d.data()}));}));
   await Promise.all(tasks).catch(console.error);
@@ -1105,13 +1109,20 @@ function openSection(key,sec,btn){
   const secObj=d?.content?.[key]?.[sec]||{};
   const groups=secObj.groups||[];
 
+  // For liquidity/reviews: data is a flat array in firestoreContent
+  const flatArr = Array.isArray(secObj) ? secObj : null;
+
   if(groups.length>0){
-    // عرض الاستراتيجيات كبطاقات
     renderGroups(key,sec,groups);
-    // إخفاء تبويبات المحاضرات/الكتب وعرض الجروبات
     document.querySelector('.tabs-bar').style.display='none';
     document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
     document.getElementById('tc-lectures').classList.add('active');
+  } else if(flatArr){
+    document.querySelector('.tabs-bar').style.display='flex';
+    const secData={content:{[key]:{lectures:flatArr,books:[]}}};
+    renderLectures(key,secData,sec);
+    renderBooks(key,secData,sec);
+    switchTab('lectures',document.getElementById('tab-lectures'));
   } else {
     document.querySelector('.tabs-bar').style.display='flex';
     const secData={content:{[key]:{lectures:secObj.lectures||[],books:secObj.books||[]}}};
