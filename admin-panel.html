@@ -579,7 +579,7 @@ async function uploadToBunny(file, onProgress){
       retryDelays: [0, 3000, 5000],
       headers: {
         AuthorizationSignature: BUNNY_KEY,
-        AuthorizationExpire: 0,
+        AuthorizationExpire: Math.floor(Date.now()/1000) + 3600,
         VideoId: videoId,
         LibraryId: BUNNY_LIB
       },
