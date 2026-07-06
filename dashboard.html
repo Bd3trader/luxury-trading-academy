@@ -1704,8 +1704,8 @@ function showWaSuccess(){
 }
 
 /* ── AI Chat (ChatGPT) ── */
-const _a='sk-proj-0JYWAnpGo5Gnqb2QLhNRPemSs6wBkRwPAphJnHiPany1oGLMr8sL7Qg_KOgsm2UEvbXQOSMigK',_b='T3BlbkFJA1gZ2ZyEeoqE7mMbXhMgQf01tAbTVhOVEGXtSUJnBn-VJPwblAgLi1Tm5HobCy6VuGI6a1uaIA';
-const OPENAI_KEY=_a+_b;
+let OPENAI_KEY='';
+db.collection('settings').doc('openai').get().then(s=>{ if(s.exists) OPENAI_KEY=s.data().key||''; });
 let chatOpen=false;
 let chatHistory=[];
 let aiTyping=false;

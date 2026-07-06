@@ -302,6 +302,19 @@
     <!-- SETTINGS -->
     <div class="panel" id="panel-settings">
       <div class="settings-card">
+        <h3>🤖 مفتاح OpenAI API</h3>
+        <p style="font-size:.82rem;color:var(--muted);margin-bottom:14px">أدخل المفتاح مرة واحدة ويُحفظ تلقائياً ويُستخدم في المساعد الذكي والاختبارات.</p>
+        <div class="field">
+          <label>المفتاح (sk-proj-...)</label>
+          <div class="inp-wrap">
+            <input type="password" id="openaiKeyInp" placeholder="sk-proj-..." dir="ltr"/>
+            <button type="button" class="pwd-eye" onclick="toggleKeyVisibility()">👁</button>
+          </div>
+        </div>
+        <div id="openaiKeyStatus" style="font-size:.82rem;margin-bottom:12px"></div>
+        <button class="btn-primary" onclick="saveOpenAIKey()">💾 حفظ المفتاح</button>
+      </div>
+      <div class="settings-card">
         <h3>🔑 تغيير كلمة مرور المسؤول</h3>
         <div class="field"><label>كلمة المرور الحالية</label><input type="password" id="curPwd" placeholder="••••••••" dir="ltr"/></div>
         <div class="field"><label>كلمة المرور الجديدة</label><input type="password" id="newPwd" placeholder="••••••••" dir="ltr"/></div>
@@ -309,6 +322,7 @@
         <button class="btn-primary" onclick="changePassword()">حفظ كلمة المرور الجديدة</button>
       </div>
     </div>
+
 
   </div>
 </div>
@@ -1263,6 +1277,33 @@ function renderSchedule(){
   }).join('');
 }
 
+/* ═══ OpenAI Key ═══ */
+function toggleKeyVisibility(){
+  const inp=document.getElementById('openaiKeyInp');
+  inp.type=inp.type==='password'?'text':'password';
+}
+
+async function loadOpenAIKeyStatus(){
+  try{
+    const snap=await db.collection('settings').doc('openai').get();
+    const st=document.getElementById('openaiKeyStatus');
+    if(snap.exists && snap.data().key){
+      st.innerHTML='<span style="color:var(--green)">✅ المفتاح محفوظ ومفعّل</span>';
+    } else {
+      st.innerHTML='<span style="color:var(--muted)">لم يتم حفظ أي مفتاح بعد</span>';
+    }
+  } catch(e){}
+}
+
+async function saveOpenAIKey(){
+  const key=document.getElementById('openaiKeyInp').value.trim();
+  if(!key.startsWith('sk-')){ toast('المفتاح غير صحيح — يجب أن يبدأ بـ sk-','error'); return; }
+  await db.collection('settings').doc('openai').set({key});
+  document.getElementById('openaiKeyInp').value='';
+  document.getElementById('openaiKeyStatus').innerHTML='<span style="color:var(--green)">✅ تم الحفظ بنجاح</span>';
+  toast('✅ تم حفظ مفتاح OpenAI');
+}
+
 /* ═══ Settings ═══ */
 async function changePassword(){
   const cur = document.getElementById('curPwd').value;
@@ -1287,6 +1328,12 @@ document.querySelectorAll('.modal-overlay').forEach(o=>{
 /* ═══ Sidebar ═══ */
 function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); }
 function adminLogout(){ sessionStorage.removeItem('adminLoggedIn'); window.location.href='admin.html'; }
+
+const _origShowPanel=showPanel;
+function showPanel(name){
+  _origShowPanel(name);
+  if(name==='settings') loadOpenAIKeyStatus();
+}
 
 /* ═══ Init ═══ */
 loadAndRender();

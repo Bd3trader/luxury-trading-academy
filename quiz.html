@@ -216,7 +216,13 @@
 
 </div><!-- /page -->
 
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script>
+const _fc={apiKey:"AIzaSyCp4YfzewPiH6XkVHo6Sp86hyy5gB-eUSY",authDomain:"luxury-trading-academy.firebaseapp.com",projectId:"luxury-trading-academy",storageBucket:"luxury-trading-academy.firebasestorage.app",messagingSenderId:"247439882691",appId:"1:247439882691:web:46a1a83ebceb96596fe576"};
+if(!firebase.apps.length) firebase.initializeApp(_fc);
+const db=firebase.firestore();
+
 /* ════════════════════════════════
    DATA
 ════════════════════════════════ */
@@ -240,8 +246,8 @@ if(!(SUB.schools||[]).includes(SCHOOL)){window.location.href='dashboard.html';}
 /* ════════════════════════════════
    API KEY
 ════════════════════════════════ */
-const _a='sk-proj-0JYWAnpGo5Gnqb2QLhNRPemSs6wBkRwPAphJnHiPany1oGLMr8sL7Qg_KOgsm2UEvbXQOSMigK',_b='T3BlbkFJA1gZ2ZyEeoqE7mMbXhMgQf01tAbTVhOVEGXtSUJnBn-VJPwblAgLi1Tm5HobCy6VuGI6a1uaIA';
-const OPENAI_KEY=_a+_b;
+let OPENAI_KEY='';
+db.collection('settings').doc('openai').get().then(s=>{ if(s.exists) OPENAI_KEY=s.data().key||''; });
 
 /* ════════════════════════════════
    AI QUESTION GENERATION
