@@ -747,7 +747,7 @@ const firebaseConfig={apiKey:"AIzaSyCp4YfzewPiH6XkVHo6Sp86hyy5gB-eUSY",authDomai
 if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db=firebase.firestore();
 
-let firestoreContent={content:{classic:{lectures:[],books:[],images:[],liquidity:[],reviews:[]},advanced:{lectures:[],books:[],images:[],liquidity:[],reviews:[]}},scheduledSessions:[]};
+let firestoreContent={content:{classic:{lectures:[],books:[],images:[],liquidity:[],reviews:[],strategies:[]},advanced:{lectures:[],books:[],images:[],liquidity:[],reviews:[],strategies:[]}},scheduledSessions:[]};
 function getData(){return firestoreContent;}
 function saveData(d){}  // no-op — Firestore is the source of truth
 
@@ -768,6 +768,8 @@ async function loadFirestoreContent(){
     tasks.push(db.collection('liquidity_advanced').orderBy('order').get().then(s=>{firestoreContent.content.advanced.liquidity=s.docs.map(d=>({id:d.id,...d.data()}));}));
     tasks.push(db.collection('reviews_classic').orderBy('order').get().then(s=>{firestoreContent.content.classic.reviews=s.docs.map(d=>({id:d.id,...d.data()}));}));
     tasks.push(db.collection('reviews_advanced').orderBy('order').get().then(s=>{firestoreContent.content.advanced.reviews=s.docs.map(d=>({id:d.id,...d.data()}));}));
+    tasks.push(db.collection('strategies_classic').orderBy('order').get().then(s=>{firestoreContent.content.classic.strategies=s.docs.map(d=>({id:d.id,...d.data()}));}));
+    tasks.push(db.collection('strategies_advanced').orderBy('order').get().then(s=>{firestoreContent.content.advanced.strategies=s.docs.map(d=>({id:d.id,...d.data()}));}));
   }
   tasks.push(db.collection('scheduled_sessions').get().then(s=>{firestoreContent.scheduledSessions=s.docs.map(d=>({id:d.id,...d.data()}));}));
   await Promise.all(tasks).catch(console.error);
@@ -1109,19 +1111,25 @@ function openSection(key,sec,btn){
   const secObj=d?.content?.[key]?.[sec]||{};
   const groups=secObj.groups||[];
 
-  // For liquidity/reviews: data is a flat array in firestoreContent
+  // liquidity / reviews / strategies: flat arrays from Firestore
   const flatArr = Array.isArray(secObj) ? secObj : null;
+  // Check Firestore strategies data
+  const stratArr = sec==='strategies' ? (firestoreContent.content?.[key]?.strategies||[]) : null;
+  const firestoreFlat = flatArr || (sec==='liquidity'||sec==='reviews' ? secObj : null);
 
-  if(groups.length>0){
+  if(stratArr && stratArr.length>0){
+    // strategies from Firestore admin
+    document.querySelector('.tabs-bar').style.display='flex';
+    renderSectionItems(key, stratArr, sec);
+    switchTab('lectures',document.getElementById('tab-lectures'));
+  } else if(groups.length>0){
     renderGroups(key,sec,groups);
     document.querySelector('.tabs-bar').style.display='none';
     document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
     document.getElementById('tc-lectures').classList.add('active');
-  } else if(flatArr){
+  } else if(firestoreFlat){
     document.querySelector('.tabs-bar').style.display='flex';
-    const secData={content:{[key]:{lectures:flatArr,books:[]}}};
-    renderLectures(key,secData,sec);
-    renderBooks(key,secData,sec);
+    renderSectionItems(key, firestoreFlat, sec);
     switchTab('lectures',document.getElementById('tab-lectures'));
   } else {
     document.querySelector('.tabs-bar').style.display='flex';
@@ -1134,6 +1142,36 @@ function openSection(key,sec,btn){
   const panel=document.getElementById('contentPanel');
   panel.classList.add('show');
   setTimeout(()=>panel.scrollIntoView({behavior:'smooth',block:'start'}),100);
+}
+
+function renderSectionItems(key, items, sec){
+  const el=document.getElementById('lecturesList');
+  const sorted=[...items].sort((a,b)=>a.order-b.order);
+  if(!sorted.length){
+    el.innerHTML='<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">لا يوجد محتوى بعد — ترقّب التحديثات!</div></div>';
+    return;
+  }
+  el.innerHTML=sorted.map(l=>{
+    const rawHref=l.fileURL||'';
+    const viewUrl=getViewerUrl(rawHref);
+    const hasFile=!!viewUrl;
+    const titleEsc=(l.title||'').replace(/'/g,"\'");
+    const typeIcon=l.type==='image'?'🖼️':l.type==='file'?'📄':'🎬';
+    const btnLabel=l.type==='image'?'🖼️ عرض':l.type==='file'?'📄 فتح':'▶ مشاهدة';
+    return`<li class="lec-item">
+      <div class="lec-num">${l.order}</div>
+      <div class="lec-info">
+        <div class="lec-title">${typeIcon} ${l.title}</div>
+        <div class="lec-meta"><span>⏱ ${l.duration||''}</span></div>
+      </div>
+      ${hasFile
+        ?`<button class="lec-btn has-file" onclick="openViewer('${viewUrl}','${titleEsc}')">${btnLabel}</button>`
+        :`<button class="lec-btn no-file" disabled>⌛ قريباً</button>`
+      }
+    </li>`;
+  }).join('');
+  // Hide books tab for these sections
+  document.getElementById('booksList').innerHTML='';
 }
 
 function renderGroups(key, sec, groups){
