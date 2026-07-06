@@ -561,6 +561,11 @@ function handleLectureVideo(input){
   document.getElementById('l-video-name').textContent = '📎 ' + file.name + ' (' + (file.size/1024/1024).toFixed(1) + ' MB)';
 }
 
+async function sha256hex(msg){
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(msg));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+
 async function uploadToBunny(file, onProgress){
   // 1. أنشئ entry للفيديو
   const createRes = await fetch(`https://video.bunnycdn.com/library/${BUNNY_LIB}/videos`, {
@@ -572,16 +577,19 @@ async function uploadToBunny(file, onProgress){
   const videoId = createData.guid;
   if(!videoId) throw new Error('فشل إنشاء الفيديو');
 
-  // 2. ارفع الملف عبر TUS
+  // 2. ارفع الملف عبر TUS مع توقيع SHA256
+  const expire = Math.floor(Date.now()/1000) + 3600;
+  const sig = await sha256hex(BUNNY_LIB + BUNNY_KEY + expire + videoId);
+
   return new Promise((resolve, reject) => {
     const upload = new tus.Upload(file, {
       endpoint: `https://video.bunnycdn.com/tusupload`,
       retryDelays: [0, 3000, 5000],
       headers: {
-        AuthorizationSignature: BUNNY_KEY,
-        AuthorizationExpire: Math.floor(Date.now()/1000) + 3600,
+        AuthorizationSignature: sig,
+        AuthorizationExpire: expire,
         VideoId: videoId,
-        LibraryId: BUNNY_LIB
+        LibraryId: String(BUNNY_LIB)
       },
       metadata: { filetype: file.type, title: file.name },
       chunkSize: 5 * 1024 * 1024,
