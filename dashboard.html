@@ -3,22 +3,23 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>منصتي | منصة تعليم التداول</title>
+  <title>3B Trading | منصة التداول الاحترافية</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
-      --gold:#B8860B;--gold-g:linear-gradient(135deg,#B8860B,#D4A017);
-      --bg:#f8f6f1;--white:#fff;--text:#1a1a2e;--muted:#6b7280;
+      --gold:#B8860B;--gold-light:#D4A017;--gold-g:linear-gradient(135deg,#B8860B,#D4A017);
+      --navy:#0f172a;--navy2:#1e293b;--navy3:#162032;
+      --bg:#f0f2f5;--white:#fff;--text:#0f172a;--muted:#64748b;
       --border:rgba(184,134,11,.18);--green:#0a9e78;--red:#dc2626;--blue:#3b82f6;
     }
-    body{font-family:'Cairo',sans-serif;background:#f5f5f0;color:var(--text);min-height:100vh}
+    body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 
     /* ── Navbar ── */
-    nav{background:#1a1a2e;padding:0 28px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+    nav{background:var(--navy);padding:0 28px;height:68px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(184,134,11,.15);box-shadow:0 2px 20px rgba(0,0,0,.3)}
     .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
-    .nav-logo-icon{width:34px;height:34px;background:var(--gold-g);border-radius:9px;display:flex;align-items:center;justify-content:center}
-    .nav-logo-name{font-weight:900;font-size:.9rem;color:#fff}
+    .nav-logo-img{height:44px;width:auto;object-fit:contain}
+    .nav-logo-name{font-weight:900;font-size:.85rem;color:rgba(255,255,255,.5);letter-spacing:.05em}
     .nav-right{display:flex;align-items:center;gap:10px}
     /* ── User Menu ── */
     .user-menu-wrap{position:relative}
@@ -27,7 +28,7 @@
     .user-dropdown{display:none;position:absolute;top:calc(100% + 10px);left:0;width:300px;background:#fff;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.18);border:1px solid rgba(0,0,0,.07);overflow:hidden;z-index:9999;animation:dropIn .2s ease}
     .user-dropdown.open{display:block}
     @keyframes dropIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
-    .ud-header{background:linear-gradient(135deg,#1a1a2e,#16213e);padding:20px 18px;display:flex;align-items:center;gap:14px}
+    .ud-header{background:linear-gradient(135deg,var(--navy),var(--navy2));padding:20px 18px;display:flex;align-items:center;gap:14px}
     .ud-avatar{width:46px;height:46px;border-radius:14px;background:var(--gold-g);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:900;flex-shrink:0;box-shadow:0 4px 12px rgba(184,134,11,.4)}
     .ud-name{font-size:.95rem;font-weight:900;color:#fff}
     .ud-email{font-size:.72rem;color:rgba(255,255,255,.45);margin-top:2px;direction:ltr;text-align:right}
@@ -43,7 +44,7 @@
     .modal-overlay.open{display:flex}
     .modal-box{background:#fff;border-radius:22px;width:100%;max-width:460px;box-shadow:0 30px 80px rgba(0,0,0,.2);overflow:hidden;animation:modalIn .25s ease}
     @keyframes modalIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
-    .modal-head{background:linear-gradient(135deg,#1a1a2e,#16213e);padding:22px 24px;display:flex;align-items:center;justify-content:space-between}
+    .modal-head{background:linear-gradient(135deg,var(--navy),var(--navy2));padding:22px 24px;display:flex;align-items:center;justify-content:space-between}
     .modal-title{font-size:1rem;font-weight:900;color:#fff}
     .modal-close{background:rgba(255,255,255,.1);border:none;color:#fff;width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center}
     .modal-body{padding:24px}
@@ -73,7 +74,7 @@
     body.dark-theme{background:#0d1117;color:#e6edf3}
     body.dark-theme main section,body.dark-theme .school-card,body.dark-theme .cp-wrap{background:#161b22;border-color:#30363d;color:#e6edf3}
     body.dark-theme .welcome{background:linear-gradient(135deg,#0d1117,#161b22,#1c2128)!important}
-    body.dark-theme nav{background:#0d1117}
+    body.dark-theme nav{background:#060c16}
     .user-chip{display:flex;align-items:center;gap:8px;padding:5px 12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:999px;font-size:.82rem;font-weight:700;color:rgba(255,255,255,.85)}
     .user-avatar{width:26px;height:26px;border-radius:50%;background:var(--gold-g);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:900}
     .btn-logout{padding:6px 14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:rgba(255,255,255,.6);font-family:'Cairo',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s}
@@ -84,9 +85,9 @@
     main{max-width:960px;margin:0 auto;padding:32px 20px 80px}
 
     /* ── Welcome Banner ── */
-    .welcome{background:linear-gradient(135deg,#1a1a2e 0%,#16213e 60%,#0f3460 100%);border-radius:20px;padding:28px 32px;margin-bottom:28px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(26,26,46,.25)}
-    .welcome::before{content:'';position:absolute;top:-40px;left:-40px;width:200px;height:200px;background:radial-gradient(circle,rgba(184,134,11,.15) 0%,transparent 70%);pointer-events:none}
-    .welcome::after{content:'';position:absolute;bottom:-30px;right:80px;width:150px;height:150px;background:radial-gradient(circle,rgba(37,99,235,.12) 0%,transparent 70%);pointer-events:none}
+    .welcome{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 60%,var(--navy3) 100%);border-radius:24px;padding:32px 36px;margin-bottom:28px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;position:relative;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.2),0 0 0 1px rgba(184,134,11,.15)}
+    .welcome::before{content:'';position:absolute;top:-60px;right:-60px;width:260px;height:260px;background:radial-gradient(circle,rgba(184,134,11,.12) 0%,transparent 65%);pointer-events:none}
+    .welcome::after{content:'';position:absolute;bottom:-40px;left:60px;width:200px;height:200px;background:radial-gradient(circle,rgba(212,160,23,.07) 0%,transparent 65%);pointer-events:none}
     .welcome-text{position:relative;z-index:1}
     .welcome-text h1{font-size:1.5rem;font-weight:900;margin-bottom:10px;color:#fff}
     .welcome-text p{color:var(--muted);font-size:.82rem}
@@ -109,8 +110,8 @@
     .school-card:not(.locked):hover{transform:translateY(-4px);box-shadow:0 12px 36px rgba(0,0,0,.08)}
     .school-card.open{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold)}
     .sc-banner{height:56px;display:flex;align-items:center;justify-content:center;position:relative}
-    .sc-banner.classic{background:linear-gradient(135deg,#1e3a5f,#2563eb)}
-    .sc-banner.advanced{background:linear-gradient(135deg,#78350f,#b45309)}
+    .sc-banner.classic{background:linear-gradient(135deg,var(--navy),var(--navy2))}
+    .sc-banner.advanced{background:linear-gradient(135deg,#0c1f3f,var(--navy))}
     .sc-badge{position:absolute;top:50%;right:16px;transform:translateY(-50%);padding:3px 10px;border-radius:999px;font-size:.68rem;font-weight:800}
     .badge-enrolled{background:rgba(255,255,255,.2);color:#fff}
     .badge-locked{background:rgba(255,255,255,.15);color:rgba(255,255,255,.7)}
@@ -123,8 +124,8 @@
     .sc-btn-locked{width:100%;padding:11px;background:rgba(0,0,0,.03);border:1px solid rgba(0,0,0,.06);border-radius:10px;font-family:'Cairo',sans-serif;font-size:.82rem;font-weight:700;color:var(--muted);cursor:not-allowed}
 
     /* ── Quiz Button ── */
-    .sc-quiz-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:9px;background:#1a1a2e;color:#fff;font-family:'Cairo',sans-serif;font-weight:800;font-size:.8rem;border:none;border-radius:10px;cursor:pointer;transition:all .25s;margin-top:6px}
-    .sc-quiz-btn:hover{background:#2d2d44}
+    .sc-quiz-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:9px;background:var(--navy);color:var(--gold);font-family:'Cairo',sans-serif;font-weight:800;font-size:.8rem;border:none;border-radius:10px;cursor:pointer;transition:all .25s;margin-top:6px;border:1px solid rgba(184,134,11,.2)}
+    .sc-quiz-btn:hover{background:var(--gold-g);color:#fff;border-color:transparent}
     .sc-quiz-btn .quiz-ai-badge{background:var(--gold-g);color:#fff;font-size:.62rem;padding:2px 6px;border-radius:999px;font-weight:900}
 
     /* ── Section Buttons ── */
@@ -138,7 +139,7 @@
     .content-panel.show{display:block}
     @keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
 
-    .cp-header{background:#1a1a2e;padding:16px 22px;display:flex;align-items:center;justify-content:space-between}
+    .cp-header{background:linear-gradient(135deg,var(--navy),var(--navy2));padding:16px 22px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid rgba(184,134,11,.3)}
     .cp-title{font-weight:900;font-size:.95rem;display:flex;align-items:center;gap:8px;color:#fff}
     .cp-close{width:30px;height:30px;background:rgba(255,255,255,.1);border:none;border-radius:7px;cursor:pointer;font-size:.85rem;color:rgba(255,255,255,.6);display:flex;align-items:center;justify-content:center;transition:background .2s}
     .cp-close:hover{background:rgba(220,38,38,.3);color:#fff}
@@ -156,14 +157,14 @@
     .lectures-list{list-style:none;display:flex;flex-direction:column;gap:8px}
     .lec-item{display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid rgba(0,0,0,.05);border-radius:12px;background:#fafaf8;transition:all .2s}
     .lec-item:hover{border-color:rgba(184,134,11,.18);background:#fffef9;box-shadow:0 4px 14px rgba(0,0,0,.04)}
-    .lec-num{min-width:36px;height:36px;border-radius:10px;background:#1a1a2e;color:var(--gold);font-weight:900;font-size:.82rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .lec-num{min-width:36px;height:36px;border-radius:10px;background:var(--navy);color:var(--gold);font-weight:900;font-size:.82rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.2)}
     .lec-info{flex:1}
     .lec-title{font-weight:800;font-size:.88rem;margin-bottom:2px;color:var(--text)}
     .lec-desc{color:var(--muted);font-size:.75rem;line-height:1.5}
     .lec-meta{display:flex;align-items:center;gap:8px;margin-top:3px;font-size:.72rem;color:var(--muted)}
     .lec-btn,.book-btn{padding:8px 16px;border-radius:8px;font-family:'Cairo',sans-serif;font-weight:700;font-size:.78rem;border:none;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
-    .has-file{background:#1a1a2e;color:var(--gold)}
-    .has-file:hover{background:#2d2d44;transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.12)}
+    .has-file{background:var(--navy);color:var(--gold);border:1px solid rgba(184,134,11,.25)}
+    .has-file:hover{background:var(--gold-g);color:#fff;border-color:transparent;transform:translateY(-1px);box-shadow:0 4px 14px rgba(184,134,11,.3)}
     .no-file{background:rgba(0,0,0,.04);color:var(--muted);border:1px solid rgba(0,0,0,.06);cursor:default}
 
     /* ── Books List ── */
@@ -191,7 +192,7 @@
     .econ-card{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;overflow:hidden}
     .econ-header{padding:16px 22px;border-bottom:1px solid rgba(0,0,0,.06);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
     .econ-title{display:flex;align-items:center;gap:10px;font-weight:900;font-size:.95rem}
-    .econ-title-icon{width:34px;height:34px;background:#1a1a2e;border-radius:9px;display:flex;align-items:center;justify-content:center}
+    .econ-title-icon{width:34px;height:34px;background:var(--navy);border-radius:9px;display:flex;align-items:center;justify-content:center}
     .econ-badge{padding:3px 10px;background:rgba(26,26,46,.06);color:#1a1a2e;border:1px solid rgba(0,0,0,.08);border-radius:999px;font-size:.7rem;font-weight:800}
     .econ-update{font-size:.75rem;color:var(--muted);display:flex;align-items:center;gap:5px}
     .econ-live-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;display:inline-block;animation:blink 1.5s ease-in-out infinite}
@@ -381,10 +382,10 @@
 <body>
 
 <!-- Navbar -->
+<div style="height:3px;background:linear-gradient(90deg,#B8860B,#D4A017,#B8860B);"></div>
 <nav>
   <a href="index.html" class="nav-logo">
-    <div class="nav-logo-icon" style="font-weight:900;font-size:.75rem;color:#fff">T</div>
-    <div class="nav-logo-name">منصة تعليم التداول</div>
+    <img src="logo.svg" alt="3B Trading" class="nav-logo-img"/>
   </a>
   <div class="nav-right">
     <div class="user-menu-wrap">
@@ -511,7 +512,11 @@
   <!-- Welcome -->
   <div class="welcome">
     <div class="welcome-text">
-      <h1 id="welcomeMsg">مرحباً</h1>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <img src="logo.svg" alt="3B Trading" style="height:38px;width:auto;filter:brightness(0) invert(1);opacity:.9"/>
+      </div>
+      <h1 id="welcomeMsg" style="font-size:1.45rem">مرحباً</h1>
+      <div style="font-size:.72rem;color:rgba(255,255,255,.35);font-weight:700;letter-spacing:.08em;margin-bottom:8px">BUILD • BELIEVE • BENEFIT</div>
       <div class="welcome-schools" id="welcomeSchools"></div>
     </div>
     <div id="welcomeLevel" style="position:relative;z-index:1;text-align:center;padding:16px 24px;background:rgba(255,255,255,.06);border:1px solid rgba(184,134,11,.25);border-radius:16px;backdrop-filter:blur(8px);min-width:110px">
