@@ -3,19 +3,20 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>منصتي | منصة تعليم التداول</title>
+  <title>منصتي | 3B Trading Academy</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
-      --gold:#B8860B;--gold-g:linear-gradient(135deg,#B8860B,#D4A017);
-      --bg:#f8f6f1;--white:#fff;--text:#1a1a2e;--muted:#6b7280;
-      --border:rgba(184,134,11,.18);--green:#0a9e78;--red:#dc2626;--blue:#3b82f6;
+      --navy:#132A57;--navy2:#284D9C;
+      --gold:#D4A03C;--gold2:#B8860B;--gold-g:linear-gradient(135deg,#B8860B,#D4A03C);
+      --bg:#f0f4f8;--white:#fff;--text:#132A57;--muted:#6b7280;
+      --border:rgba(212,160,60,.2);--green:#0a9e78;--red:#dc2626;--blue:#3b82f6;
     }
-    body{font-family:'Cairo',sans-serif;background:#f5f5f0;color:var(--text);min-height:100vh}
+    body{font-family:'Cairo',sans-serif;background:#FAFAFA;color:var(--text);min-height:100vh}
 
     /* ── Navbar ── */
-    nav{background:#1a1a2e;padding:0 28px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+    nav{background:var(--navy);padding:0 28px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
     .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
     .nav-logo-icon{width:34px;height:34px;background:var(--gold-g);border-radius:9px;display:flex;align-items:center;justify-content:center}
     .nav-logo-name{font-weight:900;font-size:.9rem;color:#fff}
@@ -27,12 +28,12 @@
     .user-dropdown{display:none;position:absolute;top:calc(100% + 10px);left:0;width:300px;background:#fff;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.18);border:1px solid rgba(0,0,0,.07);overflow:hidden;z-index:9999;animation:dropIn .2s ease}
     .user-dropdown.open{display:block}
     @keyframes dropIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
-    .ud-header{background:linear-gradient(135deg,#1a1a2e,#16213e);padding:20px 18px;display:flex;align-items:center;gap:14px}
+    .ud-header{background:linear-gradient(135deg,var(--navy),var(--navy2));padding:20px 18px;display:flex;align-items:center;gap:14px}
     .ud-avatar{width:46px;height:46px;border-radius:14px;background:var(--gold-g);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:900;flex-shrink:0;box-shadow:0 4px 12px rgba(184,134,11,.4)}
     .ud-name{font-size:.95rem;font-weight:900;color:#fff}
     .ud-email{font-size:.72rem;color:rgba(255,255,255,.45);margin-top:2px;direction:ltr;text-align:right}
     .ud-sep{height:1px;background:rgba(0,0,0,.06);margin:0 12px}
-    .ud-item{display:flex;align-items:center;gap:12px;padding:13px 18px;cursor:pointer;transition:background .15s;color:#1a1a2e;font-size:.86rem;font-weight:700;text-decoration:none;border:none;background:none;width:100%;font-family:'Cairo',sans-serif}
+    .ud-item{display:flex;align-items:center;gap:12px;padding:13px 18px;cursor:pointer;transition:background .15s;color:var(--navy);font-size:.86rem;font-weight:700;text-decoration:none;border:none;background:none;width:100%;font-family:'Cairo',sans-serif}
     .ud-item:hover{background:#f8f7f4}
     .ud-item-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
     .ud-item.logout .ud-item-icon{background:#fef2f2}
@@ -43,7 +44,7 @@
     .modal-overlay.open{display:flex}
     .modal-box{background:#fff;border-radius:22px;width:100%;max-width:460px;box-shadow:0 30px 80px rgba(0,0,0,.2);overflow:hidden;animation:modalIn .25s ease}
     @keyframes modalIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
-    .modal-head{background:linear-gradient(135deg,#1a1a2e,#16213e);padding:22px 24px;display:flex;align-items:center;justify-content:space-between}
+    .modal-head{background:linear-gradient(135deg,var(--navy),var(--navy2));padding:22px 24px;display:flex;align-items:center;justify-content:space-between}
     .modal-title{font-size:1rem;font-weight:900;color:#fff}
     .modal-close{background:rgba(255,255,255,.1);border:none;color:#fff;width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center}
     .modal-body{padding:24px}
@@ -51,11 +52,11 @@
     .info-row:last-child{border-bottom:none}
     .info-icon{width:36px;height:36px;border-radius:10px;background:#f5f3ee;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
     .info-label{font-size:.72rem;color:#6b7280;font-weight:700;margin-bottom:2px}
-    .info-val{font-size:.9rem;font-weight:800;color:#1a1a2e}
+    .info-val{font-size:.9rem;font-weight:800;color:var(--navy)}
     /* Support form */
     .sf-field{margin-bottom:16px}
-    .sf-label{display:block;font-weight:700;font-size:.82rem;color:#1a1a2e;margin-bottom:5px}
-    .sf-input,.sf-textarea,.sf-select{width:100%;padding:11px 14px;border:1.5px solid rgba(0,0,0,.1);border-radius:10px;font-family:'Cairo',sans-serif;font-size:.88rem;background:#fafafa;color:#1a1a2e;outline:none;transition:border-color .2s}
+    .sf-label{display:block;font-weight:700;font-size:.82rem;color:var(--navy);margin-bottom:5px}
+    .sf-input,.sf-textarea,.sf-select{width:100%;padding:11px 14px;border:1.5px solid rgba(0,0,0,.1);border-radius:10px;font-family:'Cairo',sans-serif;font-size:.88rem;background:#fafafa;color:var(--navy);outline:none;transition:border-color .2s}
     .sf-input:focus,.sf-textarea:focus,.sf-select:focus{border-color:var(--gold);background:#fff}
     .sf-textarea{resize:vertical;min-height:90px}
     .sf-btn{width:100%;padding:13px;background:var(--gold-g);color:#fff;font-family:'Cairo',sans-serif;font-weight:800;font-size:.95rem;border:none;border-radius:12px;cursor:pointer;box-shadow:0 6px 20px rgba(184,134,11,.3);transition:all .2s}
@@ -67,13 +68,13 @@
     .theme-opt:hover{border-color:var(--gold);background:#fffbf0}
     .theme-opt.active{border-color:var(--gold);background:rgba(184,134,11,.08)}
     .theme-opt-icon{font-size:1.6rem;margin-bottom:6px}
-    .theme-opt-label{font-size:.78rem;font-weight:800;color:#1a1a2e}
+    .theme-opt-label{font-size:.78rem;font-weight:800;color:var(--navy)}
     /* Light theme */
-    body.light-theme{background:#f5f5f0}
+    body.light-theme{background:#FAFAFA}
     body.dark-theme{background:#0d1117;color:#e6edf3}
     body.dark-theme main section,body.dark-theme .school-card,body.dark-theme .cp-wrap{background:#161b22;border-color:#30363d;color:#e6edf3}
     body.dark-theme .welcome{background:linear-gradient(135deg,#0d1117,#161b22,#1c2128)!important}
-    body.dark-theme nav{background:#0d1117}
+    body.dark-theme nav{background:#0a1628}
     .user-chip{display:flex;align-items:center;gap:8px;padding:5px 12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:999px;font-size:.82rem;font-weight:700;color:rgba(255,255,255,.85)}
     .user-avatar{width:26px;height:26px;border-radius:50%;background:var(--gold-g);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:900}
     .btn-logout{padding:6px 14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:rgba(255,255,255,.6);font-family:'Cairo',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s}
@@ -84,7 +85,7 @@
     main{max-width:960px;margin:0 auto;padding:32px 20px 80px}
 
     /* ── Welcome Banner ── */
-    .welcome{background:linear-gradient(135deg,#1a1a2e 0%,#16213e 60%,#0f3460 100%);border-radius:20px;padding:28px 32px;margin-bottom:28px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(26,26,46,.25)}
+    .welcome{background:linear-gradient(135deg,#0d1e3d 0%,var(--navy) 60%,var(--navy2) 100%);border-radius:20px;padding:28px 32px;margin-bottom:28px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(26,26,46,.25)}
     .welcome::before{content:'';position:absolute;top:-40px;left:-40px;width:200px;height:200px;background:radial-gradient(circle,rgba(184,134,11,.15) 0%,transparent 70%);pointer-events:none}
     .welcome::after{content:'';position:absolute;bottom:-30px;right:80px;width:150px;height:150px;background:radial-gradient(circle,rgba(37,99,235,.12) 0%,transparent 70%);pointer-events:none}
     .welcome-text{position:relative;z-index:1}
@@ -94,7 +95,7 @@
     .school-badge{display:inline-flex;align-items:center;gap:7px;padding:7px 16px;background:rgba(255,255,255,.07);border:1px solid rgba(184,134,11,.3);border-radius:50px;font-size:.8rem;font-weight:800;color:#E8C547;backdrop-filter:blur(4px)}
     .school-badge::before{content:'🏫';font-size:.85rem}
     .welcome-stats{display:flex;gap:20px}
-    .ws-item{text-align:center;padding:8px 16px;background:#f8f6f1;border-radius:10px}
+    .ws-item{text-align:center;padding:8px 16px;background:rgba(255,255,255,.12);border-radius:10px}
     .ws-num{font-size:1.3rem;font-weight:900;color:var(--gold)}
     .ws-lbl{font-size:.68rem;color:var(--muted);font-weight:700}
 
@@ -123,13 +124,13 @@
     .sc-btn-locked{width:100%;padding:11px;background:rgba(0,0,0,.03);border:1px solid rgba(0,0,0,.06);border-radius:10px;font-family:'Cairo',sans-serif;font-size:.82rem;font-weight:700;color:var(--muted);cursor:not-allowed}
 
     /* ── Quiz Button ── */
-    .sc-quiz-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:9px;background:#1a1a2e;color:#fff;font-family:'Cairo',sans-serif;font-weight:800;font-size:.8rem;border:none;border-radius:10px;cursor:pointer;transition:all .25s;margin-top:6px}
-    .sc-quiz-btn:hover{background:#2d2d44}
+    .sc-quiz-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:9px;background:var(--navy);color:#fff;font-family:'Cairo',sans-serif;font-weight:800;font-size:.8rem;border:none;border-radius:10px;cursor:pointer;transition:all .25s;margin-top:6px}
+    .sc-quiz-btn:hover{background:#1c3d72}
     .sc-quiz-btn .quiz-ai-badge{background:var(--gold-g);color:#fff;font-size:.62rem;padding:2px 6px;border-radius:999px;font-weight:900}
 
     /* ── Section Buttons ── */
     .sc-sections{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px;padding-top:8px;border-top:1px solid rgba(0,0,0,.05)}
-    .sc-sec-btn{display:flex;align-items:center;justify-content:center;padding:9px 6px;background:#f8f6f1;border:1px solid rgba(0,0,0,.06);border-radius:9px;font-family:'Cairo',sans-serif;font-size:.76rem;font-weight:800;color:var(--text);cursor:pointer;transition:all .2s;text-align:center;line-height:1.3}
+    .sc-sec-btn{display:flex;align-items:center;justify-content:center;padding:9px 6px;background:#f0f4f8;border:1px solid rgba(0,0,0,.06);border-radius:9px;font-family:'Cairo',sans-serif;font-size:.76rem;font-weight:800;color:var(--text);cursor:pointer;transition:all .2s;text-align:center;line-height:1.3}
     .sc-sec-btn:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-1px)}
     .sc-sec-btn.active-sec{border-color:var(--gold);background:rgba(184,134,11,.06);color:var(--gold)}
 
@@ -138,13 +139,13 @@
     .content-panel.show{display:block}
     @keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
 
-    .cp-header{background:#1a1a2e;padding:16px 22px;display:flex;align-items:center;justify-content:space-between}
+    .cp-header{background:var(--navy);padding:16px 22px;display:flex;align-items:center;justify-content:space-between}
     .cp-title{font-weight:900;font-size:.95rem;display:flex;align-items:center;gap:8px;color:#fff}
     .cp-close{width:30px;height:30px;background:rgba(255,255,255,.1);border:none;border-radius:7px;cursor:pointer;font-size:.85rem;color:rgba(255,255,255,.6);display:flex;align-items:center;justify-content:center;transition:background .2s}
     .cp-close:hover{background:rgba(220,38,38,.3);color:#fff}
 
     /* ── Tabs ── */
-    .tabs-bar{display:flex;gap:0;background:#f8f6f1;border-bottom:1px solid rgba(0,0,0,.06)}
+    .tabs-bar{display:flex;gap:0;background:#f0f4f8;border-bottom:1px solid rgba(0,0,0,.06)}
     .tab-btn{padding:12px 22px;font-family:'Cairo',sans-serif;font-weight:700;font-size:.84rem;border:none;background:none;cursor:pointer;color:var(--muted);position:relative;transition:color .2s}
     .tab-btn.active{color:var(--gold);font-weight:800}
     .tab-btn.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2.5px;background:var(--gold-g);border-radius:2px 2px 0 0}
@@ -156,14 +157,14 @@
     .lectures-list{list-style:none;display:flex;flex-direction:column;gap:8px}
     .lec-item{display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid rgba(0,0,0,.05);border-radius:12px;background:#fafaf8;transition:all .2s}
     .lec-item:hover{border-color:rgba(184,134,11,.18);background:#fffef9;box-shadow:0 4px 14px rgba(0,0,0,.04)}
-    .lec-num{min-width:36px;height:36px;border-radius:10px;background:#1a1a2e;color:var(--gold);font-weight:900;font-size:.82rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .lec-num{min-width:36px;height:36px;border-radius:10px;background:var(--navy);color:var(--gold);font-weight:900;font-size:.82rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
     .lec-info{flex:1}
     .lec-title{font-weight:800;font-size:.88rem;margin-bottom:2px;color:var(--text)}
     .lec-desc{color:var(--muted);font-size:.75rem;line-height:1.5}
     .lec-meta{display:flex;align-items:center;gap:8px;margin-top:3px;font-size:.72rem;color:var(--muted)}
     .lec-btn,.book-btn{padding:8px 16px;border-radius:8px;font-family:'Cairo',sans-serif;font-weight:700;font-size:.78rem;border:none;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
-    .has-file{background:#1a1a2e;color:var(--gold)}
-    .has-file:hover{background:#2d2d44;transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.12)}
+    .has-file{background:var(--navy);color:var(--gold)}
+    .has-file:hover{background:#1c3d72;transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.12)}
     .no-file{background:rgba(0,0,0,.04);color:var(--muted);border:1px solid rgba(0,0,0,.06);cursor:default}
 
     /* ── Books List ── */
@@ -173,7 +174,7 @@
     .book-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
     .book-icon{font-size:1.4rem}
     .book-type-badge{padding:2px 8px;border-radius:6px;font-size:.65rem;font-weight:800}
-    .type-book{background:rgba(26,26,46,.08);color:#1a1a2e}
+    .type-book{background:rgba(19,42,87,.08);color:var(--navy)}
     .type-summary{background:rgba(184,134,11,.08);color:var(--gold)}
     .book-title{font-weight:800;font-size:.85rem;margin-bottom:3px}
     .book-desc{color:var(--muted);font-size:.74rem;line-height:1.5;margin-bottom:10px}
@@ -191,14 +192,14 @@
     .econ-card{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;overflow:hidden}
     .econ-header{padding:16px 22px;border-bottom:1px solid rgba(0,0,0,.06);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
     .econ-title{display:flex;align-items:center;gap:10px;font-weight:900;font-size:.95rem}
-    .econ-title-icon{width:34px;height:34px;background:#1a1a2e;border-radius:9px;display:flex;align-items:center;justify-content:center}
-    .econ-badge{padding:3px 10px;background:rgba(26,26,46,.06);color:#1a1a2e;border:1px solid rgba(0,0,0,.08);border-radius:999px;font-size:.7rem;font-weight:800}
+    .econ-title-icon{width:34px;height:34px;background:var(--navy);border-radius:9px;display:flex;align-items:center;justify-content:center}
+    .econ-badge{padding:3px 10px;background:rgba(19,42,87,.06);color:var(--navy);border:1px solid rgba(0,0,0,.08);border-radius:999px;font-size:.7rem;font-weight:800}
     .econ-update{font-size:.75rem;color:var(--muted);display:flex;align-items:center;gap:5px}
     .econ-live-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;display:inline-block;animation:blink 1.5s ease-in-out infinite}
     @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 
     .econ-table{width:100%;border-collapse:collapse}
-    .econ-table thead{background:#f8f6f1}
+    .econ-table thead{background:#f0f4f8}
     .econ-table th{padding:12px 16px;font-size:.78rem;font-weight:800;color:var(--muted);text-align:right;border-bottom:1px solid var(--border)}
     .econ-table td{padding:13px 16px;font-size:.85rem;font-weight:600;border-bottom:1px solid rgba(0,0,0,.05);vertical-align:middle}
     .econ-table tr:last-child td{border-bottom:none}
@@ -234,7 +235,7 @@
     .sched-day.replay{color:#a16207}
     .sched-month{font-size:.65rem;font-weight:800;opacity:.7}
     .sched-info{flex:1;min-width:0}
-    .sched-title{font-size:.92rem;font-weight:900;color:#1a1a2e;margin-bottom:5px}
+    .sched-title{font-size:.92rem;font-weight:900;color:var(--navy);margin-bottom:5px}
     .sched-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
     .sched-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:800}
     .sched-badge.online{background:#dbeafe;color:#1d4ed8}
@@ -246,7 +247,7 @@
     .sched-link:hover{background:#dbeafe}
     .sched-today-badge{position:absolute;top:10px;left:12px;background:var(--gold-g);color:#fff;font-size:.65rem;font-weight:900;padding:2px 8px;border-radius:20px}
     .tip-section{margin-bottom:28px}
-    .tip-card{background:#1a1a2e;border-radius:16px;padding:28px 32px;text-align:center;cursor:pointer;transition:all .3s;position:relative;overflow:hidden}
+    .tip-card{background:var(--navy);border-radius:16px;padding:28px 32px;text-align:center;cursor:pointer;transition:all .3s;position:relative;overflow:hidden}
     .tip-card:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.15)}
     .tip-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--gold-g)}
     .tip-label{font-size:.75rem;font-weight:800;color:rgba(255,255,255,.4);margin-bottom:12px;letter-spacing:1px}
@@ -259,7 +260,7 @@
     /* ── WhatsApp Section ── */
     .wa-section{margin-bottom:28px}
     .wa-card{background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.07);border:1px solid rgba(0,0,0,.05)}
-    .wa-hero{background:linear-gradient(135deg,#0f172a 0%,#1e293b 50%,#0f2027 100%);padding:32px 28px;position:relative;overflow:hidden}
+    .wa-hero{background:linear-gradient(135deg,#0d1e3d 0%,var(--navy) 50%,var(--navy2) 100%);padding:32px 28px;position:relative;overflow:hidden}
     .wa-hero::before{content:'';position:absolute;top:-40px;left:-40px;width:180px;height:180px;background:radial-gradient(circle,rgba(184,134,11,.15),transparent 70%);pointer-events:none}
     .wa-hero::after{content:'';position:absolute;bottom:-30px;right:-20px;width:140px;height:140px;background:radial-gradient(circle,rgba(184,134,11,.1),transparent 70%);pointer-events:none}
     .wa-hero-inner{display:flex;align-items:center;gap:20px;position:relative;z-index:1}
@@ -276,7 +277,7 @@
     .wa-form label{display:block;font-weight:800;font-size:.84rem;color:var(--text);margin-bottom:8px}
     .wa-textarea{width:100%;padding:14px 16px;border:1.5px solid rgba(0,0,0,.1);border-radius:14px;font-family:'Cairo',sans-serif;font-size:.88rem;color:var(--text);resize:none;outline:none;transition:all .2s;line-height:1.7;background:#fafaf8;box-sizing:border-box}
     .wa-textarea:focus{border-color:#b8860b;box-shadow:0 0 0 3px rgba(184,134,11,.1);background:#fff}
-    .wa-send-btn{margin-top:14px;width:100%;padding:14px;background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff;border:2px solid rgba(184,134,11,.4);border-radius:14px;font-family:'Cairo',sans-serif;font-weight:900;font-size:.95rem;cursor:pointer;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:10px}
+    .wa-send-btn{margin-top:14px;width:100%;padding:14px;background:linear-gradient(135deg,#0d1e3d,var(--navy));color:#fff;border:2px solid rgba(184,134,11,.4);border-radius:14px;font-family:'Cairo',sans-serif;font-weight:900;font-size:.95rem;cursor:pointer;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:10px}
     .wa-send-btn:hover{background:linear-gradient(135deg,#b8860b,#d4a017);border-color:transparent;box-shadow:0 6px 20px rgba(184,134,11,.4);transform:translateY(-1px)}
     .wa-send-btn svg{flex-shrink:0}
 
@@ -285,7 +286,7 @@
     .ai-fab-btn{width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#10a37f,#1a7f64);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.5rem;box-shadow:0 6px 24px rgba(16,163,127,.4);transition:all .25s;animation:fabPulse 2.5s ease-in-out infinite}
     .ai-fab-btn:hover{transform:scale(1.1);box-shadow:0 10px 32px rgba(16,163,127,.55)}
     @keyframes fabPulse{0%,100%{box-shadow:0 6px 24px rgba(16,163,127,.4)}50%{box-shadow:0 6px 32px rgba(16,163,127,.65),0 0 0 8px rgba(16,163,127,.1)}}
-    .ai-fab-label{background:#1a1a2e;color:#fff;padding:7px 14px;border-radius:10px;font-size:.8rem;font-weight:800;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.25);animation:fabPulse 2.5s ease-in-out infinite}
+    .ai-fab-label{background:var(--navy);color:#fff;padding:7px 14px;border-radius:10px;font-size:.8rem;font-weight:800;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.25);animation:fabPulse 2.5s ease-in-out infinite}
 
     .ai-chat-panel{position:fixed;bottom:0;left:0;width:100%;max-width:420px;height:600px;background:#fff;border-radius:20px 20px 0 0;box-shadow:0 -8px 48px rgba(0,0,0,.18);z-index:1000;display:none;flex-direction:column;overflow:hidden;animation:slideUp .3s ease}
     .ai-chat-panel.open{display:flex}
@@ -383,8 +384,8 @@
 <!-- Navbar -->
 <nav>
   <a href="index.html" class="nav-logo">
-    <div class="nav-logo-icon" style="font-weight:900;font-size:.75rem;color:#fff">T</div>
-    <div class="nav-logo-name">منصة تعليم التداول</div>
+    <img src="logo.svg" alt="3B Trading" style="height:38px;width:auto;filter:brightness(0) invert(1);display:block"/>
+    <div class="nav-logo-name" style="font-size:1.05rem;font-weight:900;letter-spacing:1px">3B TRADING</div>
   </a>
   <div class="nav-right">
     <div class="user-menu-wrap">
@@ -2065,5 +2066,55 @@ document.getElementById('fileViewer').addEventListener('click', function(e){
   if(e.target===this) closeViewer();
 });
 </script>
+
+<!-- ── Footer ── -->
+<footer style="background:var(--navy);color:rgba(255,255,255,.85);padding:40px 20px 24px;margin-top:60px">
+  <div style="max-width:960px;margin:0 auto">
+    <div style="display:flex;flex-wrap:wrap;gap:40px;justify-content:space-between;margin-bottom:32px">
+      <!-- Brand -->
+      <div style="flex:1;min-width:220px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+          <img src="logo.svg" alt="3B Trading" style="height:42px;filter:brightness(0) invert(1)"/>
+          <div>
+            <div style="font-size:1.1rem;font-weight:900;letter-spacing:1px;color:#fff">3B TRADING</div>
+            <div style="font-size:.68rem;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-top:1px">Build · Believe · Benefit</div>
+          </div>
+        </div>
+        <p style="font-size:.8rem;line-height:1.8;color:rgba(255,255,255,.55);max-width:280px">أكاديمية متخصصة في تعليم التداول المالي وتطوير مهارات المتداولين بأساليب احترافية ومنهجية.</p>
+      </div>
+      <!-- Links -->
+      <div style="min-width:160px">
+        <div style="font-size:.8rem;font-weight:900;letter-spacing:1px;color:var(--gold);text-transform:uppercase;margin-bottom:14px">روابط سريعة</div>
+        <div style="display:flex;flex-direction:column;gap:9px">
+          <a href="dashboard.html" style="color:rgba(255,255,255,.65);text-decoration:none;font-size:.82rem;font-weight:700;transition:color .2s" onmouseover="this.style.color='#D4A03C'" onmouseout="this.style.color='rgba(255,255,255,.65)'">🏠 الرئيسية</a>
+          <a href="login.html" style="color:rgba(255,255,255,.65);text-decoration:none;font-size:.82rem;font-weight:700" onmouseover="this.style.color='#D4A03C'" onmouseout="this.style.color='rgba(255,255,255,.65)'">🔐 تسجيل الدخول</a>
+          <a href="forgot-password.html" style="color:rgba(255,255,255,.65);text-decoration:none;font-size:.82rem;font-weight:700" onmouseover="this.style.color='#D4A03C'" onmouseout="this.style.color='rgba(255,255,255,.65)'">🔑 نسيت كلمة المرور</a>
+        </div>
+      </div>
+      <!-- Contact -->
+      <div style="min-width:160px">
+        <div style="font-size:.8rem;font-weight:900;letter-spacing:1px;color:var(--gold);text-transform:uppercase;margin-bottom:14px">تواصل معنا</div>
+        <div style="display:flex;flex-direction:column;gap:9px">
+          <span style="color:rgba(255,255,255,.65);font-size:.82rem;font-weight:700;display:flex;align-items:center;gap:6px">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            واتساب للدعم
+          </span>
+          <span style="color:rgba(255,255,255,.65);font-size:.82rem;font-weight:700;display:flex;align-items:center;gap:6px">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+            الدعم متاح 24/7
+          </span>
+        </div>
+      </div>
+    </div>
+    <!-- Divider + copyright -->
+    <div style="border-top:1px solid rgba(255,255,255,.1);padding-top:20px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px">
+      <span style="font-size:.75rem;color:rgba(255,255,255,.35);font-weight:700">© 2025 3B Trading Academy · جميع الحقوق محفوظة</span>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="width:6px;height:6px;border-radius:50%;background:#22c55e;display:inline-block"></span>
+        <span style="font-size:.72rem;color:rgba(255,255,255,.4);font-weight:700">المنصة تعمل بشكل طبيعي</span>
+      </div>
+    </div>
+  </div>
+</footer>
 </body>
 </html>
