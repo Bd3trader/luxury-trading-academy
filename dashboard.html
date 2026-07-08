@@ -54,8 +54,7 @@
 
     /* ── Main Content ── */
     .main-wrap{margin-right:var(--sidebar-w);min-height:100vh;display:flex;flex-direction:column}
-    .top-header{background:var(--navy);padding:0 28px;height:64px;display:flex;align-items:center;justify-content:flex-start;position:sticky;top:0;z-index:100;box-shadow:0 4px 24px rgba(0,0,0,.15)}
-    .th-datetime{display:flex;align-items:center;gap:16px}
+    .top-header{background:var(--navy);padding:0 28px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 4px 24px rgba(0,0,0,.15)}
     .th-date-box{display:flex;align-items:center;gap:8px;padding:8px 16px;background:rgba(255,255,255,.07);border:1px solid rgba(212,160,60,.25);border-radius:12px}
     .th-date-icon{font-size:1rem;opacity:.8}
     .th-date-text{font-size:.82rem;font-weight:700;color:rgba(255,255,255,.9);letter-spacing:.3px}
@@ -519,16 +518,13 @@
 <div class="main-wrap">
 <!-- Top header -->
 <div class="top-header">
-  <div class="th-datetime">
-    <div class="th-date-box">
-      <span class="th-date-icon">📅</span>
-      <span class="th-date-text" id="thDate">—</span>
-    </div>
-    <div class="th-divider"></div>
-    <div class="th-time-box">
-      <span style="font-size:.85rem;opacity:.7">🕐</span>
-      <span class="th-time-text" id="thTime">00:00:00</span>
-    </div>
+  <div class="th-date-box">
+    <span class="th-date-icon">📅</span>
+    <span class="th-date-text" id="thDate">—</span>
+  </div>
+  <div class="th-time-box">
+    <span style="font-size:.85rem;opacity:.7">🕐</span>
+    <span class="th-time-text" id="thTime">00:00:00</span>
   </div>
 </div>
 
