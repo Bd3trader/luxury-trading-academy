@@ -489,7 +489,7 @@
     <button class="sb-item" id="nav-schools" onclick="showSection('sec-schools')">
       <div class="sb-item-icon">🎓</div> مدارسي
     </button>
-    <button class="sb-item" id="nav-chart" onclick="showSection('sec-home');setTimeout(openTVPanel,50)">
+    <button class="sb-item" id="nav-chart" onclick="showSection('sec-chart');setTimeout(openTVPanel,50)">
       <div class="sb-item-icon">📈</div> الشارت المباشر
     </button>
     <button class="sb-item" id="nav-news" onclick="showSection('sec-news')">
@@ -639,9 +639,85 @@
       </div>
     </div>
   </div>
-  <!-- شارت السوق الكامل -->
+  <!-- نظرة عامة على الأسواق -->
+  <div style="margin-bottom:28px">
+    <div class="sec-title"><div class="sec-title-bar"></div> نظرة عامة على الأسواق</div>
+    <div style="border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.08);border:1px solid rgba(0,0,0,.06)">
+      <div class="tradingview-widget-container" style="height:500px">
+        <div class="tradingview-widget-container__widget" style="height:100%"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
+        {
+          "colorTheme": "light",
+          "dateRange": "1D",
+          "showChart": true,
+          "locale": "ar_AE",
+          "largeChartUrl": "",
+          "isTransparent": true,
+          "showSymbolLogo": true,
+          "showFloatingTooltip": true,
+          "width": "100%",
+          "height": "500",
+          "tabs": [
+            {
+              "title": "الفوركس",
+              "symbols": [
+                {"s":"FX_IDC:EURUSD","d":"يورو / دولار"},
+                {"s":"FX_IDC:GBPUSD","d":"إسترليني / دولار"},
+                {"s":"FX_IDC:USDJPY","d":"دولار / ين"},
+                {"s":"FOREXCOM:XAUUSD","d":"الذهب"},
+                {"s":"FOREXCOM:XAGUSD","d":"الفضة"},
+                {"s":"FX_IDC:USDCAD","d":"دولار / كندي"}
+              ],
+              "originalTitle": "Forex"
+            },
+            {
+              "title": "الأسهم",
+              "symbols": [
+                {"s":"NASDAQ:AAPL","d":"آبل"},
+                {"s":"NASDAQ:TSLA","d":"تيسلا"},
+                {"s":"NYSE:NVDA","d":"نفيديا"},
+                {"s":"NASDAQ:AMZN","d":"أمازون"},
+                {"s":"NASDAQ:MSFT","d":"مايكروسوفت"},
+                {"s":"NASDAQ:GOOGL","d":"جوجل"}
+              ],
+              "originalTitle": "Stocks"
+            },
+            {
+              "title": "العملات الرقمية",
+              "symbols": [
+                {"s":"BITSTAMP:BTCUSD","d":"بيتكوين"},
+                {"s":"BITSTAMP:ETHUSD","d":"إيثيريوم"},
+                {"s":"BINANCE:BNBUSD","d":"BNB"},
+                {"s":"BINANCE:SOLUSD","d":"سولانا"},
+                {"s":"BINANCE:XRPUSDT","d":"ريبل"},
+                {"s":"BINANCE:ADAUSD","d":"كاردانو"}
+              ],
+              "originalTitle": "Crypto"
+            },
+            {
+              "title": "المؤشرات",
+              "symbols": [
+                {"s":"SP:SPX","d":"S&P 500"},
+                {"s":"NASDAQ:NDX","d":"ناسداك"},
+                {"s":"DJ:DJI","d":"داو جونز"},
+                {"s":"INDEX:DXY","d":"مؤشر الدولار"},
+                {"s":"TVC:US10Y","d":"سندات أمريكية 10Y"},
+                {"s":"NYMEX:CL1!","d":"النفط الخام"}
+              ],
+              "originalTitle": "Indices"
+            }
+          ]
+        }
+        </script>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── الشارت المباشر ── -->
+<div class="dash-section" id="sec-chart">
   <div class="tv-section">
-    <div class="sec-title"><div class="sec-title-bar"></div> منصة التحليل الفني</div>
+    <div class="sec-title"><div class="sec-title-bar"></div> منصة التحليل الفني المباشر</div>
     <div class="tv-teaser" id="tvTeaser" onclick="openTVPanel()">
       <div class="tv-bar"></div>
       <div class="tv-teaser-inner">
@@ -1530,7 +1606,7 @@ function showSection(id){
   const el=document.getElementById(id);
   if(el){ el.classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); }
   document.querySelectorAll('.sb-item[id^="nav-"]').forEach(b=>b.classList.remove('active'));
-  const navMap={'sec-home':'nav-home','sec-schools':'nav-schools','sec-news':'nav-news','sec-sessions':'nav-sessions'};
+  const navMap={'sec-home':'nav-home','sec-schools':'nav-schools','sec-chart':'nav-chart','sec-news':'nav-news','sec-sessions':'nav-sessions'};
   const navId=navMap[id];
   if(navId){ const nb=document.getElementById(navId); if(nb) nb.classList.add('active'); }
 }
