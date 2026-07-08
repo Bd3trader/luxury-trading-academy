@@ -12,15 +12,49 @@
       --gold:#D4A03C;--gold2:#B8860B;--gold-g:linear-gradient(135deg,#B8860B,#D4A03C);
       --bg:#f0f4f8;--white:#fff;--text:#132A57;--muted:#6b7280;
       --border:rgba(212,160,60,.2);--green:#0a9e78;--red:#dc2626;--blue:#3b82f6;
+      --sidebar-w:270px;
     }
-    body{font-family:'Cairo',sans-serif;background:#FAFAFA;color:var(--text);min-height:100vh}
+    body{font-family:'Cairo',sans-serif;background:#f0f4f8;color:var(--text);min-height:100vh}
 
-    /* ── Navbar ── */
-    nav{background:var(--navy);padding:0 28px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-    .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
-    .nav-logo-icon{width:34px;height:34px;background:var(--gold-g);border-radius:9px;display:flex;align-items:center;justify-content:center}
-    .nav-logo-name{font-weight:900;font-size:.9rem;color:#fff}
-    .nav-right{display:flex;align-items:center;gap:10px}
+    /* ── Sidebar ── */
+    .sidebar{position:fixed;top:0;right:0;width:var(--sidebar-w);height:100vh;background:linear-gradient(180deg,var(--navy) 0%,#0d1e3d 100%);display:flex;flex-direction:column;z-index:200;box-shadow:-4px 0 30px rgba(0,0,0,.2)}
+    .sb-logo{display:flex;align-items:center;gap:10px;padding:22px 20px 18px;border-bottom:1px solid rgba(255,255,255,.07)}
+    .sb-logo img{height:36px;width:auto;filter:brightness(0) invert(1)}
+    .sb-logo-name{font-size:.95rem;font-weight:900;color:#fff;letter-spacing:.5px;line-height:1.2}
+    .sb-logo-sub{font-size:.6rem;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-top:1px}
+
+    /* Sidebar user card */
+    .sb-user{margin:14px 14px 10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:14px;padding:14px;position:relative}
+    .sb-user-inner{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
+    .sb-avatar{width:38px;height:38px;border-radius:12px;background:var(--gold-g);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:900;flex-shrink:0;box-shadow:0 4px 12px rgba(184,134,11,.35)}
+    .sb-user-name{font-size:.84rem;font-weight:800;color:#fff;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .sb-chevron{color:rgba(255,255,255,.4);font-size:.55rem;transition:transform .2s}
+    .sb-chevron.open{transform:rotate(180deg)}
+
+    /* Nav items */
+    .sb-nav{flex:1;overflow-y:auto;padding:8px 10px;scrollbar-width:none}
+    .sb-nav::-webkit-scrollbar{display:none}
+    .sb-section-label{font-size:.6rem;font-weight:900;color:rgba(255,255,255,.3);letter-spacing:2px;text-transform:uppercase;padding:12px 10px 5px}
+    .sb-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;color:rgba(255,255,255,.65);font-size:.82rem;font-weight:700;transition:all .2s;text-decoration:none;border:none;background:none;width:100%;font-family:'Cairo',sans-serif;margin-bottom:2px}
+    .sb-item:hover{background:rgba(255,255,255,.08);color:#fff}
+    .sb-item.active{background:linear-gradient(135deg,rgba(212,160,60,.2),rgba(184,134,11,.15));color:var(--gold);border:1px solid rgba(212,160,60,.2)}
+    .sb-item-icon{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
+    .sb-item.active .sb-item-icon{background:rgba(212,160,60,.15)}
+
+    /* Sidebar bottom */
+    .sb-bottom{padding:12px 14px 20px;border-top:1px solid rgba(255,255,255,.07)}
+    .sb-live-card{background:rgba(255,255,255,.04);border:1px solid rgba(212,160,60,.15);border-radius:12px;padding:12px 14px}
+    .sb-live-label{font-size:.58rem;color:rgba(255,255,255,.35);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+    .live-dot{width:6px;height:6px;border-radius:50%;background:#22c55e;animation:blink 1.5s ease-in-out infinite;flex-shrink:0}
+    .sb-live-sym{font-size:.78rem;font-weight:900;color:var(--gold);margin-bottom:1px}
+    .sb-live-price{font-size:1.1rem;font-weight:900;color:#fff;direction:ltr;text-align:right}
+
+    /* ── Main Content ── */
+    .main-wrap{margin-right:var(--sidebar-w);min-height:100vh;display:flex;flex-direction:column}
+    .top-header{background:#fff;border-bottom:1px solid rgba(0,0,0,.06);padding:0 28px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.05)}
+    .th-greeting{font-size:.95rem;font-weight:900;color:var(--navy)}
+    .th-date{font-size:.75rem;font-weight:700;color:var(--muted);background:#f0f4f8;padding:5px 12px;border-radius:20px}
+    main{flex:1;padding:28px 28px 80px}
     /* ── User Menu ── */
     .user-menu-wrap{position:relative}
     .user-chip{cursor:pointer;user-select:none;transition:background .2s}
@@ -74,15 +108,21 @@
     body.dark-theme{background:#0d1117;color:#e6edf3}
     body.dark-theme main section,body.dark-theme .school-card,body.dark-theme .cp-wrap{background:#161b22;border-color:#30363d;color:#e6edf3}
     body.dark-theme .welcome{background:linear-gradient(135deg,#0d1117,#161b22,#1c2128)!important}
-    body.dark-theme nav{background:#0a1628}
+    body.dark-theme .top-header{background:#161b22;border-color:#30363d}
+    body.dark-theme .econ-card,body.dark-theme .wa-card,body.dark-theme .tv-teaser,body.dark-theme .tv-panel,body.dark-theme .content-panel{background:#161b22;border-color:#30363d}
+    @media(max-width:900px){
+      .sidebar{display:none}
+      .main-wrap{margin-right:0}
+    }
     .user-chip{display:flex;align-items:center;gap:8px;padding:5px 12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:999px;font-size:.82rem;font-weight:700;color:rgba(255,255,255,.85)}
     .user-avatar{width:26px;height:26px;border-radius:50%;background:var(--gold-g);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:900}
     .btn-logout{padding:6px 14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:rgba(255,255,255,.6);font-family:'Cairo',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s}
     .btn-logout:hover{background:rgba(220,38,38,.15);color:#f87171;border-color:rgba(220,38,38,.3)}
-    @media(max-width:600px){nav{padding:0 16px}}
+    @media(max-width:600px){main{padding:16px 14px 60px}.welcome{padding:20px 18px}.schools-row{grid-template-columns:1fr}.tv-teaser-inner{flex-wrap:wrap}.tv-open-badge{margin-right:0}}
 
     /* ── Main ── */
-    main{max-width:960px;margin:0 auto;padding:32px 20px 80px}
+    main{max-width:960px;margin:0 auto;padding:28px 20px 80px}
+    footer{margin-right:0}
 
     /* ── Welcome Banner ── */
     .welcome{background:linear-gradient(135deg,#0d1e3d 0%,var(--navy) 60%,var(--navy2) 100%);border-radius:20px;padding:28px 32px;margin-bottom:28px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(26,26,46,.25)}
@@ -376,25 +416,30 @@
     .tv-sym-btn{padding:6px 14px;background:#fff;border:1.5px solid var(--border);border-radius:8px;font-family:'Cairo',sans-serif;font-size:.78rem;font-weight:800;color:var(--text);cursor:pointer;transition:all .2s}
     .tv-sym-btn:hover,.tv-sym-btn.active{background:var(--gold-g);color:#fff;border-color:transparent}
 
-    @media(max-width:600px){main{padding:20px 16px 60px}.welcome{padding:20px 18px}.schools-row{grid-template-columns:1fr}.tv-teaser-inner{flex-wrap:wrap}.tv-open-badge{margin-right:0}}
   </style>
 </head>
 <body>
 
-<!-- Navbar -->
-<nav>
-  <a href="index.html" class="nav-logo">
-    <img src="logo.svg" alt="3B Trading" style="height:38px;width:auto;filter:brightness(0) invert(1);display:block"/>
-    <div class="nav-logo-name" style="font-size:1.05rem;font-weight:900;letter-spacing:1px">3B TRADING</div>
-  </a>
-  <div class="nav-right">
+<!-- Sidebar -->
+<aside class="sidebar">
+  <!-- Logo -->
+  <div class="sb-logo">
+    <img src="logo.svg" alt="3B Trading"/>
+    <div>
+      <div class="sb-logo-name">3B TRADING</div>
+      <div class="sb-logo-sub">Build · Believe · Benefit</div>
+    </div>
+  </div>
+
+  <!-- User card with dropdown -->
+  <div class="sb-user">
     <div class="user-menu-wrap">
-      <div class="user-chip" onclick="toggleUserMenu()" style="display:flex;align-items:center;gap:8px;padding:5px 14px 5px 10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:50px;cursor:pointer">
-        <div class="user-avatar" id="avatarLetter" style="width:30px;height:30px;border-radius:50%;background:var(--gold-g);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:900;flex-shrink:0">؟</div>
-        <span id="userName" style="font-size:.82rem;font-weight:800;color:#fff">...</span>
-        <span style="color:rgba(255,255,255,.4);font-size:.6rem" id="menuArrow">▼</span>
+      <div class="sb-user-inner user-chip" onclick="toggleUserMenu()">
+        <div class="sb-avatar" id="avatarLetter">؟</div>
+        <span class="sb-user-name" id="userName">...</span>
+        <span class="sb-chevron" id="menuArrow">▼</span>
       </div>
-      <div class="user-dropdown" id="userDropdown">
+      <div class="user-dropdown" id="userDropdown" style="left:auto;right:0;top:calc(100% + 8px);width:270px">
         <div class="ud-header">
           <div class="ud-avatar" id="udAvatar">؟</div>
           <div>
@@ -424,7 +469,51 @@
       </div>
     </div>
   </div>
-</nav>
+
+  <!-- Nav links -->
+  <nav class="sb-nav">
+    <div class="sb-section-label">القائمة الرئيسية</div>
+    <a class="sb-item active" href="dashboard.html">
+      <div class="sb-item-icon">🏠</div> لوحة التحكم
+    </a>
+    <button class="sb-item" onclick="document.getElementById('schoolsRow').scrollIntoView({behavior:'smooth'})">
+      <div class="sb-item-icon">🎓</div> مدارسي
+    </button>
+    <button class="sb-item" onclick="openTVPanel();document.getElementById('tvPanel').scrollIntoView({behavior:'smooth'})">
+      <div class="sb-item-icon">📈</div> الشارت المباشر
+    </button>
+    <button class="sb-item" onclick="document.querySelector('.econ-section').scrollIntoView({behavior:'smooth'})">
+      <div class="sb-item-icon">📰</div> الأخبار الاقتصادية
+    </button>
+    <button class="sb-item" onclick="document.getElementById('scheduleSection').scrollIntoView({behavior:'smooth'})">
+      <div class="sb-item-icon">📅</div> الجلسات المجدولة
+    </button>
+    <div class="sb-section-label">الدعم</div>
+    <button class="sb-item" onclick="openModal('supportModal')">
+      <div class="sb-item-icon">🎧</div> الدعم الفني
+    </button>
+    <button class="sb-item" onclick="toggleChat()">
+      <div class="sb-item-icon">💬</div> المساعد الذكي
+    </button>
+  </nav>
+
+  <!-- Bottom live price -->
+  <div class="sb-bottom">
+    <div class="sb-live-card">
+      <div class="sb-live-label"><span class="live-dot"></span> سعر مباشر</div>
+      <div class="sb-live-sym">XAUUSD — الذهب</div>
+      <div class="sb-live-price" id="sbLivePrice">جارٍ التحميل...</div>
+    </div>
+  </div>
+</aside>
+
+<!-- Main wrap -->
+<div class="main-wrap">
+<!-- Top header -->
+<div class="top-header">
+  <div class="th-greeting" id="thGreeting">مرحباً بك 👋</div>
+  <div class="th-date" id="thDate"></div>
+</div>
 
 <!-- Modal: المعلومات الشخصية -->
 <div class="modal-overlay" id="infoModal" onclick="if(event.target===this)closeModal('infoModal')">
@@ -509,7 +598,6 @@
 
 <!-- Main -->
 <main>
-  <!-- Welcome -->
   <div class="welcome">
     <div class="welcome-text">
       <h1 id="welcomeMsg">مرحباً</h1>
@@ -1007,6 +1095,7 @@ async function init(){
   document.getElementById('info-country').textContent=sub.country||'غير محدد';
   document.getElementById('info-schools').textContent=(sub.schools||[]).map(k=>k==='classic'?'مدرسة الكلاسيك':'المدرسة المتقدمة SMC').join(' | ')||'—';
   document.getElementById('welcomeMsg').textContent='مرحباً '+sub.name;
+  const tg=document.getElementById('thGreeting');if(tg)tg.textContent='مرحباً، '+sub.name+' 👋';
 
   const d=getData();
   const schools=sub.schools||[];
@@ -1987,6 +2076,26 @@ async function sendAiMsg(){
 let _internalNav=false;
 window.addEventListener('beforeunload',()=>{ if(!_internalNav) logout(); });
 init();
+
+/* ── Top header date ── */
+(function(){
+  const days=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+  const months=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  const now=new Date();
+  const el=document.getElementById('thDate');
+  if(el) el.textContent=days[now.getDay()]+' '+now.getDate()+' '+months[now.getMonth()]+' '+now.getFullYear();
+})();
+
+/* ── Sidebar live XAUUSD via TradingView REST ── */
+(function fetchLive(){
+  fetch('https://symbol-search.tradingview.com/symbol_search/v3/?text=XAUUSD&hl=1&exchange=FOREXCOM&lang=en&domain=production')
+    .catch(()=>{})
+    .finally(()=>{
+      // TradingView REST not accessible from browser; show placeholder
+      const el=document.getElementById('sbLivePrice');
+      if(el) el.textContent='— راجع الشارت';
+    });
+})();
 </script>
 
 <!-- File Viewer Modal -->
@@ -2067,8 +2176,10 @@ document.getElementById('fileViewer').addEventListener('click', function(e){
 });
 </script>
 
+</div><!-- /main-wrap -->
+
 <!-- ── Footer ── -->
-<footer style="background:var(--navy);color:rgba(255,255,255,.85);padding:40px 20px 24px;margin-top:60px">
+<footer style="background:var(--navy);color:rgba(255,255,255,.85);padding:40px 20px 24px;margin-top:0;margin-right:var(--sidebar-w)">
   <div style="max-width:960px;margin:0 auto">
     <div style="display:flex;flex-wrap:wrap;gap:40px;justify-content:space-between;margin-bottom:32px">
       <!-- Brand -->
