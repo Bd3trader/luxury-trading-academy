@@ -1118,12 +1118,8 @@ async function init(){
     `<span class="school-badge">أنت متداول في ${n}</span>`
   ).join('');
 
-  // حساب المستوى
-  let level='مبتدئ', stars='⭐';
-  if(totalLecs>=20){level='متقدم';stars='⭐⭐⭐';}
-  else if(totalLecs>=10){level='متوسط';stars='⭐⭐';}
-  document.getElementById('levelText').textContent=level;
-  document.getElementById('levelStars').textContent=stars;
+  // حساب المستوى بناءً على المقاطع المشاهدة
+  updateLevel();
   await loadFirestoreContent();
   renderSchools();
   renderScheduledSessions();
@@ -2085,6 +2081,33 @@ async function sendAiMsg(){
   document.getElementById('aiInput').focus();
 }
 
+/* ── نظام تتبع المقاطع المشاهدة ── */
+function watchedKey(){ return 'watched_'+(sub?.username||sub?.email||'user'); }
+function getWatched(){ try{ return new Set(JSON.parse(localStorage.getItem(watchedKey())||'[]')); }catch(e){ return new Set(); } }
+function markWatched(url){
+  if(!url) return;
+  const s=getWatched(); s.add(url);
+  localStorage.setItem(watchedKey(), JSON.stringify([...s]));
+  const prev=document.getElementById('levelText').textContent;
+  updateLevel();
+  // تأثير احتفالي عند رفع المستوى
+  const cur=document.getElementById('levelText').textContent;
+  if(cur!==prev){
+    const card=document.getElementById('welcomeLevel');
+    if(card){ card.style.transition='all .3s'; card.style.boxShadow='0 0 0 4px rgba(212,160,60,.6), 0 0 24px rgba(212,160,60,.4)'; setTimeout(()=>{ card.style.boxShadow=''; },2000); }
+  }
+}
+function updateLevel(){
+  const watched=getWatched().size;
+  let level='مبتدئ', stars='⭐', color='#E8C547';
+  if(watched>=10){ level='متقدم'; stars='⭐⭐⭐'; color='#D4A03C'; }
+  else if(watched>=5){ level='متوسط'; stars='⭐⭐'; color='#E8C547'; }
+  const lt=document.getElementById('levelText');
+  const ls=document.getElementById('levelStars');
+  if(lt){ lt.textContent=level; lt.style.color=color; }
+  if(ls) ls.textContent=stars;
+}
+
 let _internalNav=false;
 window.addEventListener('beforeunload',()=>{ if(!_internalNav) logout(); });
 init();
@@ -2163,6 +2186,9 @@ function openViewer(url, title){
   vid.src = ''; frm.src = ''; img.src = '';
 
   document.getElementById('viewerTitle').textContent = title||'';
+
+  // تتبع المقطع كمشاهَد (فيديو فقط)
+  if(url && (isBunnyEmbed(url)||isVideoUrl(url))) markWatched(url);
 
   if(isBunnyEmbed(url)){
     // Bunny Stream embed — force HD quality
