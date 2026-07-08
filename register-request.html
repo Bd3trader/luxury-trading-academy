@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>طلب الانضمام | 3B Trading</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--navy:#132A57;--navy2:#284D9C;--gold:#D4A03C;--gold2:#B8860B;}
+    body{
+      font-family:'Cairo',sans-serif;background:#FAFAFA;
+      min-height:100vh;display:flex;align-items:center;justify-content:center;
+      padding:24px;position:relative;overflow:hidden;
+    }
+    body::before{
+      content:'';position:fixed;inset:0;
+      background-image:linear-gradient(rgba(19,42,87,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(19,42,87,.04) 1px,transparent 1px);
+      background-size:60px 60px;pointer-events:none;
+    }
+    .wrap{width:100%;max-width:480px;position:relative;z-index:1;}
+
+    .back-link{
+      display:inline-flex;align-items:center;gap:6px;
+      color:#8a9ab5;font-size:.82rem;text-decoration:none;
+      margin-bottom:24px;transition:color .2s;
+    }
+    .back-link:hover{color:var(--navy);}
+
+    .card{
+      background:rgba(255,255,255,.92);backdrop-filter:blur(20px);
+      border:1px solid rgba(212,160,60,.2);border-radius:24px;
+      padding:44px 40px;
+      box-shadow:0 20px 60px rgba(19,42,87,.1);
+      position:relative;overflow:hidden;
+    }
+    .card::before{
+      content:'';position:absolute;top:0;left:10%;right:10%;height:2px;
+      background:linear-gradient(90deg,transparent,var(--gold),var(--gold2),var(--gold),transparent);
+    }
+
+    .card-logo{display:flex;align-items:center;gap:10px;margin-bottom:28px;}
+    .card-logo img{width:52px;height:52px;object-fit:contain;}
+    .card-logo .n{font-size:.72rem;font-weight:800;letter-spacing:2.5px;color:var(--navy);text-transform:uppercase;}
+    .card-logo .t{font-size:.58rem;letter-spacing:2px;color:var(--gold2);text-transform:uppercase;margin-top:1px;}
+
+    .card-icon{
+      width:56px;height:56px;
+      background:linear-gradient(135deg,rgba(212,160,60,.12),rgba(212,160,60,.04));
+      border:1.5px solid rgba(212,160,60,.25);border-radius:16px;
+      display:flex;align-items:center;justify-content:center;margin-bottom:18px;
+    }
+    .card-icon svg{width:26px;height:26px;color:var(--gold2);}
+    .card-heading{margin-bottom:28px;}
+    .card-heading h2{font-size:1.5rem;font-weight:800;color:var(--navy);margin-bottom:6px;}
+    .card-heading p{font-size:.84rem;color:#7a8aaa;line-height:1.7;}
+
+    .field{margin-bottom:16px;}
+    label{display:block;font-size:.76rem;font-weight:700;color:var(--navy);letter-spacing:.5px;margin-bottom:7px;text-transform:uppercase;}
+    .inp-wrap{position:relative;}
+    .inp-icon{position:absolute;right:13px;top:50%;transform:translateY(-50%);color:#a0aec0;pointer-events:none;display:flex;}
+    .inp-icon svg{width:15px;height:15px;}
+    input[type=text],input[type=email],input[type=number],select{
+      width:100%;padding:12px 40px 12px 14px;
+      background:rgba(250,252,255,.9);
+      border:1.5px solid rgba(19,42,87,.1);border-radius:12px;
+      font-family:'Cairo',sans-serif;font-size:.88rem;color:var(--navy);
+      outline:none;transition:border-color .25s,box-shadow .25s;
+      appearance:none;
+    }
+    input::placeholder{color:#b0bdd4;}
+    input:focus,select:focus{
+      border-color:var(--gold);background:#fff;
+      box-shadow:0 0 0 4px rgba(212,160,60,.1);
+    }
+    select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a0aec0' stroke-width='2'%3E%3Cpolyline points='6,9 12,15 18,9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:left 14px center;}
+
+    .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+    .alert{display:none;padding:10px 14px;border-radius:10px;font-size:.82rem;margin-bottom:14px;align-items:center;gap:8px;font-weight:600;}
+    .alert.show{display:flex;}
+    .alert.error{background:rgba(220,38,38,.07);border:1.5px solid rgba(220,38,38,.2);color:#b91c1c;}
+
+    .btn{
+      width:100%;padding:14px;margin-top:4px;
+      background:linear-gradient(135deg,#0d1e3d,var(--navy),var(--navy2));
+      color:#fff;font-family:'Cairo',sans-serif;font-weight:700;font-size:.95rem;
+      border:none;border-radius:12px;cursor:pointer;
+      box-shadow:0 6px 20px rgba(19,42,87,.3);
+      transition:transform .25s,box-shadow .25s;position:relative;overflow:hidden;
+    }
+    .btn::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold2),var(--gold),var(--gold2));}
+    .btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(19,42,87,.4);}
+    .btn:disabled{opacity:.55;cursor:not-allowed;transform:none!important;}
+    .spinner{width:17px;height:17px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-left:6px;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* Success */
+    .success-view{display:none;text-align:center;padding:16px 0;}
+    .success-view.show{display:block;}
+    .success-icon{width:80px;height:80px;background:linear-gradient(135deg,rgba(212,160,60,.15),rgba(212,160,60,.05));border:2px solid rgba(212,160,60,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
+    .success-icon svg{width:36px;height:36px;color:var(--gold2);}
+    .success-view h3{font-size:1.4rem;font-weight:800;color:var(--navy);margin-bottom:10px;}
+    .success-view p{color:#7a8aaa;font-size:.88rem;line-height:1.8;max-width:300px;margin:0 auto;}
+    .success-badge{
+      display:inline-block;margin-top:20px;
+      background:rgba(212,160,60,.1);border:1px solid rgba(212,160,60,.25);
+      color:var(--gold2);padding:8px 20px;border-radius:30px;
+      font-size:.8rem;font-weight:700;
+    }
+    .back-btn{display:inline-block;margin-top:20px;color:var(--gold2);font-weight:700;text-decoration:none;font-size:.86rem;}
+
+    @media(max-width:480px){
+      .card{padding:32px 20px;}
+      .row2{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <a href="login.html" class="back-link">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>
+    العودة لتسجيل الدخول
+  </a>
+
+  <div class="card">
+    <div class="card-logo">
+      <img src="logo.svg" alt="3B Trading"/>
+      <div>
+        <div class="n">3B Trading</div>
+        <div class="t">Build · Believe · Benefit</div>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <div id="formView">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+      <div class="card-heading">
+        <h2>طلب الانضمام</h2>
+        <p>أدخل بياناتك وسنتواصل معك لإتمام تسجيلك في الأكاديمية.</p>
+      </div>
+
+      <div class="alert error" id="errMsg">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="errText">يرجى ملء جميع الحقول</span>
+      </div>
+
+      <form id="registerForm" autocomplete="off">
+        <div class="field">
+          <label>الاسم الكامل</label>
+          <div class="inp-wrap">
+            <span class="inp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+            <input type="text" id="rName" placeholder="اسمك الكامل" required/>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>البريد الإلكتروني</label>
+          <div class="inp-wrap">
+            <span class="inp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>
+            <input type="email" id="rEmail" placeholder="example@email.com" dir="ltr" required/>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>رقم الهاتف (واتساب)</label>
+          <div class="inp-wrap">
+            <span class="inp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.37 2 2 0 0 1 3.62 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6 6l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.72 16z"/></svg></span>
+            <input type="text" id="rPhone" placeholder="+966xxxxxxxx" dir="ltr" required/>
+          </div>
+        </div>
+
+        <div class="row2">
+          <div class="field">
+            <label>الدولة</label>
+            <div class="inp-wrap">
+              <span class="inp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span>
+              <select id="rCountry" required>
+                <option value="" disabled selected>اختر دولتك</option>
+                <option>المملكة العربية السعودية</option>
+                <option>الإمارات العربية المتحدة</option>
+                <option>الكويت</option>
+                <option>قطر</option>
+                <option>البحرين</option>
+                <option>عُمان</option>
+                <option>الأردن</option>
+                <option>مصر</option>
+                <option>العراق</option>
+                <option>سوريا</option>
+                <option>لبنان</option>
+                <option>المغرب</option>
+                <option>تونس</option>
+                <option>ليبيا</option>
+                <option>اليمن</option>
+                <option>أخرى</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>العمر</label>
+            <div class="inp-wrap">
+              <span class="inp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+              <input type="number" id="rAge" placeholder="عمرك" min="14" max="80" dir="ltr" required/>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn" id="submitBtn">إرسال طلب الانضمام</button>
+      </form>
+    </div>
+
+    <!-- Success -->
+    <div class="success-view" id="successView">
+      <div class="success-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg>
+      </div>
+      <h3>تم استلام طلبك ✓</h3>
+      <p>شكراً لاهتمامك بالانضمام لأكاديمية 3B Trading.<br/>سيتواصل معك المسؤول قريباً على رقم هاتفك أو بريدك الإلكتروني.</p>
+      <div class="success-badge">⏳ قيد المراجعة</div><br/>
+      <a href="login.html" class="back-btn">← العودة لتسجيل الدخول</a>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey:"AIzaSyCp4YfzewPiH6XkVHo6Sp86hyy5gB-eUSY",
+  authDomain:"luxury-trading-academy.firebaseapp.com",
+  projectId:"luxury-trading-academy",
+  storageBucket:"luxury-trading-academy.firebasestorage.app",
+  messagingSenderId:"247439882691",
+  appId:"1:247439882691:web:46a1a83ebceb96596fe576"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+const EMAILJS_SERVICE  = 'service_3btrading';
+const EMAILJS_TEMPLATE_REG = 'template_new_reg';
+const EMAILJS_PUBLIC   = 'YOUR_EMAILJS_PUBLIC_KEY';
+const ADMIN_EMAIL      = 'albalooshia555@gmail.com';
+
+document.getElementById('registerForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const name    = document.getElementById('rName').value.trim();
+  const email   = document.getElementById('rEmail').value.trim();
+  const phone   = document.getElementById('rPhone').value.trim();
+  const country = document.getElementById('rCountry').value;
+  const age     = document.getElementById('rAge').value;
+  const btn     = document.getElementById('submitBtn');
+
+  if (!name||!email||!phone||!country||!age) { showErr('يرجى ملء جميع الحقول'); return; }
+  if (age < 14 || age > 80) { showErr('يرجى إدخال عمر صحيح (14-80)'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = 'جاري الإرسال... <span class="spinner"></span>';
+
+  const reqData = {
+    type: 'registration_request',
+    name, email, phone, country,
+    age: Number(age),
+    sentAt: Date.now(),
+    status: 'pending'
+  };
+
+  try {
+    // 1. Save to Firestore
+    await db.collection('admin_requests').add(reqData);
+
+    // 2. Send email (EmailJS)
+    try {
+      emailjs.init(EMAILJS_PUBLIC);
+      await emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE_REG, {
+        to_email:  ADMIN_EMAIL,
+        from_name: name,
+        email:     email,
+        phone:     phone,
+        country:   country,
+        age:       age,
+        req_type:  'طلب انضمام جديد',
+        sent_at:   new Date().toLocaleString('ar-SA'),
+      });
+    } catch(emailErr) { console.warn('EmailJS not configured:', emailErr); }
+
+    // 3. Show success
+    document.getElementById('formView').style.display = 'none';
+    document.getElementById('successView').classList.add('show');
+
+  } catch(err) {
+    console.error(err);
+    showErr('حدث خطأ في الاتصال، حاول مرة أخرى');
+    btn.disabled = false;
+    btn.innerHTML = 'إرسال طلب الانضمام';
+  }
+});
+
+function showErr(msg) {
+  document.getElementById('errText').textContent = msg;
+  document.getElementById('errMsg').classList.add('show');
+  setTimeout(()=>document.getElementById('errMsg').classList.remove('show'), 4000);
+}
+</script>
+</body>
+</html>

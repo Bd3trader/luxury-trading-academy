@@ -192,6 +192,7 @@
     <button class="sb-link" onclick="showPanel('courses')"><span class="icon">📚</span> المدارس والمحاضرات</button>
     <div class="sb-section">التواصل</div>
     <button class="sb-link" onclick="showPanel('messages')"><span class="icon">💬</span> رسائل الطلاب<span class="sb-badge" id="msgBadge" style="display:none">0</span></button>
+    <button class="sb-link" onclick="showPanel('requests')"><span class="icon">📋</span> طلبات الانضمام<span class="sb-badge" id="reqBadge" style="display:none">0</span></button>
     <div class="sb-section">النظام</div>
     <button class="sb-link" onclick="showPanel('settings')"><span class="icon">⚙️</span> الإعدادات</button>
   </nav>
@@ -304,6 +305,10 @@
     <!-- SETTINGS -->
     <div class="panel" id="panel-messages">
       <div id="msgList" style="display:flex;flex-direction:column;gap:12px"></div>
+    </div>
+
+    <div class="panel" id="panel-requests">
+      <div id="reqList" style="display:flex;flex-direction:column;gap:12px"></div>
     </div>
 
     <div class="panel" id="panel-settings">
@@ -725,10 +730,11 @@ async function loadAndRender(){
   renderPanel(active);
   updateOnlineCounts();
   checkUnreadMessages();
+  checkPendingRequests();
 }
 
 /* ═══ Navigation ═══ */
-const panelTitles = { dashboard:'الرئيسية', online:'المتواجدون الآن', subscribers:'إدارة المشتركين', sessions:'سجل الجلسات', schedule:'الجلسات المجدولة', courses:'المدارس والمحاضرات', messages:'رسائل الطلاب', settings:'الإعدادات' };
+const panelTitles = { dashboard:'الرئيسية', online:'المتواجدون الآن', subscribers:'إدارة المشتركين', sessions:'سجل الجلسات', schedule:'الجلسات المجدولة', courses:'المدارس والمحاضرات', messages:'رسائل الطلاب', requests:'طلبات الانضمام', settings:'الإعدادات' };
 let currentSchool = 'classic';
 let currentSubTab = 'lectures';
 
@@ -745,6 +751,7 @@ function showPanel(name){
 function renderPanel(name){
   if(name==='dashboard') renderDashboard();
   else if(name==='messages') renderMessages();
+  else if(name==='requests') renderRequests();
   else if(name==='subscribers') renderSubscribers();
   else if(name==='sessions') renderSessions();
   else if(name==='online') renderOnline();
@@ -1559,6 +1566,73 @@ async function checkUnreadMessages(){
     const snap = await db.collection('messages').where('read','==',false).get();
     const n = snap.size;
     const badge = document.getElementById('msgBadge');
+    if(n>0){ badge.textContent=n; badge.style.display=''; }
+    else badge.style.display='none';
+  }catch(e){}
+}
+
+/* ═══ Admin Requests (password reset + registration) ═══ */
+async function renderRequests(){
+  const el = document.getElementById('reqList');
+  el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:32px">جاري التحميل...</div>';
+  try {
+    const snap = await db.collection('admin_requests').orderBy('sentAt','desc').get();
+    if(snap.empty){ el.innerHTML='<div style="color:var(--muted);text-align:center;padding:40px">لا توجد طلبات حتى الآن</div>'; return; }
+    el.innerHTML = '';
+    snap.forEach(doc => {
+      const r = {id:doc.id,...doc.data()};
+      const isReset = r.type === 'password_reset';
+      const date = r.sentAt ? new Date(r.sentAt).toLocaleString('ar-SA') : '—';
+      const statusColor = r.status==='done' ? '#059669' : r.status==='rejected' ? '#dc2626' : '#B8860B';
+      const statusLabel = r.status==='done' ? 'تم التنفيذ' : r.status==='rejected' ? 'مرفوض' : 'قيد المراجعة';
+      const card = document.createElement('div');
+      card.style.cssText = 'background:#fff;border-radius:14px;padding:18px 20px;border:1px solid rgba(0,0,0,.07);box-shadow:0 2px 8px rgba(0,0,0,.05);';
+      card.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+          <div>
+            <span style="background:${isReset?'rgba(40,77,156,.1)':'rgba(184,134,11,.1)'};color:${isReset?'#284D9C':'#B8860B'};font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.5px">
+              ${isReset ? '🔑 إعادة كلمة مرور' : '📋 طلب انضمام'}
+            </span>
+          </div>
+          <span style="font-size:.72rem;color:#9ca3af">${date}</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-bottom:14px">
+          <div><span style="font-size:.7rem;color:#9ca3af">الاسم</span><div style="font-weight:700;font-size:.88rem;color:#1a1a2e">${r.name||'—'}</div></div>
+          ${isReset ? `<div><span style="font-size:.7rem;color:#9ca3af">اسم المستخدم</span><div style="font-weight:700;font-size:.88rem;color:#1a1a2e;direction:ltr">${r.username||'—'}</div></div>` : `<div><span style="font-size:.7rem;color:#9ca3af">البريد</span><div style="font-weight:700;font-size:.82rem;color:#1a1a2e;direction:ltr">${r.email||'—'}</div></div>`}
+          <div><span style="font-size:.7rem;color:#9ca3af">الهاتف</span><div style="font-weight:700;font-size:.88rem;color:#1a1a2e;direction:ltr">${r.phone||'—'}</div></div>
+          ${!isReset ? `<div><span style="font-size:.7rem;color:#9ca3af">الدولة</span><div style="font-weight:700;font-size:.88rem;color:#1a1a2e">${r.country||'—'}</div></div><div><span style="font-size:.7rem;color:#9ca3af">العمر</span><div style="font-weight:700;font-size:.88rem;color:#1a1a2e">${r.age||'—'}</div></div>` : ''}
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+          <span style="font-size:.75rem;font-weight:700;color:${statusColor}">● ${statusLabel}</span>
+          <div style="display:flex;gap:8px">
+            ${r.status!=='done' ? `<button onclick="updateReqStatus('${r.id}','done')" style="background:#059669;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-family:'Cairo',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer">✓ تم التنفيذ</button>` : ''}
+            ${r.status!=='rejected' ? `<button onclick="updateReqStatus('${r.id}','rejected')" style="background:#dc2626;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-family:'Cairo',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer">✗ رفض</button>` : ''}
+            <button onclick="deleteReq('${r.id}')" style="background:#f3f4f6;color:#6b7280;border:none;border-radius:8px;padding:6px 14px;font-family:'Cairo',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer">🗑 حذف</button>
+          </div>
+        </div>`;
+      el.appendChild(card);
+    });
+  } catch(e){ console.error(e); el.innerHTML='<div style="color:#dc2626;text-align:center;padding:32px">حدث خطأ في التحميل</div>'; }
+}
+
+async function updateReqStatus(id, status){
+  await db.collection('admin_requests').doc(id).update({status});
+  renderRequests();
+  checkPendingRequests();
+}
+
+async function deleteReq(id){
+  if(!confirm('حذف هذا الطلب؟')) return;
+  await db.collection('admin_requests').doc(id).delete();
+  renderRequests();
+  checkPendingRequests();
+}
+
+async function checkPendingRequests(){
+  try{
+    const snap = await db.collection('admin_requests').where('status','==','pending').get();
+    const n = snap.size;
+    const badge = document.getElementById('reqBadge');
     if(n>0){ badge.textContent=n; badge.style.display=''; }
     else badge.style.display='none';
   }catch(e){}
