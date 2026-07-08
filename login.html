@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Sign In | 3B Trading Academy</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <title>تسجيل الدخول | أكاديمية 3B للتداول</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
   <style>
     :root {
       --navy:    #132A57;
@@ -18,7 +18,7 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'Inter', sans-serif;
+      font-family: 'Cairo', sans-serif;
       background: #FAFAFA;
       min-height: 100vh;
       overflow: hidden;
@@ -231,18 +231,18 @@
     }
     .inp-wrap { position: relative; }
     .inp-icon {
-      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
       color: #a0aec0; pointer-events: none;
       display: flex; align-items: center;
     }
     .inp-icon svg { width: 16px; height: 16px; }
     input[type=text], input[type=password], input[type=email] {
       width: 100%;
-      padding: 13px 14px 13px 44px;
+      padding: 13px 44px 13px 14px;
       background: rgba(250,252,255,.9);
       border: 1.5px solid rgba(19,42,87,.1);
       border-radius: 12px;
-      font-family: 'Inter', sans-serif;
+      font-family: 'Cairo', sans-serif;
       font-size: .9rem; color: var(--navy);
       outline: none;
       transition: border-color .25s, box-shadow .25s, background .25s;
@@ -254,7 +254,7 @@
       box-shadow: 0 0 0 4px rgba(212,160,60,.1);
     }
     .pwd-toggle {
-      position: absolute; right: 13px; top: 50%; transform: translateY(-50%);
+      position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
       background: none; border: none; cursor: pointer;
       color: #a0aec0; padding: 4px;
       transition: color .2s;
@@ -299,7 +299,7 @@
       width: 100%; padding: 15px;
       background: linear-gradient(135deg, var(--navy3) 0%, var(--navy) 40%, var(--navy2) 100%);
       color: #fff;
-      font-family: 'Inter', sans-serif; font-weight: 700; font-size: .95rem;
+      font-family: 'Cairo', sans-serif; font-weight: 700; font-size: .95rem;
       border: none; border-radius: 13px; cursor: pointer;
       position: relative; overflow: hidden;
       transition: transform .25s, box-shadow .25s;
@@ -400,37 +400,37 @@
       <img src="logo.svg" alt="3B Trading"/>
       <div class="left-brand-text">
         <div class="name">3B Trading</div>
-        <div class="tagline">Build · Believe · Benefit</div>
+        <div class="tagline">ابنِ · آمن · استفد</div>
       </div>
     </div>
 
     <!-- Welcome text -->
     <div class="left-welcome">
-      <div class="eyebrow">Trading Academy</div>
-      <h1>Welcome<br/>Back to<br/><em>3B Trading</em></h1>
-      <p class="sub">Access your personal trading dashboard, review lessons, strategies, and track your progress toward financial mastery.</p>
+      <div class="eyebrow">أكاديمية التداول</div>
+      <h1>أهلاً<br/>بعودتك إلى<br/><em>3B Trading</em></h1>
+      <p class="sub">ادخل إلى لوحة تحكمك الشخصية، راجع الدروس والاستراتيجيات، وتابع تقدمك نحو التميز المالي.</p>
     </div>
 
     <!-- Stats -->
     <div class="stat-cards">
       <div class="stat-card">
         <div class="num">500<span>+</span></div>
-        <div class="lbl">Active Traders</div>
+        <div class="lbl">متداول نشط</div>
       </div>
       <div class="stat-card">
         <div class="num">2</div>
-        <div class="lbl">Elite Schools</div>
+        <div class="lbl">مدارس متخصصة</div>
       </div>
       <div class="stat-card">
         <div class="num">5.0<span>★</span></div>
-        <div class="lbl">Student Rating</div>
+        <div class="lbl">تقييم الطلاب</div>
       </div>
     </div>
 
     <!-- Floating mini-chart -->
     <div class="chart-float">
       <div class="chart-float-top">
-        <span class="title">XAUUSD · Gold</span>
+        <span class="title">XAUUSD · الذهب</span>
         <span class="badge">▲ +2.4%</span>
       </div>
       <canvas id="miniChart"></canvas>
@@ -447,43 +447,43 @@
         <img src="logo.svg" alt="3B Trading"/>
         <div class="card-logo-text">
           <div class="n">3B Trading</div>
-          <div class="t">Build · Believe · Benefit</div>
+          <div class="t">ابنِ · آمن · استفد</div>
         </div>
       </div>
 
       <!-- Heading -->
       <div class="card-heading">
-        <h2>Welcome Back</h2>
-        <p>Access your Trading Dashboard</p>
+        <h2>أهلاً بعودتك</h2>
+        <p>ادخل إلى لوحة تحكم التداول الخاصة بك</p>
       </div>
 
       <!-- Alerts -->
       <div class="alert error" id="errMsg">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        Incorrect username or password
+        اسم المستخدم أو كلمة المرور غير صحيحة
       </div>
       <div class="alert warn" id="suspMsg">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        Your account is suspended — contact administrator
+        حسابك موقوف مؤقتاً — تواصل مع المسؤول
       </div>
       <div class="alert error" id="netMsg">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55M5 12.55a10.94 10.94 0 0 1 5.17-2.39M10.71 5.05A16 16 0 0 1 22.56 9M1.42 9a15.91 15.91 0 0 1 4.7-2.88M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/></svg>
-        Connection error — check your internet
+        خطأ في الاتصال — تحقق من الإنترنت
       </div>
 
       <!-- Form -->
       <form id="loginForm" autocomplete="off">
         <div class="field">
-          <label>Username</label>
+          <label>اسم المستخدم</label>
           <div class="inp-wrap">
             <span class="inp-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             </span>
-            <input type="text" id="username" placeholder="Enter username" dir="ltr" autocomplete="username" required/>
+            <input type="text" id="username" placeholder="أدخل اسم المستخدم" dir="ltr" autocomplete="username" required/>
           </div>
         </div>
         <div class="field">
-          <label>Password</label>
+          <label>كلمة المرور</label>
           <div class="inp-wrap">
             <span class="inp-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -500,24 +500,24 @@
           <label class="remember">
             <input type="checkbox" id="rememberMe"/>
             <span class="check-box"></span>
-            <span>Remember me</span>
+            <span>تذكرني</span>
           </label>
-          <a href="#" class="forgot">Forgot password?</a>
+          <a href="#" class="forgot">نسيت كلمة المرور؟</a>
         </div>
 
         <button type="submit" class="btn-signin" id="loginBtn">
           <span class="btn-content">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10,17 15,12 10,7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-            Sign In
+            تسجيل الدخول
           </span>
         </button>
       </form>
 
-      <div class="divider">or</div>
+      <div class="divider">أو</div>
 
       <div class="contact-admin">
-        Don't have an account?<br/>
-        <a href="#contact">Contact Administrator</a>
+        ليس لديك حساب؟<br/>
+        <a href="#contact">تواصل مع المسؤول</a>
       </div>
 
     </div>
@@ -563,7 +563,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
   const password = document.getElementById('password').value;
   const btn = document.getElementById('loginBtn');
   btn.disabled = true;
-  btn.innerHTML = '<span class="btn-content"><div class="spinner"></div> Verifying...</span>';
+  btn.innerHTML = '<span class="btn-content"><div class="spinner"></div> جاري التحقق...</span>';
   try {
     const snap = await db.collection('subscribers').where('username','==',username).get();
     if (snap.empty) { showAlert('errMsg'); reset(); return; }
@@ -574,7 +574,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
     currentSub = sub;
     doLogin();
   } catch(err) { console.error(err); showAlert('netMsg'); reset(); }
-  function reset() { btn.disabled=false; btn.innerHTML='<span class="btn-content"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10,17 15,12 10,7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>Sign In</span>'; }
+  function reset() { btn.disabled=false; btn.innerHTML='<span class="btn-content"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10,17 15,12 10,7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>تسجيل الدخول</span>'; }
 });
 
 function doLogin() {
