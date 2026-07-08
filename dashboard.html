@@ -20,7 +20,7 @@
     .sidebar{position:fixed;top:0;right:0;width:var(--sidebar-w);height:100vh;background:linear-gradient(180deg,var(--navy) 0%,#0d1e3d 100%);display:flex;flex-direction:column;z-index:200;box-shadow:-4px 0 30px rgba(0,0,0,.2)}
 
     /* Sidebar logo area centered */
-    .sb-logo{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px 16px 16px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center}
+    .sb-logo{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 16px 16px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center}
     .sb-logo-emblem{width:120px;height:120px;border-radius:24px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.4),0 0 0 2px rgba(212,160,60,.6),0 0 0 5px rgba(212,160,60,.12);margin-bottom:12px;flex-shrink:0}
     .sb-logo-emblem img{width:100%;height:100%;object-fit:cover;display:block}
     .sb-logo-name{font-size:1.15rem;font-weight:900;color:#fff;letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;text-shadow:0 2px 8px rgba(0,0,0,.4)}
@@ -54,9 +54,14 @@
 
     /* ── Main Content ── */
     .main-wrap{margin-right:var(--sidebar-w);min-height:100vh;display:flex;flex-direction:column}
-    .top-header{background:#fff;border-bottom:1px solid rgba(0,0,0,.06);padding:0 28px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.05)}
-    .th-greeting{font-size:.95rem;font-weight:900;color:var(--navy)}
-    .th-date{font-size:.75rem;font-weight:700;color:var(--muted);background:#f0f4f8;padding:5px 12px;border-radius:20px}
+    .top-header{background:var(--navy);padding:0 28px;height:64px;display:flex;align-items:center;justify-content:flex-start;position:sticky;top:0;z-index:100;box-shadow:0 4px 24px rgba(0,0,0,.15)}
+    .th-datetime{display:flex;align-items:center;gap:16px}
+    .th-date-box{display:flex;align-items:center;gap:8px;padding:8px 16px;background:rgba(255,255,255,.07);border:1px solid rgba(212,160,60,.25);border-radius:12px}
+    .th-date-icon{font-size:1rem;opacity:.8}
+    .th-date-text{font-size:.82rem;font-weight:700;color:rgba(255,255,255,.9);letter-spacing:.3px}
+    .th-divider{width:1px;height:28px;background:rgba(255,255,255,.12)}
+    .th-time-box{display:flex;align-items:center;gap:8px;padding:8px 16px;background:rgba(212,160,60,.12);border:1px solid rgba(212,160,60,.3);border-radius:12px}
+    .th-time-text{font-size:.92rem;font-weight:900;color:var(--gold);direction:ltr;letter-spacing:1px;font-variant-numeric:tabular-nums}
     main{flex:1;padding:28px 28px 80px}
     /* ── User Menu ── */
     .user-menu-wrap{position:relative}
@@ -514,8 +519,17 @@
 <div class="main-wrap">
 <!-- Top header -->
 <div class="top-header">
-  <div class="th-greeting" id="thGreeting">مرحباً بك 👋</div>
-  <div class="th-date" id="thDate"></div>
+  <div class="th-datetime">
+    <div class="th-date-box">
+      <span class="th-date-icon">📅</span>
+      <span class="th-date-text" id="thDate">—</span>
+    </div>
+    <div class="th-divider"></div>
+    <div class="th-time-box">
+      <span style="font-size:.85rem;opacity:.7">🕐</span>
+      <span class="th-time-text" id="thTime">00:00:00</span>
+    </div>
+  </div>
 </div>
 
 <!-- Modal: المعلومات الشخصية -->
@@ -1098,7 +1112,6 @@ async function init(){
   document.getElementById('info-country').textContent=sub.country||'غير محدد';
   document.getElementById('info-schools').textContent=(sub.schools||[]).map(k=>k==='classic'?'مدرسة الكلاسيك':'المدرسة المتقدمة SMC').join(' | ')||'—';
   document.getElementById('welcomeMsg').textContent='مرحباً '+sub.name;
-  const tg=document.getElementById('thGreeting');if(tg)tg.textContent='مرحباً، '+sub.name+' 👋';
 
   const d=getData();
   const schools=sub.schools||[];
@@ -2080,13 +2093,24 @@ let _internalNav=false;
 window.addEventListener('beforeunload',()=>{ if(!_internalNav) logout(); });
 init();
 
-/* ── Top header date ── */
+/* ── Top header date + live clock ── */
 (function(){
   const days=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
   const months=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
-  const now=new Date();
-  const el=document.getElementById('thDate');
-  if(el) el.textContent=days[now.getDay()]+' '+now.getDate()+' '+months[now.getMonth()]+' '+now.getFullYear();
+  function tick(){
+    const now=new Date();
+    const dateEl=document.getElementById('thDate');
+    const timeEl=document.getElementById('thTime');
+    if(dateEl) dateEl.textContent=days[now.getDay()]+' '+now.getDate()+' '+months[now.getMonth()]+' '+now.getFullYear();
+    if(timeEl){
+      const h=String(now.getHours()).padStart(2,'0');
+      const m=String(now.getMinutes()).padStart(2,'0');
+      const s=String(now.getSeconds()).padStart(2,'0');
+      timeEl.textContent=h+':'+m+':'+s;
+    }
+  }
+  tick();
+  setInterval(tick,1000);
 })();
 
 /* ── Sidebar live XAUUSD via TradingView REST ── */
