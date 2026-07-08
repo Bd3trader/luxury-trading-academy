@@ -293,6 +293,9 @@
     .sched-link{display:inline-flex;align-items:center;gap:5px;margin-top:8px;padding:5px 12px;background:#f0f4ff;color:#2563eb;border-radius:8px;font-size:.78rem;font-weight:800;text-decoration:none;border:1px solid rgba(37,99,235,.15);transition:background .2s}
     .sched-link:hover{background:#dbeafe}
     .sched-today-badge{position:absolute;top:10px;left:12px;background:var(--gold-g);color:#fff;font-size:.65rem;font-weight:900;padding:2px 8px;border-radius:20px}
+    .dash-section{display:none;animation:fadeIn .25s ease}
+    .dash-section.active{display:block}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
     .tip-section{margin-bottom:28px}
     .tip-card{background:var(--navy);border-radius:16px;padding:28px 32px;text-align:center;cursor:pointer;transition:all .3s;position:relative;overflow:hidden}
     .tip-card:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.15)}
@@ -480,19 +483,19 @@
   <!-- Nav links -->
   <nav class="sb-nav">
     <div class="sb-section-label">القائمة الرئيسية</div>
-    <a class="sb-item active" href="dashboard.html">
+    <a class="sb-item active" id="nav-home" href="#" onclick="showSection('sec-home');return false;">
       <div class="sb-item-icon">🏠</div> لوحة التحكم
     </a>
-    <button class="sb-item" onclick="document.getElementById('schoolsRow').scrollIntoView({behavior:'smooth'})">
+    <button class="sb-item" id="nav-schools" onclick="showSection('sec-schools')">
       <div class="sb-item-icon">🎓</div> مدارسي
     </button>
-    <button class="sb-item" onclick="openTVPanel();document.getElementById('tvPanel').scrollIntoView({behavior:'smooth'})">
+    <button class="sb-item" id="nav-chart" onclick="showSection('sec-home');setTimeout(openTVPanel,50)">
       <div class="sb-item-icon">📈</div> الشارت المباشر
     </button>
-    <button class="sb-item" onclick="document.querySelector('.econ-section').scrollIntoView({behavior:'smooth'})">
+    <button class="sb-item" id="nav-news" onclick="showSection('sec-news')">
       <div class="sb-item-icon">📰</div> الأخبار الاقتصادية
     </button>
-    <button class="sb-item" onclick="document.getElementById('scheduleSection').scrollIntoView({behavior:'smooth'})">
+    <button class="sb-item" id="nav-sessions" onclick="showSection('sec-sessions')">
       <div class="sb-item-icon">📅</div> الجلسات المجدولة
     </button>
     <div class="sb-section-label">الدعم</div>
@@ -611,6 +614,9 @@
 
 <!-- Main -->
 <main>
+
+<!-- ── الرئيسية: ترحيب + شريط الأسعار ── -->
+<div class="dash-section active" id="sec-home">
   <div class="welcome">
     <div class="welcome-text">
       <h1 id="welcomeMsg">مرحباً</h1>
@@ -622,45 +628,18 @@
       <div id="levelStars" style="margin-top:6px;font-size:.75rem;color:rgba(232,197,71,.6)">⭐</div>
     </div>
   </div>
-
-  <!-- Live Prices (moved above schools) -->
   <div style="margin-bottom:28px">
     <div class="sec-title"><div class="sec-title-bar"></div> أسعار السوق المباشرة</div>
     <div style="border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.08);border:1px solid rgba(0,0,0,.06)">
       <div class="tradingview-widget-container">
         <div class="tradingview-widget-container__widget"></div>
         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
-        {
-          "symbols": [
-            {"proName":"FOREXCOM:XAUUSD","title":"الذهب"},
-            {"proName":"FX_IDC:EURUSD","title":"يورو/دولار"},
-            {"proName":"FX_IDC:GBPUSD","title":"إسترليني/دولار"},
-            {"proName":"FX_IDC:USDJPY","title":"دولار/ين"},
-            {"proName":"FX_IDC:USDCHF","title":"دولار/فرنك"},
-            {"proName":"FX_IDC:AUDUSD","title":"أسترالي/دولار"},
-            {"proName":"FX_IDC:USDCAD","title":"دولار/كندي"},
-            {"proName":"FX_IDC:NZDUSD","title":"نيوزيلندي/دولار"},
-            {"proName":"FOREXCOM:XAGUSD","title":"الفضة"},
-            {"proName":"NASDAQ:NDX","title":"ناسداك"},
-            {"proName":"SP:SPX","title":"S&P 500"},
-            {"proName":"BITSTAMP:BTCUSD","title":"بيتكوين"}
-          ],
-          "showSymbolLogo": true,
-          "isTransparent": false,
-          "displayMode": "adaptive",
-          "colorTheme": "dark",
-          "locale": "ar_AE"
-        }
+        {"symbols":[{"proName":"FOREXCOM:XAUUSD","title":"الذهب"},{"proName":"FX_IDC:EURUSD","title":"يورو/دولار"},{"proName":"FX_IDC:GBPUSD","title":"إسترليني/دولار"},{"proName":"FX_IDC:USDJPY","title":"دولار/ين"},{"proName":"FX_IDC:USDCHF","title":"دولار/فرنك"},{"proName":"FX_IDC:AUDUSD","title":"أسترالي/دولار"},{"proName":"FX_IDC:USDCAD","title":"دولار/كندي"},{"proName":"FX_IDC:NZDUSD","title":"نيوزيلندي/دولار"},{"proName":"FOREXCOM:XAGUSD","title":"الفضة"},{"proName":"NASDAQ:NDX","title":"ناسداك"},{"proName":"SP:SPX","title":"S&P 500"},{"proName":"BITSTAMP:BTCUSD","title":"بيتكوين"},{"proName":"INDEX:DXY","title":"الدولار"},{"proName":"NASDAQ:AAPL","title":"آبل"},{"proName":"NASDAQ:TSLA","title":"تيسلا"},{"proName":"NYSE:NVDA","title":"نفيديا"}],"showSymbolLogo":true,"isTransparent":false,"displayMode":"adaptive","colorTheme":"dark","locale":"ar_AE"}
         </script>
       </div>
     </div>
   </div>
-
-  <!-- Schools -->
-  <div class="sec-title"><div class="sec-title-bar"></div> مدارسك التعليمية</div>
-  <div class="schools-row" id="schoolsRow"></div>
-
-  <!-- TradingView Section -->
+  <!-- شارت السوق الكامل -->
   <div class="tv-section">
     <div class="sec-title"><div class="sec-title-bar"></div> منصة التحليل الفني</div>
     <div class="tv-teaser" id="tvTeaser" onclick="openTVPanel()">
@@ -674,12 +653,9 @@
         <div class="tv-open-badge">افتح الشارت ←</div>
       </div>
     </div>
-
     <div class="tv-panel" id="tvPanel">
       <div class="tv-panel-header">
-        <div class="tv-panel-title">
-          📈 TradingView &nbsp;·&nbsp; <span id="tvSymLabel">XAUUSD</span>
-        </div>
+        <div class="tv-panel-title">📈 TradingView &nbsp;·&nbsp; <span id="tvSymLabel">XAUUSD</span></div>
         <div class="tv-panel-controls">
           <button class="tv-tf-btn active" onclick="tvSwitchTF('15',this)">15د</button>
           <button class="tv-tf-btn" onclick="tvSwitchTF('60',this)">1H</button>
@@ -693,8 +669,12 @@
       <div class="tv-symbol-row" id="tvSymbolRow"></div>
     </div>
   </div>
+</div>
 
-  <!-- Content Panel -->
+<!-- ── مدارسي ── -->
+<div class="dash-section" id="sec-schools">
+  <div class="sec-title"><div class="sec-title-bar"></div> مدارسك التعليمية</div>
+  <div class="schools-row" id="schoolsRow"></div>
   <div class="content-panel" id="contentPanel">
     <div class="cp-header">
       <div class="cp-title" id="cpTitle">المحتوى</div>
@@ -709,57 +689,13 @@
     <div class="tab-content" id="tc-books"><div class="books-grid" id="booksList"></div></div>
     <div class="tab-content" id="tc-images"><div class="books-grid" id="imagesList"></div></div>
   </div>
-
-  <!-- Economic Calendar Section -->
-  <div class="econ-section">
-    <div class="sec-title"><div class="sec-title-bar"></div> الأخبار الاقتصادية</div>
-    <div class="econ-card">
-      <div class="econ-header">
-        <div class="econ-title">
-          <div class="econ-title-icon" style="font-weight:900;font-size:.75rem;color:#fff">EC</div>
-          التقويم الاقتصادي — أخبار اليوم
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-          <span class="econ-badge">🇺🇸 الدولار الأمريكي</span>
-          <span class="econ-update"><span class="econ-live-dot"></span> يتحدث تلقائياً</span>
-        </div>
-      </div>
-      <div id="econWidget">
-        <div style="height:460px;width:100%">
-        <div class="tradingview-widget-container" style="height:100%;width:100%">
-          <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
-          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js" async>
-          {
-            "width": "100%",
-            "height": "100%",
-            "colorTheme": "light",
-            "isTransparent": true,
-            "locale": "ar_AE",
-            "importanceFilter": "1",
-            "countryFilter": "us"
-          }
-          </script>
-        </div>
-      </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- WhatsApp Section -->
   <div class="wa-section">
     <div class="sec-title"><div class="sec-title-bar"></div> تواصل مع المدرب</div>
     <div class="wa-card">
       <div class="wa-hero">
         <div class="wa-hero-inner">
-          <div class="wa-icon-box">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-            </svg>
-          </div>
-          <div class="wa-text">
-            <h3>إرسال استفسار إلى المدرب</h3>
-            <p>اطرح سؤالك أو استفسارك وسيصلك الرد مباشرة على واتساب</p>
-          </div>
+          <div class="wa-icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+          <div class="wa-text"><h3>إرسال استفسار إلى المدرب</h3><p>اطرح سؤالك أو استفسارك وسيصلك الرد مباشرة على واتساب</p></div>
           <button class="wa-open-btn" onclick="toggleWaForm()">✉️ إرسال استفسار</button>
         </div>
       </div>
@@ -780,9 +716,39 @@
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Daily Tip -->
-  <!-- Scheduled Sessions -->
+<!-- ── الأخبار الاقتصادية ── -->
+<div class="dash-section" id="sec-news">
+  <div class="econ-section">
+    <div class="sec-title"><div class="sec-title-bar"></div> الأخبار الاقتصادية</div>
+    <div class="econ-card">
+      <div class="econ-header">
+        <div class="econ-title">
+          <div class="econ-title-icon" style="font-weight:900;font-size:.75rem;color:#fff">EC</div>
+          التقويم الاقتصادي — أخبار اليوم
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span class="econ-badge">🇺🇸 الدولار الأمريكي</span>
+          <span class="econ-update"><span class="econ-live-dot"></span> يتحدث تلقائياً</span>
+        </div>
+      </div>
+      <div id="econWidget">
+        <div style="height:560px;width:100%">
+          <div class="tradingview-widget-container" style="height:100%;width:100%">
+            <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js" async>
+            {"width":"100%","height":"100%","colorTheme":"light","isTransparent":true,"locale":"ar_AE","importanceFilter":"1","countryFilter":"us"}
+            </script>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── الجلسات المجدولة ── -->
+<div class="dash-section" id="sec-sessions">
   <div style="margin-bottom:28px" id="scheduleSection">
     <div class="sec-title"><div class="sec-title-bar"></div> جلسات هذا الشهر</div>
     <div id="scheduleCards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px"></div>
@@ -791,7 +757,6 @@
       لا توجد جلسات مجدولة هذا الشهر
     </div>
   </div>
-
   <div class="tip-section">
     <div class="sec-title"><div class="sec-title-bar"></div> نصيحة اليوم</div>
     <div class="tip-card" onclick="nextTip()">
@@ -800,6 +765,7 @@
       <div class="tip-hint">اضغط للنصيحة التالية</div>
     </div>
   </div>
+</div>
 
 </main>
 
@@ -1191,9 +1157,9 @@ function openSchool(key){
 
   switchTab('lectures',document.getElementById('tab-lectures'));
 
+  showSection('sec-schools');
   const panel=document.getElementById('contentPanel');
   panel.classList.add('show');
-  setTimeout(()=>panel.scrollIntoView({behavior:'smooth',block:'start'}),100);
 }
 
 const sectionMeta={
@@ -1250,9 +1216,9 @@ function openSection(key,sec,btn){
     switchTab('lectures',document.getElementById('tab-lectures'));
   }
 
+  showSection('sec-schools');
   const panel=document.getElementById('contentPanel');
   panel.classList.add('show');
-  setTimeout(()=>panel.scrollIntoView({behavior:'smooth',block:'start'}),100);
 }
 
 function renderSectionItems(key, items, sec){
@@ -1559,6 +1525,16 @@ function logout(){
 
 /* ── TradingView Dashboard Chart ── */
 const TV_SYMBOLS=['XAUUSD','EURUSD','GBPUSD','USDJPY','BTCUSD','NAS100'];
+function showSection(id){
+  document.querySelectorAll('.dash-section').forEach(s=>s.classList.remove('active'));
+  const el=document.getElementById(id);
+  if(el){ el.classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); }
+  document.querySelectorAll('.sb-item[id^="nav-"]').forEach(b=>b.classList.remove('active'));
+  const navMap={'sec-home':'nav-home','sec-schools':'nav-schools','sec-news':'nav-news','sec-sessions':'nav-sessions'};
+  const navId=navMap[id];
+  if(navId){ const nb=document.getElementById(navId); if(nb) nb.classList.add('active'); }
+}
+
 let tvSym='XAUUSD', tvTF='60', tvOpen=false;
 
 function openTVPanel(){
@@ -1568,7 +1544,6 @@ function openTVPanel(){
   panel.classList.add('show');
   buildTVSymbolRow();
   loadTVChart();
-  setTimeout(()=>panel.scrollIntoView({behavior:'smooth',block:'start'}),100);
 }
 
 function closeTVPanel(){
