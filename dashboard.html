@@ -412,18 +412,21 @@
     .tv-bar{height:4px;background:linear-gradient(90deg,#B8860B,#D4A017,#f59e0b,#B8860B);background-size:200%;animation:tvBar 2s linear infinite}
     @keyframes tvBar{0%{background-position:0%}100%{background-position:200%}}
 
-    .tv-panel{display:none;background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;overflow:hidden;margin-top:12px;animation:slideDown .3s ease}
-    .tv-panel.show{display:block}
-    .tv-panel-header{background:linear-gradient(135deg,#1e293b,#0f172a);padding:16px 22px;display:flex;align-items:center;justify-content:space-between}
+    /* ── sec-chart: fullscreen panel ── */
+    #sec-chart{position:fixed;top:0;right:var(--sidebar-w);left:0;bottom:0;z-index:150;background:#0f172a;display:none;flex-direction:column}
+    #sec-chart.active{display:flex}
+    .tv-panel{flex:1;display:flex;flex-direction:column;overflow:hidden}
+    .tv-panel-header{background:linear-gradient(135deg,#1e293b,#0f172a);padding:14px 22px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,.08)}
     .tv-panel-title{color:#fff;font-weight:900;font-size:.95rem;display:flex;align-items:center;gap:10px}
     .tv-panel-controls{display:flex;gap:6px;align-items:center}
     .tv-tf-btn{padding:5px 12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:7px;font-family:'Cairo',sans-serif;font-size:.75rem;font-weight:700;color:rgba(255,255,255,.7);cursor:pointer;transition:all .2s}
     .tv-tf-btn:hover,.tv-tf-btn.active{background:var(--gold-g);color:#fff;border-color:transparent}
     .tv-close-btn{width:30px;height:30px;background:rgba(255,255,255,.1);border:none;border-radius:7px;cursor:pointer;color:rgba(255,255,255,.6);font-size:.9rem;display:flex;align-items:center;justify-content:center;transition:background .2s;margin-right:8px}
     .tv-close-btn:hover{background:rgba(220,38,38,.3);color:#fff}
-    #tvChartContainer{width:100%;height:520px}
-    .tv-symbol-row{padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;background:#fafaf8}
-    .tv-sym-btn{padding:6px 14px;background:#fff;border:1.5px solid var(--border);border-radius:8px;font-family:'Cairo',sans-serif;font-size:.78rem;font-weight:800;color:var(--text);cursor:pointer;transition:all .2s}
+    #tvChartContainer{flex:1;width:100%;min-height:0}
+    #tvChartContainer iframe{width:100%;height:100%;border:none}
+    .tv-symbol-row{padding:10px 20px;border-top:1px solid rgba(255,255,255,.08);display:flex;gap:8px;flex-wrap:wrap;background:#1e293b;flex-shrink:0}
+    .tv-sym-btn{padding:5px 14px;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);border-radius:8px;font-family:'Cairo',sans-serif;font-size:.78rem;font-weight:800;color:rgba(255,255,255,.7);cursor:pointer;transition:all .2s}
     .tv-sym-btn:hover,.tv-sym-btn.active{background:var(--gold-g);color:#fff;border-color:transparent}
 
   </style>
@@ -714,36 +717,22 @@
   </div>
 </div>
 
-<!-- ── الشارت المباشر ── -->
-<div class="dash-section" id="sec-chart">
-  <div class="tv-section">
-    <div class="sec-title"><div class="sec-title-bar"></div> منصة التحليل الفني المباشر</div>
-    <div class="tv-teaser" id="tvTeaser" onclick="openTVPanel()">
-      <div class="tv-bar"></div>
-      <div class="tv-teaser-inner">
-        <div class="tv-logo-box" style="font-weight:900;font-size:.8rem;color:#fff">TV</div>
-        <div class="tv-teaser-text">
-          <h3>TradingView — شارت مباشر</h3>
-          <p>تحليل فني احترافي · شموع يابانية · رسم مباشر على الشارت · أزواج متعددة</p>
-        </div>
-        <div class="tv-open-badge">افتح الشارت ←</div>
+<!-- ── الشارت المباشر (fullscreen) ── -->
+<div id="sec-chart">
+  <div class="tv-panel" id="tvPanel">
+    <div class="tv-panel-header">
+      <div class="tv-panel-title">📈 TradingView &nbsp;·&nbsp; <span id="tvSymLabel">XAUUSD</span></div>
+      <div class="tv-panel-controls">
+        <button class="tv-tf-btn active" onclick="tvSwitchTF('15',this)">15د</button>
+        <button class="tv-tf-btn" onclick="tvSwitchTF('60',this)">1H</button>
+        <button class="tv-tf-btn" onclick="tvSwitchTF('240',this)">4H</button>
+        <button class="tv-tf-btn" onclick="tvSwitchTF('D',this)">يومي</button>
+        <button class="tv-tf-btn" onclick="tvSwitchTF('W',this)">أسبوعي</button>
+        <button class="tv-close-btn" onclick="closeTVPanel()">✕</button>
       </div>
     </div>
-    <div class="tv-panel" id="tvPanel">
-      <div class="tv-panel-header">
-        <div class="tv-panel-title">📈 TradingView &nbsp;·&nbsp; <span id="tvSymLabel">XAUUSD</span></div>
-        <div class="tv-panel-controls">
-          <button class="tv-tf-btn active" onclick="tvSwitchTF('15',this)">15د</button>
-          <button class="tv-tf-btn" onclick="tvSwitchTF('60',this)">1H</button>
-          <button class="tv-tf-btn" onclick="tvSwitchTF('240',this)">4H</button>
-          <button class="tv-tf-btn" onclick="tvSwitchTF('D',this)">يومي</button>
-          <button class="tv-tf-btn" onclick="tvSwitchTF('W',this)">أسبوعي</button>
-          <button class="tv-close-btn" onclick="closeTVPanel()">✕</button>
-        </div>
-      </div>
-      <div id="tvChartContainer"></div>
-      <div class="tv-symbol-row" id="tvSymbolRow"></div>
-    </div>
+    <div id="tvChartContainer"></div>
+    <div class="tv-symbol-row" id="tvSymbolRow"></div>
   </div>
 </div>
 
@@ -1602,9 +1591,16 @@ function logout(){
 /* ── TradingView Dashboard Chart ── */
 const TV_SYMBOLS=['XAUUSD','EURUSD','GBPUSD','USDJPY','BTCUSD','NAS100'];
 function showSection(id){
+  // hide all normal sections
   document.querySelectorAll('.dash-section').forEach(s=>s.classList.remove('active'));
-  const el=document.getElementById(id);
-  if(el){ el.classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); }
+  // hide fullscreen chart if switching away
+  document.getElementById('sec-chart').style.display='none';
+  if(id==='sec-chart'){
+    document.getElementById('sec-chart').style.display='flex';
+  } else {
+    const el=document.getElementById(id);
+    if(el){ el.classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); }
+  }
   document.querySelectorAll('.sb-item[id^="nav-"]').forEach(b=>b.classList.remove('active'));
   const navMap={'sec-home':'nav-home','sec-schools':'nav-schools','sec-chart':'nav-chart','sec-news':'nav-news','sec-sessions':'nav-sessions'};
   const navId=navMap[id];
@@ -1615,18 +1611,14 @@ let tvSym='XAUUSD', tvTF='60', tvOpen=false;
 
 function openTVPanel(){
   tvOpen=true;
-  document.getElementById('tvTeaser').style.display='none';
-  const panel=document.getElementById('tvPanel');
-  panel.classList.add('show');
   buildTVSymbolRow();
   loadTVChart();
 }
 
 function closeTVPanel(){
   tvOpen=false;
-  document.getElementById('tvPanel').classList.remove('show');
   document.getElementById('tvChartContainer').innerHTML='';
-  document.getElementById('tvTeaser').style.display='block';
+  showSection('sec-home');
 }
 
 function buildTVSymbolRow(){
