@@ -481,6 +481,8 @@
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>emailjs.init('18Xghb6S1UqAHBxfs');</script>
 <script>
 /* ════════════════════════════════════════════════════════
    FIREBASE
@@ -531,12 +533,58 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
   function reset() { btn.disabled=false; btn.innerHTML='<span class="btn-content"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10,17 15,12 10,7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>تسجيل الدخول</span>'; }
 });
 
-function doLogin() {
+async function doLogin() {
   const sub = currentSub;
+  // ── device fingerprint ──
+  const fp = btoa([navigator.userAgent, screen.width+'x'+screen.height,
+    Intl.DateTimeFormat().resolvedOptions().timeZone, navigator.language].join('|')).slice(0,40);
+  const sessionId = 'ses_'+Date.now();
+
+  // ── check for existing active session from different device ──
+  try{
+    const existing = await db.collection('student_sessions')
+      .where('studentId','==',sub.id).where('active','==',true).get();
+    if(!existing.empty){
+      const other = existing.docs.find(d=>d.data().fingerprint!==fp);
+      if(other){
+        const od = other.data();
+        // get IP for alert
+        let ip='غير معروف';
+        try{ const r=await fetch('https://api.ipify.org?format=json',{signal:AbortSignal.timeout(3000)}); ip=(await r.json()).ip||ip; }catch(e){}
+        // log security alert
+        await db.collection('security_alerts').add({
+          type:'multi_device', read:false, time:Date.now(),
+          detail:`المتدرب "${sub.name}" (${sub.username}) دخل من جهازين مختلفين`,
+          ip, username:sub.username, studentName:sub.name,
+          deviceA: od.userAgent?.slice(0,80)||'—',
+          deviceB: navigator.userAgent.slice(0,80),
+          userAgent: navigator.userAgent
+        });
+        // send email alert
+        emailjs.send('service_3btrading','template_8gx9xqw',{
+          to_email:'bd3trader@gmail.com',
+          subject:`🚨 تنبيه: متدرب دخل من جهازين — ${sub.name}`,
+          message:`⚠️ المتدرب "${sub.name}" (${sub.username}) قام بتسجيل الدخول من جهازين مختلفين!\n\nالجهاز السابق: ${od.userAgent?.slice(0,100)||'غير معروف'}\nالجهاز الجديد: ${navigator.userAgent.slice(0,100)}\nالـ IP الجديد: ${ip}\nالوقت: ${new Date().toLocaleString('ar-SA')}`
+        }).catch(()=>{});
+      }
+    }
+    // mark old sessions inactive
+    const batch=db.batch();
+    existing.docs.forEach(d=>batch.update(d.ref,{active:false}));
+    await batch.commit().catch(()=>{});
+  }catch(e){ console.warn('session check err',e); }
+
+  // ── save new session ──
+  db.collection('student_sessions').add({
+    studentId:sub.id, studentName:sub.name, username:sub.username,
+    fingerprint:fp, userAgent:navigator.userAgent,
+    loginTime:Date.now(), active:true, sessionId
+  }).catch(console.error);
+
   db.collection('subscribers').doc(sub.id).update({ isOnline:true, lastSeen:Date.now() }).catch(console.error);
   db.collection('login_sessions').add({ studentId:sub.id, studentName:sub.name, loginTime:Date.now(), logoutTime:null }).catch(console.error);
   sessionStorage.setItem('currentSubscriber', JSON.stringify({...sub, isOnline:true, lastSeen:Date.now()}));
-  sessionStorage.setItem('sessionId', 'ses_'+Date.now());
+  sessionStorage.setItem('sessionId', sessionId);
   window.location.href = 'dashboard.html';
 }
 

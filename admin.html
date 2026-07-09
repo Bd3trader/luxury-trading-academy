@@ -63,14 +63,30 @@
     .back-link { text-align:center; font-size:.83rem; color:var(--muted); }
     .back-link a { color:var(--gold); font-weight:700; text-decoration:none; }
 
-    /* Admin hint box */
-    .hint-box {
-      background:#f8f6f1; border:1px solid rgba(184,134,11,.2);
-      border-radius:12px; padding:14px 16px;
-      font-size:.78rem; color:var(--muted); line-height:1.7;
-      margin-bottom:20px;
-    }
-    .hint-box strong { color:var(--text); }
+    /* OTP step */
+    .otp-step { display:none; }
+    .otp-step.show { display:block; }
+    .otp-header { text-align:center; margin-bottom:20px; }
+    .otp-icon { font-size:2.5rem; margin-bottom:8px; }
+    .otp-title { font-size:1.1rem; font-weight:900; color:var(--text); margin-bottom:6px; }
+    .otp-desc { font-size:.82rem; color:var(--muted); line-height:1.6; }
+    .otp-email { color:var(--gold); font-weight:700; }
+    .otp-inp-wrap { display:flex; gap:8px; justify-content:center; margin:20px 0; direction:ltr; }
+    .otp-digit { width:46px; height:56px; border:2px solid var(--border); border-radius:12px; font-size:1.4rem; font-weight:900; text-align:center; color:var(--text); font-family:'Cairo',sans-serif; transition:border-color .2s; outline:none; }
+    .otp-digit:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(184,134,11,.15); }
+    .otp-timer { text-align:center; font-size:.8rem; color:var(--muted); margin-bottom:16px; }
+    .otp-timer span { color:var(--red); font-weight:800; }
+    .otp-resend { text-align:center; font-size:.82rem; color:var(--muted); }
+    .otp-resend button { background:none; border:none; color:var(--gold); font-weight:700; cursor:pointer; font-family:'Cairo',sans-serif; font-size:.82rem; }
+    .otp-resend button:disabled { color:var(--muted); cursor:default; }
+    /* lockout */
+    .lockout-box { background:#fef2f2; border:1px solid #fecaca; border-radius:12px; padding:14px 16px; text-align:center; color:#dc2626; font-size:.85rem; font-weight:700; display:none; margin-bottom:16px; }
+    .lockout-box.show { display:block; }
+    /* sending spinner */
+    .sending-state { text-align:center; padding:24px 0; color:var(--muted); font-size:.88rem; display:none; }
+    .sending-state.show { display:block; }
+    .send-spin { width:32px; height:32px; border:3px solid rgba(184,134,11,.2); border-top-color:var(--gold); border-radius:50%; animation:spin .8s linear infinite; margin:0 auto 12px; }
+    @keyframes spin { to{transform:rotate(360deg)} }
   </style>
 </head>
 <body>
@@ -89,7 +105,9 @@
       <p class="subtitle">هذه الصفحة مخصصة لإدارة المنصة فقط</p>
 
       <div class="error" id="errMsg">⚠️ اسم المستخدم أو كلمة المرور غير صحيحة</div>
+      <div class="lockout-box" id="lockoutBox"></div>
 
+      <!-- Step 1: Login form -->
       <form id="adminForm" autocomplete="off">
         <div class="field">
           <label>اسم المستخدم</label>
@@ -106,68 +124,313 @@
             <button type="button" class="eye-btn" id="eyeBtn" onclick="togglePwd()">👁</button>
           </div>
         </div>
-        <button type="submit" class="btn">دخول لوحة التحكم →</button>
+        <button type="submit" class="btn" id="loginBtn">دخول لوحة التحكم →</button>
       </form>
+
+      <!-- Sending state -->
+      <div class="sending-state" id="sendingState">
+        <div class="send-spin"></div>
+        جاري إرسال رمز التحقق إلى بريدك...
+      </div>
+
+      <!-- Step 2: OTP -->
+      <div class="otp-step" id="otpStep">
+        <div class="otp-header">
+          <div class="otp-icon">📧</div>
+          <div class="otp-title">أدخل رمز التحقق</div>
+          <div class="otp-desc">تم إرسال رمز مكوّن من 6 أرقام إلى<br/><span class="otp-email">bd3trader@gmail.com</span></div>
+        </div>
+        <div class="otp-inp-wrap" id="otpInputs">
+          <input class="otp-digit" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"/>
+          <input class="otp-digit" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"/>
+          <input class="otp-digit" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"/>
+          <input class="otp-digit" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"/>
+          <input class="otp-digit" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"/>
+          <input class="otp-digit" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"/>
+        </div>
+        <div class="otp-timer">ينتهي خلال <span id="otpCountdown">05:00</span></div>
+        <div class="error" id="otpErr" style="margin-bottom:12px">⚠️ الرمز غير صحيح أو انتهت صلاحيته</div>
+        <button class="btn" onclick="verifyOTP()">✅ تحقق والدخول</button>
+        <div class="otp-resend" style="margin-top:14px">
+          لم يصلك الرمز؟
+          <button id="resendBtn" onclick="resendOTP()" disabled>إعادة الإرسال (<span id="resendTimer">60</span>ث)</button>
+        </div>
+        <div style="text-align:center;margin-top:12px">
+          <button onclick="backToLogin()" style="background:none;border:none;color:var(--muted);font-family:'Cairo',sans-serif;font-size:.82rem;cursor:pointer;text-decoration:underline">← العودة لتسجيل الدخول</button>
+        </div>
+      </div>
 
       <div class="divider"></div>
       <div class="back-link"><a href="index.html">← الموقع الرئيسي</a></div>
     </div>
   </div>
 
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<!-- EmailJS -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
-const STORE = 'tradingPlatform_v1';
-function getData() { try { const r=localStorage.getItem(STORE); if(r) return JSON.parse(r); } catch(e){} return null; }
-function saveData(d) { localStorage.setItem(STORE,JSON.stringify(d)); }
-function initDB() {
-  const data = {
-    adminCredentials: { username: 'admin', password: 'Admin@2025' },
-    students: [
-      { id:'s1', name:'أحمد المطيري', email:'ahmed@test.com', phone:'96891000001', courses:['basic'], isOnline:false, lastSeen:null, joinDate:'2025-01-15' },
-      { id:'s2', name:'محمد العتيبي', email:'mohammed@test.com', phone:'96891000002', courses:['basic','advanced'], isOnline:false, lastSeen:null, joinDate:'2025-02-20' }
-    ],
-    lectures: {
-      basic: [
-        { id:'b1', order:1, title:'مقدمة في الأسواق المالية', desc:'تعرّف على أساسيات الأسواق المالية وكيفية عملها', duration:'45 دقيقة', filename:'', date:'2025-01-10' },
-        { id:'b2', order:2, title:'الشموع اليابانية وأنماطها', desc:'شرح مفصّل لأنواع الشموع اليابانية وأهم الأنماط', duration:'60 دقيقة', filename:'', date:'2025-01-12' },
-        { id:'b3', order:3, title:'التحليل الفني - المستوى الأول', desc:'أدوات التحليل الفني وكيفية قراءة الرسوم البيانية', duration:'55 دقيقة', filename:'', date:'2025-01-15' },
-        { id:'b4', order:4, title:'إدارة رأس المال والمخاطر', desc:'أسس إدارة المخاطر وكيفية حماية رأس المال بفاعلية', duration:'50 دقيقة', filename:'', date:'2025-01-20' }
-      ],
-      advanced: [
-        { id:'a1', order:1, title:'مفهوم Smart Money Concepts', desc:'مقدمة شاملة في مفاهيم المال الذكي وكيف تفكر المؤسسات', duration:'55 دقيقة', filename:'', date:'2025-02-01' },
-        { id:'a2', order:2, title:'هيكلة السوق والسيولة', desc:'فهم بنية السوق ومناطق السيولة المؤسسية', duration:'70 دقيقة', filename:'', date:'2025-02-05' },
-        { id:'a3', order:3, title:'مناطق العرض والطلب المؤسسية', desc:'تحديد مناطق العرض والطلب بدقة مؤسسية عالية', duration:'65 دقيقة', filename:'', date:'2025-02-10' }
-      ]
-    },
-    sessions: []
-  };
-  saveData(data); return data;
+/* ═══ Config ═══ */
+const EMAILJS_PK   = '18Xghb6S1UqAHBxfs';
+const EMAILJS_SVC  = 'service_3btrading';
+const EMAILJS_TPL  = 'template_8gx9xqw';
+const ADMIN_EMAIL  = 'bd3trader@gmail.com';
+const MAX_ATTEMPTS = 5;
+const LOCKOUT_MIN  = 15;
+
+emailjs.init(EMAILJS_PK);
+
+firebase.initializeApp({
+  apiKey:"AIzaSyCp4YfzewPiH6XkVHo6Sp86hyy5gB-eUSY",
+  authDomain:"luxury-trading-academy.firebaseapp.com",
+  projectId:"luxury-trading-academy",
+  storageBucket:"luxury-trading-academy.firebasestorage.app",
+  messagingSenderId:"247439882691",
+  appId:"1:247439882691:web:46a1a83ebceb96596fe576"
+});
+const db = firebase.firestore();
+
+/* ═══ Brute-force lockout (localStorage) ═══ */
+const LK = 'adminLockout';
+function getLockout(){ try{ return JSON.parse(localStorage.getItem(LK)||'{}'); }catch(e){ return {}; } }
+function setLockout(o){ localStorage.setItem(LK,JSON.stringify(o)); }
+function checkLockout(){
+  const lk = getLockout();
+  if(lk.until && Date.now() < lk.until){
+    const rem = Math.ceil((lk.until - Date.now())/60000);
+    showLockout(`🔒 تم تعليق الدخول لـ ${rem} دقيقة بسبب محاولات متكررة`);
+    return true;
+  }
+  return false;
+}
+function recordFailedAttempt(){
+  let lk = getLockout();
+  lk.attempts = (lk.attempts||0) + 1;
+  lk.lastAttempt = Date.now();
+  if(lk.attempts >= MAX_ATTEMPTS){
+    lk.until = Date.now() + LOCKOUT_MIN*60*1000;
+    lk.attempts = 0;
+    sendSecurityAlert('🚨 تنبيه: محاولات دخول متكررة فاشلة',
+      `تم رصد ${MAX_ATTEMPTS} محاولات فاشلة متتالية للدخول للوحة التحكم.\n\nالوقت: ${new Date().toLocaleString('ar-SA')}\nالمتصفح: ${navigator.userAgent.slice(0,80)}`);
+    logSecurityEvent('brute_force', `${MAX_ATTEMPTS} محاولات فاشلة متتالية`);
+  }
+  setLockout(lk);
+}
+function clearFailedAttempts(){ const lk=getLockout(); lk.attempts=0; delete lk.until; setLockout(lk); }
+
+function showLockout(msg){
+  const box = document.getElementById('lockoutBox');
+  box.textContent = msg; box.classList.add('show');
+  document.getElementById('loginBtn').disabled = true;
 }
 
-if (!getData()) initDB();
-
-function togglePwd() {
-  const inp = document.getElementById('password');
-  inp.type = inp.type === 'password' ? 'text' : 'password';
-  document.getElementById('eyeBtn').textContent = inp.type === 'password' ? '👁' : '🙈';
+/* ═══ Security helpers ═══ */
+async function getIP(){
+  try{ const r=await fetch('https://api.ipify.org?format=json',{signal:AbortSignal.timeout(3000)}); const d=await r.json(); return d.ip||'غير معروف'; }
+  catch(e){ return 'غير معروف'; }
+}
+async function logSecurityEvent(type, detail, extra={}){
+  try{
+    const ip = await getIP();
+    await db.collection('security_alerts').add({
+      type, detail, ip,
+      userAgent: navigator.userAgent,
+      time: Date.now(),
+      read: false,
+      ...extra
+    });
+  }catch(e){ console.warn('log err',e); }
+}
+function sendSecurityAlert(subject, message){
+  emailjs.send(EMAILJS_SVC, EMAILJS_TPL, {
+    to_email: ADMIN_EMAIL,
+    subject,
+    message: message + `\n\nالمتصفح: ${navigator.userAgent.slice(0,100)}\nالوقت: ${new Date().toLocaleString('ar-SA')}`
+  }).catch(e=>console.warn('email err',e));
 }
 
-document.getElementById('adminForm').addEventListener('submit', function(e) {
+/* ═══ OTP state ═══ */
+let currentOTP = '';
+let otpExpiry  = 0;
+let countdownInterval = null;
+let resendInterval = null;
+
+function generateOTP(){ return String(Math.floor(100000+Math.random()*900000)); }
+
+async function sendOTP(){
+  currentOTP = generateOTP();
+  otpExpiry  = Date.now() + 5*60*1000;
+  // store in Firestore
+  await db.collection('admin_otp').doc('current').set({
+    code: currentOTP, expiresAt: otpExpiry, used: false, createdAt: Date.now()
+  });
+  // send email
+  await emailjs.send(EMAILJS_SVC, EMAILJS_TPL, {
+    to_email: ADMIN_EMAIL,
+    subject: '🔐 رمز تسجيل الدخول — لوحة التحكم 3B Trading',
+    message: `رمز تسجيل الدخول الخاص بك:\n\n🔑  ${currentOTP}\n\nصالح لمدة 5 دقائق فقط.\nإذا لم تطلب هذا الرمز يرجى تجاهله.\n\nالوقت: ${new Date().toLocaleString('ar-SA')}`
+  });
+}
+
+function startOTPCountdown(){
+  let remaining = Math.floor((otpExpiry - Date.now())/1000);
+  clearInterval(countdownInterval);
+  countdownInterval = setInterval(()=>{
+    remaining--;
+    if(remaining<=0){ clearInterval(countdownInterval); document.getElementById('otpCountdown').textContent='00:00'; return; }
+    const m=String(Math.floor(remaining/60)).padStart(2,'0');
+    const s=String(remaining%60).padStart(2,'0');
+    document.getElementById('otpCountdown').textContent=`${m}:${s}`;
+  },1000);
+}
+
+function startResendTimer(){
+  let t = 60;
+  document.getElementById('resendBtn').disabled=true;
+  clearInterval(resendInterval);
+  resendInterval = setInterval(()=>{
+    t--;
+    document.getElementById('resendTimer').textContent=t;
+    if(t<=0){
+      clearInterval(resendInterval);
+      document.getElementById('resendBtn').disabled=false;
+      document.getElementById('resendBtn').textContent='إعادة الإرسال';
+    }
+  },1000);
+}
+
+function showOTPStep(){
+  document.getElementById('adminForm').style.display='none';
+  document.getElementById('sendingState').classList.remove('show');
+  document.getElementById('otpStep').classList.add('show');
+  startOTPCountdown();
+  startResendTimer();
+  setTimeout(()=>{ document.querySelectorAll('.otp-digit')[0].focus(); },100);
+}
+
+function backToLogin(){
+  document.getElementById('otpStep').classList.remove('show');
+  document.getElementById('adminForm').style.display='block';
+  document.getElementById('otpErr').classList.remove('show');
+  clearInterval(countdownInterval); clearInterval(resendInterval);
+}
+
+async function resendOTP(){
+  document.getElementById('resendBtn').disabled=true;
+  document.getElementById('resendBtn').textContent='جاري الإرسال...';
+  try{
+    await sendOTP();
+    startOTPCountdown();
+    startResendTimer();
+  }catch(e){ alert('تعذّر إعادة الإرسال، حاول مجدداً'); document.getElementById('resendBtn').disabled=false; }
+}
+
+async function verifyOTP(){
+  const entered = Array.from(document.querySelectorAll('.otp-digit')).map(i=>i.value).join('');
+  if(entered.length<6){ document.getElementById('otpErr').classList.add('show'); return; }
+  // verify against Firestore
+  try{
+    const doc = await db.collection('admin_otp').doc('current').get();
+    const data = doc.exists ? doc.data() : {};
+    if(data.code===entered && data.expiresAt>Date.now() && !data.used){
+      await db.collection('admin_otp').doc('current').update({used:true});
+      clearFailedAttempts();
+      logSecurityEvent('admin_login_success','دخول ناجح للوحة التحكم');
+      sessionStorage.setItem('adminLoggedIn','true');
+      window.location.href='admin-panel.html';
+    } else {
+      document.getElementById('otpErr').classList.add('show');
+      document.querySelectorAll('.otp-digit').forEach(i=>{ i.value=''; i.style.borderColor='#dc2626'; });
+      document.querySelectorAll('.otp-digit')[0].focus();
+      setTimeout(()=>document.querySelectorAll('.otp-digit').forEach(i=>i.style.borderColor=''),1500);
+    }
+  }catch(e){ alert('خطأ في التحقق، حاول مجدداً'); }
+}
+
+/* ═══ OTP digit input UX ═══ */
+document.querySelectorAll('.otp-digit').forEach((inp,i,arr)=>{
+  inp.addEventListener('input',e=>{
+    inp.value=inp.value.replace(/\D/g,'').slice(-1);
+    document.getElementById('otpErr').classList.remove('show');
+    if(inp.value&&i<arr.length-1) arr[i+1].focus();
+    if(Array.from(arr).every(x=>x.value)) verifyOTP();
+  });
+  inp.addEventListener('keydown',e=>{
+    if(e.key==='Backspace'&&!inp.value&&i>0) arr[i-1].focus();
+    if(e.key==='ArrowLeft'&&i>0) arr[i-1].focus();
+    if(e.key==='ArrowRight'&&i<arr.length-1) arr[i+1].focus();
+  });
+  inp.addEventListener('paste',e=>{
+    e.preventDefault();
+    const txt=(e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);
+    arr.forEach((x,j)=>{ x.value=txt[j]||''; });
+    if(txt.length===6) verifyOTP();
+  });
+});
+
+/* ═══ Toggle password ═══ */
+function togglePwd(){
+  const inp=document.getElementById('password');
+  inp.type=inp.type==='password'?'text':'password';
+  document.getElementById('eyeBtn').textContent=inp.type==='password'?'👁':'🙈';
+}
+
+/* ═══ Admin credentials (from Firestore settings) ═══ */
+let adminCreds = { username:'admin', password:'Admin@2025' };
+db.collection('settings').doc('admin').get().then(d=>{ if(d.exists&&d.data().password) adminCreds.password=d.data().password; }).catch(()=>{});
+
+/* ═══ Login form submit ═══ */
+document.getElementById('adminForm').addEventListener('submit', async function(e){
   e.preventDefault();
+  if(checkLockout()) return;
+
   const username = document.getElementById('username').value.trim();
   const password = document.getElementById('password').value;
-  const data = getData() || initDB();
-  const creds = data.adminCredentials;
-  if (username === creds.username && password === creds.password) {
-    sessionStorage.setItem('adminLoggedIn', 'true');
-    window.location.href = 'admin-panel.html';
-  } else {
+  const btn      = document.getElementById('loginBtn');
+
+  // check Firestore for admin password (fallback to local)
+  const ok = (username === adminCreds.username || username === 'admin') &&
+             (password === adminCreds.password  || password === 'Admin@2025');
+
+  if(!ok){
+    recordFailedAttempt();
+    const lk=getLockout();
+    const rem=MAX_ATTEMPTS-(lk.attempts||0);
     document.getElementById('errMsg').classList.add('show');
+    if(rem>0&&rem<MAX_ATTEMPTS) document.getElementById('errMsg').textContent=`⚠️ كلمة المرور غير صحيحة — تبقى ${rem} محاولة`;
+    logSecurityEvent('admin_login_fail',`محاولة دخول فاشلة (${username})`);
+    return;
+  }
+
+  // correct password → send OTP
+  document.getElementById('errMsg').classList.remove('show');
+  document.getElementById('adminForm').style.display='none';
+  document.getElementById('sendingState').classList.add('show');
+  btn.disabled=true;
+
+  try{
+    await sendOTP();
+    logSecurityEvent('admin_otp_sent','تم إرسال رمز OTP');
+    showOTPStep();
+  }catch(err){
+    console.error(err);
+    document.getElementById('adminForm').style.display='block';
+    document.getElementById('sendingState').classList.remove('show');
+    btn.disabled=false;
+    alert('تعذّر إرسال رمز التحقق. تحقق من اتصالك بالإنترنت.');
   }
 });
 
-['username','password'].forEach(id => {
-  document.getElementById(id).addEventListener('input', () => document.getElementById('errMsg').classList.remove('show'));
+['username','password'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',()=>{
+    document.getElementById('errMsg').classList.remove('show');
+    document.getElementById('lockoutBox').classList.remove('show');
+  });
 });
+
+// check lockout on page load
+checkLockout();
 </script>
 </body>
 </html>

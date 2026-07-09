@@ -28,6 +28,21 @@
     .sb-link.active{background:rgba(184,134,11,.2);color:#E8C547;border-right:3px solid var(--gold)}
     .sb-link .icon{font-size:1rem;min-width:20px;text-align:center}
     .sb-badge{margin-right:auto;padding:2px 8px;background:rgba(184,134,11,.3);color:#E8C547;border-radius:999px;font-size:.68rem;font-weight:900}
+    /* Security Panel */
+    .sec-alert-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px 18px;position:relative;transition:all .2s}
+    .sec-alert-card.unread{border-right:4px solid #dc2626;background:#fff8f8}
+    .sec-alert-card.type-unauthorized_access{border-right-color:#dc2626}
+    .sec-alert-card.type-brute_force{border-right-color:#f97316}
+    .sec-alert-card.type-multi_device{border-right-color:#8b5cf6}
+    .sec-alert-card.type-admin_login_fail{border-right-color:#ef4444}
+    .sec-alert-card.type-admin_login_success{border-right-color:#22c55e}
+    .sec-alert-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+    .sec-alert-type{font-size:.72rem;font-weight:900;padding:3px 10px;border-radius:20px;background:#f3f4f6;color:#374151}
+    .sec-alert-time{font-size:.72rem;color:var(--muted)}
+    .sec-alert-detail{font-size:.84rem;color:var(--text);font-weight:700;margin-bottom:6px}
+    .sec-alert-meta{font-size:.75rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:12px}
+    .sec-filter-btn{padding:5px 14px;border:1.5px solid var(--border);border-radius:20px;background:#fff;font-family:'Cairo',sans-serif;font-size:.78rem;font-weight:700;color:var(--muted);cursor:pointer;transition:all .2s}
+    .sec-filter-btn.active,.sec-filter-btn:hover{background:var(--gold-g);color:#fff;border-color:transparent}
     .sb-footer{padding:16px;border-top:1px solid rgba(255,255,255,.07)}
     .sb-admin{display:flex;align-items:center;gap:10px}
     .sb-admin-avatar{width:34px;height:34px;border-radius:9px;background:var(--gold-g);display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:900;color:#0a0600}
@@ -193,6 +208,8 @@
     <div class="sb-section">التواصل</div>
     <button class="sb-link" onclick="showPanel('messages')"><span class="icon">💬</span> رسائل الطلاب<span class="sb-badge" id="msgBadge" style="display:none">0</span></button>
     <button class="sb-link" onclick="showPanel('requests')"><span class="icon">📋</span> طلبات الانضمام<span class="sb-badge" id="reqBadge" style="display:none">0</span></button>
+    <div class="sb-section">الأمان</div>
+    <button class="sb-link" onclick="showPanel('security')"><span class="icon">🛡️</span> تنبيهات الأمان<span class="sb-badge" id="secBadge" style="display:none">0</span></button>
     <div class="sb-section">النظام</div>
     <button class="sb-link" onclick="showPanel('settings')"><span class="icon">⚙️</span> الإعدادات</button>
   </nav>
@@ -309,6 +326,28 @@
 
     <div class="panel" id="panel-requests">
       <div id="reqList" style="display:flex;flex-direction:column;gap:12px"></div>
+    </div>
+
+    <!-- ══ Security Alerts Panel ══ -->
+    <div class="panel" id="panel-security">
+      <div class="sec-hd" style="margin-bottom:16px">
+        <div class="sec-hd-title">🛡️ سجل التنبيهات الأمنية</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-secondary" onclick="markAllSecurityRead()" style="font-size:.78rem;padding:6px 14px">✓ تحديد الكل كمقروء</button>
+          <button class="btn-secondary" onclick="clearAllSecurityAlerts()" style="font-size:.78rem;padding:6px 14px;color:#dc2626;border-color:#fecaca">🗑 مسح الكل</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap" id="secFilterRow">
+        <button class="sec-filter-btn active" data-type="all" onclick="filterSecurity('all',this)">الكل</button>
+        <button class="sec-filter-btn" data-type="unauthorized_access" onclick="filterSecurity('unauthorized_access',this)">🚪 وصول غير مصرح</button>
+        <button class="sec-filter-btn" data-type="brute_force" onclick="filterSecurity('brute_force',this)">🔨 محاولات متكررة</button>
+        <button class="sec-filter-btn" data-type="multi_device" onclick="filterSecurity('multi_device',this)">📱 جهازين</button>
+        <button class="sec-filter-btn" data-type="admin_login_fail" onclick="filterSecurity('admin_login_fail',this)">❌ فشل دخول أدمن</button>
+        <button class="sec-filter-btn" data-type="admin_login_success" onclick="filterSecurity('admin_login_success',this)">✅ دخول أدمن</button>
+      </div>
+      <div id="secAlertsList" style="display:flex;flex-direction:column;gap:10px">
+        <div style="text-align:center;padding:40px;color:var(--muted)">جاري التحميل...</div>
+      </div>
     </div>
 
     <div class="panel" id="panel-settings">
@@ -579,6 +618,9 @@
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<!-- EmailJS -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>emailjs.init('18Xghb6S1UqAHBxfs');</script>
 <script src="https://cdn.jsdelivr.net/npm/tus-js-client@3.1.0/dist/tus.min.js"></script>
 
 <script>
@@ -656,8 +698,34 @@ const _s1='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6
 const SUPA_KEY=_s1+_s2;
 const SUPA_BUCKET = 'lectures';
 
-/* ═══ Auth ═══ */
-if(sessionStorage.getItem('adminLoggedIn') !== 'true'){ window.location.href = 'admin.html'; }
+/* ═══ EmailJS ═══ */
+const EMAILJS_PK  = '18Xghb6S1UqAHBxfs';
+const EMAILJS_SVC = 'service_3btrading';
+const EMAILJS_TPL = 'template_8gx9xqw';
+const ADMIN_EMAIL = 'bd3trader@gmail.com';
+
+/* ═══ Auth — log unauthorized access before redirect ═══ */
+(async function authCheck(){
+  if(sessionStorage.getItem('adminLoggedIn') === 'true') return;
+  // unauthorized — log + alert then redirect
+  try{
+    let ip='غير معروف';
+    try{ const r=await fetch('https://api.ipify.org?format=json',{signal:AbortSignal.timeout(3000)}); ip=(await r.json()).ip||ip; }catch(e){}
+    const now = new Date();
+    await db.collection('security_alerts').add({
+      type:'unauthorized_access', ip,
+      detail:`محاولة وصول مباشر لصفحة الأدمن بدون جلسة`,
+      userAgent:navigator.userAgent, time:Date.now(), read:false
+    });
+    // send email alert
+    await emailjs.send(EMAILJS_SVC, EMAILJS_TPL,{
+      to_email: ADMIN_EMAIL,
+      subject:'🚨 تنبيه أمني — محاولة وصول للوحة التحكم',
+      message:`⚠️ شخص حاول الوصول مباشرة للوحة التحكم بدون صلاحية!\n\nالـ IP: ${ip}\nالمتصفح: ${navigator.userAgent.slice(0,120)}\nالوقت: ${now.toLocaleString('ar-SA')}\nالرابط: ${location.href}`
+    });
+  }catch(e){ console.warn(e); }
+  window.location.href='admin.html';
+})();
 
 /* ═══ Memory Cache ═══ */
 let cache = {
@@ -734,7 +802,7 @@ async function loadAndRender(){
 }
 
 /* ═══ Navigation ═══ */
-const panelTitles = { dashboard:'الرئيسية', online:'المتواجدون الآن', subscribers:'إدارة المشتركين', sessions:'سجل الجلسات', schedule:'الجلسات المجدولة', courses:'المدارس والمحاضرات', messages:'رسائل الطلاب', requests:'طلبات الانضمام', settings:'الإعدادات' };
+const panelTitles = { dashboard:'الرئيسية', online:'المتواجدون الآن', subscribers:'إدارة المشتركين', sessions:'سجل الجلسات', schedule:'الجلسات المجدولة', courses:'المدارس والمحاضرات', messages:'رسائل الطلاب', requests:'طلبات الانضمام', security:'🛡️ تنبيهات الأمان', settings:'الإعدادات' };
 let currentSchool = 'classic';
 let currentSubTab = 'lectures';
 
@@ -755,6 +823,7 @@ function renderPanel(name){
   else if(name==='subscribers') renderSubscribers();
   else if(name==='sessions') renderSessions();
   else if(name==='online') renderOnline();
+  else if(name==='security') renderSecurity();
   else if(name==='courses') renderSchool(currentSchool);
   else if(name==='schedule') renderSchedule();
 }
@@ -1782,6 +1851,114 @@ document.querySelectorAll('.modal-overlay').forEach(o=>{
 /* ═══ Sidebar ═══ */
 function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); }
 function adminLogout(){ sessionStorage.removeItem('adminLoggedIn'); window.location.href='admin.html'; }
+
+/* ══════════════════════════════════════════
+   SECURITY ALERTS
+══════════════════════════════════════════ */
+let allSecAlerts = [];
+let secFilter = 'all';
+
+const secTypeLabels = {
+  unauthorized_access: { label:'🚪 وصول غير مصرح', color:'#dc2626' },
+  brute_force:         { label:'🔨 محاولات متكررة', color:'#f97316' },
+  multi_device:        { label:'📱 جهازين مختلفين', color:'#8b5cf6' },
+  admin_login_fail:    { label:'❌ فشل دخول أدمن', color:'#ef4444' },
+  admin_login_success: { label:'✅ دخول أدمن ناجح', color:'#22c55e' },
+  admin_otp_sent:      { label:'📧 OTP أُرسل', color:'#3b82f6' },
+};
+
+async function renderSecurity(){
+  const list = document.getElementById('secAlertsList');
+  list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)">جاري التحميل...</div>';
+  try{
+    const snap = await db.collection('security_alerts').orderBy('time','desc').limit(200).get();
+    allSecAlerts = snap.docs.map(d=>({id:d.id,...d.data()}));
+    displaySecAlerts();
+    // mark unread count
+    const unread = allSecAlerts.filter(a=>!a.read).length;
+    const badge = document.getElementById('secBadge');
+    if(unread>0){ badge.textContent=unread; badge.style.display=''; }
+    else badge.style.display='none';
+  }catch(e){
+    list.innerHTML='<div style="text-align:center;padding:40px;color:#dc2626">تعذّر تحميل التنبيهات</div>';
+  }
+}
+
+function displaySecAlerts(){
+  const list = document.getElementById('secAlertsList');
+  const filtered = secFilter==='all' ? allSecAlerts : allSecAlerts.filter(a=>a.type===secFilter);
+  if(!filtered.length){
+    list.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:.88rem">لا توجد تنبيهات</div>';
+    return;
+  }
+  list.innerHTML = filtered.map(a=>{
+    const meta = secTypeLabels[a.type]||{label:a.type,color:'#6b7280'};
+    const t = new Date(a.time).toLocaleString('ar-SA');
+    return`<div class="sec-alert-card ${a.read?'':'unread'} type-${a.type}" data-id="${a.id}" onclick="markSecRead('${a.id}',this)">
+      <div class="sec-alert-header">
+        <span class="sec-alert-type" style="color:${meta.color};background:${meta.color}18">${meta.label}</span>
+        <span class="sec-alert-time">${t}</span>
+      </div>
+      <div class="sec-alert-detail">${a.detail||'—'}</div>
+      <div class="sec-alert-meta">
+        ${a.ip?`<span>🌐 IP: <b>${a.ip}</b></span>`:''}
+        ${a.userAgent?`<span>🖥 ${a.userAgent.slice(0,60)}...</span>`:''}
+        ${a.username?`<span>👤 ${a.username}</span>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterSecurity(type, btn){
+  secFilter = type;
+  document.querySelectorAll('.sec-filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  displaySecAlerts();
+}
+
+async function markSecRead(id, card){
+  if(card.classList.contains('unread')){
+    card.classList.remove('unread');
+    await db.collection('security_alerts').doc(id).update({read:true}).catch(()=>{});
+    const a = allSecAlerts.find(x=>x.id===id);
+    if(a) a.read=true;
+    const unread = allSecAlerts.filter(x=>!x.read).length;
+    const badge = document.getElementById('secBadge');
+    if(unread>0){ badge.textContent=unread; badge.style.display=''; }
+    else badge.style.display='none';
+  }
+}
+
+async function markAllSecurityRead(){
+  const batch = db.batch();
+  allSecAlerts.filter(a=>!a.read).forEach(a=>{
+    batch.update(db.collection('security_alerts').doc(a.id),{read:true});
+    a.read=true;
+  });
+  await batch.commit().catch(()=>{});
+  displaySecAlerts();
+  document.getElementById('secBadge').style.display='none';
+  toast('تم تحديد الكل كمقروء');
+}
+
+async function clearAllSecurityAlerts(){
+  if(!confirm('هل أنت متأكد من مسح جميع التنبيهات؟')) return;
+  const batch = db.batch();
+  allSecAlerts.forEach(a=> batch.delete(db.collection('security_alerts').doc(a.id)));
+  await batch.commit().catch(()=>{});
+  allSecAlerts=[];
+  displaySecAlerts();
+  document.getElementById('secBadge').style.display='none';
+  toast('تم مسح جميع التنبيهات');
+}
+
+/* load unread count on startup */
+db.collection('security_alerts').where('read','==',false).get().then(snap=>{
+  if(snap.size>0){
+    const b=document.getElementById('secBadge');
+    b.textContent=snap.size; b.style.display='';
+  }
+}).catch(()=>{});
 
 
 /* ═══ Init ═══ */
