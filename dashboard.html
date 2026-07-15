@@ -125,7 +125,41 @@
     .user-avatar{width:26px;height:26px;border-radius:50%;background:var(--gold-g);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:900}
     .btn-logout{padding:6px 14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:rgba(255,255,255,.6);font-family:'Cairo',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s}
     .btn-logout:hover{background:rgba(220,38,38,.15);color:#f87171;border-color:rgba(220,38,38,.3)}
-    @media(max-width:600px){main{padding:16px 14px 60px}.welcome{padding:20px 18px}.schools-row{grid-template-columns:1fr}.tv-teaser-inner{flex-wrap:wrap}.tv-open-badge{margin-right:0}}
+
+    /* ── Mobile Bottom Nav ── */
+    .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:500;background:linear-gradient(180deg,var(--navy) 0%,#0d1e3d 100%);border-top:1px solid rgba(212,160,60,0.25);padding:6px 0 env(safe-area-inset-bottom,8px)}
+    .mobile-nav-inner{display:flex;justify-content:space-around;align-items:center}
+    .mob-nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 10px;border:none;background:none;color:rgba(255,255,255,.55);font-family:'Cairo',sans-serif;font-size:.6rem;font-weight:700;cursor:pointer;border-radius:12px;transition:.2s;min-width:52px}
+    .mob-nav-btn .mob-icon{font-size:1.3rem;line-height:1}
+    .mob-nav-btn.active{color:var(--gold)}
+    .mob-nav-btn.active .mob-icon{filter:drop-shadow(0 0 6px rgba(212,160,60,.6))}
+
+    @media(max-width:900px){
+      .mobile-nav{display:block}
+      main{padding:16px 14px 80px!important}
+      .welcome{padding:20px 18px;flex-direction:column;gap:14px}
+      .welcome-text h1{font-size:1.3rem}
+      #welcomeLevel{width:100%}
+      .schools-row{grid-template-columns:1fr 1fr!important;gap:12px}
+      .content-panel{margin-top:16px}
+      .tradingview-widget-container[style*="500px"]{height:380px!important}
+      .tradingview-widget-container[style*="500px"] > *{height:100%!important}
+      #sec-chart{right:0!important}
+      .tv-panel-controls{gap:4px}
+      .tv-tf-btn{padding:4px 8px!important;font-size:.72rem!important}
+      .econ-card .econ-header{flex-direction:column;align-items:flex-start;gap:8px}
+      #scheduleCards{grid-template-columns:1fr!important}
+      .wa-hero-inner{flex-direction:column;text-align:center}
+      .wa-open-btn{width:100%}
+      .top-header{padding:0 14px;height:56px}
+      .th-date-box{padding:6px 10px}
+      .th-time-box{padding:6px 10px}
+      .th-date-text{font-size:.72rem}
+    }
+    @media(max-width:480px){
+      .schools-row{grid-template-columns:1fr!important}
+      .sec-title{font-size:.88rem}
+    }
 
     /* ── Main ── */
     main{max-width:960px;margin:0 auto;padding:28px 20px 80px}
@@ -1612,9 +1646,7 @@ function logout(){
 /* ── TradingView Dashboard Chart ── */
 const TV_SYMBOLS=['XAUUSD','EURUSD','GBPUSD','USDJPY','BTCUSD','NAS100'];
 function showSection(id){
-  // hide all normal sections
   document.querySelectorAll('.dash-section').forEach(s=>s.classList.remove('active'));
-  // hide fullscreen chart if switching away
   document.getElementById('sec-chart').style.display='none';
   if(id==='sec-chart'){
     document.getElementById('sec-chart').style.display='flex';
@@ -1622,10 +1654,16 @@ function showSection(id){
     const el=document.getElementById(id);
     if(el){ el.classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); }
   }
+  // Sidebar nav
   document.querySelectorAll('.sb-item[id^="nav-"]').forEach(b=>b.classList.remove('active'));
   const navMap={'sec-home':'nav-home','sec-schools':'nav-schools','sec-chart':'nav-chart','sec-news':'nav-news','sec-sessions':'nav-sessions'};
   const navId=navMap[id];
   if(navId){ const nb=document.getElementById(navId); if(nb) nb.classList.add('active'); }
+  // Mobile nav
+  document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.remove('active'));
+  const mnavMap={'sec-home':'mnav-home','sec-schools':'mnav-schools','sec-chart':'mnav-chart','sec-news':'mnav-news','sec-sessions':'mnav-sessions'};
+  const mId=mnavMap[id];
+  if(mId){ const mb=document.getElementById(mId); if(mb) mb.classList.add('active'); }
 }
 
 let tvSym='XAUUSD', tvTF='60', tvOpen=false;
@@ -2290,6 +2328,27 @@ document.getElementById('fileViewer').addEventListener('click', function(e){
 </script>
 
 </div><!-- /main-wrap -->
+
+<!-- Mobile Bottom Navigation -->
+<nav class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <button class="mob-nav-btn active" id="mnav-home" onclick="showSection('sec-home')">
+      <span class="mob-icon">🏠</span>الرئيسية
+    </button>
+    <button class="mob-nav-btn" id="mnav-schools" onclick="showSection('sec-schools')">
+      <span class="mob-icon">📚</span>مدارسي
+    </button>
+    <button class="mob-nav-btn" id="mnav-chart" onclick="showSection('sec-chart');setTimeout(openTVPanel,50)">
+      <span class="mob-icon">📈</span>الشارت
+    </button>
+    <button class="mob-nav-btn" id="mnav-news" onclick="showSection('sec-news')">
+      <span class="mob-icon">📰</span>الأخبار
+    </button>
+    <button class="mob-nav-btn" id="mnav-sessions" onclick="showSection('sec-sessions')">
+      <span class="mob-icon">🎯</span>الجلسات
+    </button>
+  </div>
+</nav>
 
 <!-- ── Footer ── -->
 <footer style="background:var(--navy);color:rgba(255,255,255,.85);padding:40px 20px 24px;margin-top:0;margin-right:var(--sidebar-w)">
