@@ -134,8 +134,34 @@
     .mob-nav-btn.active{color:var(--gold)}
     .mob-nav-btn.active .mob-icon{filter:drop-shadow(0 0 6px rgba(212,160,60,.6))}
 
+    /* Mobile header with logo */
+    .mob-header{display:none;background:linear-gradient(135deg,var(--navy),#0d1e3d);padding:10px 16px;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(212,160,60,0.2);position:sticky;top:0;z-index:300}
+    .mob-header-logo{display:flex;align-items:center;gap:10px}
+    .mob-header-logo img{width:38px;height:38px;border-radius:10px;object-fit:cover;box-shadow:0 0 0 2px rgba(212,160,60,.4)}
+    .mob-header-logo span{font-size:.95rem;font-weight:900;color:#fff;letter-spacing:1px}
+    .mob-header-logo sub{display:block;font-size:.5rem;color:var(--gold);letter-spacing:2px;text-transform:uppercase}
+    .mob-notif-btn{position:relative;background:rgba(255,255,255,.08);border:1px solid rgba(212,160,60,.2);border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;cursor:pointer;border:none}
+    .mob-notif-badge{position:absolute;top:-4px;right:-4px;background:#dc2626;color:#fff;font-size:.55rem;font-weight:900;min-width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;display:none}
+
+    /* Notifications panel */
+    .notif-panel{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:9000;background:rgba(0,0,0,.5);backdrop-filter:blur(4px)}
+    .notif-panel.open{display:flex;align-items:flex-start;justify-content:center;padding-top:60px}
+    .notif-box{background:#fff;border-radius:20px;width:90%;max-width:420px;max-height:70vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+    .notif-head{background:linear-gradient(135deg,var(--navy),var(--navy2));padding:16px 20px;display:flex;align-items:center;justify-content:space-between}
+    .notif-head h3{color:#fff;font-size:.95rem;font-weight:900}
+    .notif-close{background:rgba(255,255,255,.15);border:none;color:#fff;width:28px;height:28px;border-radius:8px;cursor:pointer;font-size:.9rem}
+    .notif-list{flex:1;overflow-y:auto;padding:12px}
+    .notif-item{padding:12px 14px;border-radius:12px;margin-bottom:8px;border:1px solid rgba(0,0,0,.07);background:#f9fafb;cursor:pointer}
+    .notif-item.unread{background:rgba(212,160,60,.08);border-color:rgba(212,160,60,.25)}
+    .notif-item-title{font-size:.85rem;font-weight:800;color:var(--navy);margin-bottom:4px}
+    .notif-item-body{font-size:.78rem;color:#6b7280;line-height:1.6}
+    .notif-item-time{font-size:.68rem;color:#9ca3af;margin-top:6px}
+    .notif-empty{text-align:center;padding:32px;color:#9ca3af;font-size:.85rem}
+
     @media(max-width:900px){
       .mobile-nav{display:block}
+      .mob-header{display:flex}
+      .top-header{display:none}
       footer{display:none!important}
       .sidebar{display:none!important;visibility:hidden!important;width:0!important;overflow:hidden!important}
       main{padding:16px 14px 80px!important}
@@ -368,7 +394,8 @@
     .wa-send-btn svg{flex-shrink:0}
 
     /* ── AI Chat ── */
-    .ai-fab{position:fixed;bottom:28px;left:28px;z-index:999;display:flex;align-items:center;gap:10px;cursor:pointer}
+    .ai-fab{position:fixed;bottom:90px;left:16px;z-index:499;display:flex;align-items:center;gap:10px;cursor:pointer}
+    @media(min-width:901px){.ai-fab{bottom:28px;left:28px}}
     .ai-fab-btn{width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#10a37f,#1a7f64);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.5rem;box-shadow:0 6px 24px rgba(16,163,127,.4);transition:all .25s;animation:fabPulse 2.5s ease-in-out infinite}
     .ai-fab-btn:hover{transform:scale(1.1);box-shadow:0 10px 32px rgba(16,163,127,.55)}
     @keyframes fabPulse{0%,100%{box-shadow:0 6px 24px rgba(16,163,127,.4)}50%{box-shadow:0 6px 32px rgba(16,163,127,.65),0 0 0 8px rgba(16,163,127,.1)}}
@@ -577,6 +604,34 @@
 </aside>
 
 <!-- Main wrap -->
+<!-- Mobile Header -->
+<div class="mob-header" id="mobHeader">
+  <div class="mob-header-logo">
+    <img src="logo.svg" alt="3B"/>
+    <div>
+      <span>3B TRADING</span>
+      <sub>BUILD · BELIEVE · BENEFIT</sub>
+    </div>
+  </div>
+  <button class="mob-notif-btn" onclick="toggleNotifPanel()">
+    🔔
+    <span class="mob-notif-badge" id="mobNotifBadge">0</span>
+  </button>
+</div>
+
+<!-- Notifications Panel -->
+<div class="notif-panel" id="notifPanel" onclick="if(event.target===this)toggleNotifPanel()">
+  <div class="notif-box">
+    <div class="notif-head">
+      <h3>🔔 الإشعارات</h3>
+      <button class="notif-close" onclick="toggleNotifPanel()">✕</button>
+    </div>
+    <div class="notif-list" id="notifList">
+      <div class="notif-empty">لا توجد إشعارات حتى الآن</div>
+    </div>
+  </div>
+</div>
+
 <div class="main-wrap">
 <!-- Top header -->
 <div class="top-header">
@@ -838,12 +893,21 @@
             إرسال الاستفسار
           </button>
         </div>
-        <div id="waSuccess" style="display:none;padding:20px;background:linear-gradient(135deg,rgba(184,134,11,.08),rgba(212,160,23,.05));border:1px solid rgba(184,134,11,.25);border-radius:14px;text-align:center">
+        <div id="waSuccess" style="display:none;padding:20px;background:linear-gradient(135deg,rgba(16,163,127,.08),rgba(16,163,127,.04));border:1px solid rgba(16,163,127,.25);border-radius:14px;text-align:center">
           <div style="font-size:2.2rem;margin-bottom:8px">✅</div>
-          <div style="font-weight:900;font-size:1rem;color:#b8860b;margin-bottom:4px">تم إرسال استفسارك بنجاح</div>
-          <div style="font-size:.82rem;color:#6b7280">سيتواصل معك المدرب على واتساب قريباً</div>
+          <div style="font-weight:900;font-size:1rem;color:#059669;margin-bottom:4px">تم إرسال استفسارك بنجاح</div>
+          <div style="font-size:.82rem;color:#6b7280">سيرد عليك المدرب قريباً وستصلك إشعار بالرد</div>
+          <button onclick="document.getElementById('waSuccess').style.display='none';document.getElementById('waForm').style.display='block'" style="margin-top:12px;padding:8px 20px;background:var(--navy);color:#fff;border:none;border-radius:10px;font-family:'Cairo',sans-serif;font-weight:700;font-size:.82rem;cursor:pointer">إرسال سؤال آخر</button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- رسائلي والردود -->
+  <div style="margin-top:24px">
+    <div class="sec-title"><div class="sec-title-bar"></div> رسائلي والردود</div>
+    <div id="myMessagesList" style="margin-top:16px">
+      <div style="text-align:center;padding:24px;color:#9ca3af;font-size:.85rem">جاري التحميل...</div>
     </div>
   </div>
 </div>
@@ -1214,6 +1278,8 @@ async function init(){
   renderSchools();
   renderScheduledSessions();
   heartbeat();
+  loadMyMessages();
+  loadNotifications();
 }
 
 /* ── Schools ── */
@@ -1937,27 +2003,143 @@ async function sendToWhatsApp(){
   const btn=document.getElementById('waSendBtn');
   btn.disabled=true; btn.textContent='جاري الإرسال...';
   try{
+    const studentId=sessionStorage.getItem('studentId')||'unknown';
     await db.collection('messages').add({
+      studentId,
       name: sub?.name||'طالب',
       phone: sub?.phone||'—',
       schools: (sub?.schools||[]).map(k=>k==='classic'?'الكلاسيك':'المتقدمة').join(' و '),
       message: msg,
+      reply: null,
       read: false,
+      replyRead: false,
       sentAt: Date.now()
     });
     document.getElementById('waMsg').value='';
-    document.getElementById('waForm').classList.remove('show');
     document.getElementById('waSuccess').style.display='block';
-    setTimeout(()=>{
-      document.getElementById('waSuccess').style.display='none';
-      document.getElementById('waForm').classList.add('show');
-    },4000);
+    document.getElementById('waForm').style.display='none';
+    loadMyMessages();
   }catch(e){
     alert('تعذّر إرسال الرسالة، حاول مجدداً');
   }finally{
     btn.disabled=false;
-    btn.innerHTML='<svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> إرسال';
+    btn.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> إرسال الاستفسار';
   }
+}
+
+/* ── My Messages (student view) ── */
+let msgUnsubscribe=null;
+function loadMyMessages(){
+  const studentId=sessionStorage.getItem('studentId')||'unknown';
+  const container=document.getElementById('myMessagesList');
+  if(!container) return;
+  if(msgUnsubscribe) msgUnsubscribe();
+  msgUnsubscribe=db.collection('messages')
+    .where('studentId','==',studentId)
+    .orderBy('sentAt','desc')
+    .onSnapshot(snap=>{
+      if(snap.empty){container.innerHTML='';return;}
+      container.innerHTML='';
+      snap.docs.forEach(doc=>{
+        const m={id:doc.id,...doc.data()};
+        const date=m.sentAt?new Date(m.sentAt).toLocaleString('ar-SA'):'—';
+        const replyDate=m.replyAt?new Date(m.replyAt).toLocaleString('ar-SA'):'';
+        const div=document.createElement('div');
+        div.style.cssText='background:#f9fafb;border:1px solid rgba(0,0,0,.08);border-radius:14px;padding:16px;margin-bottom:12px';
+        div.innerHTML=`
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <span style="font-size:.72rem;color:#9ca3af">${date}</span>
+            <span style="font-size:.7rem;background:${m.reply?'rgba(16,163,127,.1)':'rgba(184,134,11,.1)'};color:${m.reply?'#059669':'#b8860b'};padding:3px 10px;border-radius:20px;font-weight:700">${m.reply?'✓ تم الرد':'⏳ بانتظار الرد'}</span>
+          </div>
+          <div style="font-size:.88rem;color:#132A57;font-weight:700;margin-bottom:${m.reply?'12px':'0'};background:rgba(19,42,87,.05);padding:10px 12px;border-radius:10px;line-height:1.7">${m.message}</div>
+          ${m.reply?`
+            <div style="margin-top:8px;border-right:3px solid #D4A03C;padding-right:12px">
+              <div style="font-size:.7rem;color:var(--gold);font-weight:800;margin-bottom:4px">رد المدرب · ${replyDate}</div>
+              <div style="font-size:.86rem;color:#132A57;line-height:1.7">${m.reply}</div>
+            </div>
+          `:''}`;
+        container.appendChild(div);
+        // Mark reply as read
+        if(m.reply && !m.replyRead){
+          db.collection('messages').doc(m.id).update({replyRead:true}).catch(()=>{});
+        }
+      });
+    });
+}
+
+/* ── Notifications ── */
+let notifUnsubscribe=null;
+function loadNotifications(){
+  const studentId=sessionStorage.getItem('studentId')||'unknown';
+  if(notifUnsubscribe) notifUnsubscribe();
+  notifUnsubscribe=db.collection('notifications')
+    .where('target','in',['all', studentId])
+    .orderBy('sentAt','desc')
+    .limit(30)
+    .onSnapshot(snap=>{
+      const list=document.getElementById('notifList');
+      const badge=document.getElementById('mobNotifBadge');
+      const sbBadge=document.getElementById('sbNotifBadge');
+      const readIds=JSON.parse(localStorage.getItem('readNotifs_'+studentId)||'[]');
+      let unread=0;
+      if(snap.empty){
+        if(list) list.innerHTML='<div class="notif-empty">لا توجد إشعارات حتى الآن</div>';
+        return;
+      }
+      if(list) list.innerHTML='';
+      snap.docs.forEach(doc=>{
+        const n={id:doc.id,...doc.data()};
+        const isRead=readIds.includes(n.id);
+        if(!isRead) unread++;
+        const date=n.sentAt?new Date(n.sentAt).toLocaleString('ar-SA'):'';
+        const item=document.createElement('div');
+        item.className='notif-item'+(isRead?'':' unread');
+        item.onclick=()=>markNotifRead(n.id,studentId,item);
+        item.innerHTML=`
+          <div class="notif-item-title">${n.title||'إشعار جديد'}</div>
+          <div class="notif-item-body">${n.body||''}</div>
+          <div class="notif-item-time">${date}</div>`;
+        if(list) list.appendChild(item);
+      });
+      // Check message replies too
+      db.collection('messages').where('studentId','==',studentId).where('reply','!=',null).where('replyRead','==',false).get().then(s=>{ unread+=s.size; updateBadge(unread,badge,sbBadge); });
+      updateBadge(unread,badge,sbBadge);
+    });
+
+  // Also listen for new replies in messages
+  db.collection('messages').where('studentId','==',studentId).where('reply','!=',null).where('replyRead','==',false)
+    .onSnapshot(snap=>{
+      if(!snap.empty){
+        snap.docs.forEach(doc=>{
+          const m=doc.data();
+          showInAppNotif('💬 رد جديد من المدرب', m.reply?.substring(0,60)+'...');
+        });
+      }
+    });
+}
+
+function updateBadge(count,badge,sbBadge){
+  if(badge){ badge.textContent=count; badge.style.display=count>0?'flex':'none'; }
+  if(sbBadge){ sbBadge.textContent=count; sbBadge.style.display=count>0?'flex':'none'; }
+}
+
+function markNotifRead(id,studentId,el){
+  const readIds=JSON.parse(localStorage.getItem('readNotifs_'+studentId)||'[]');
+  if(!readIds.includes(id)){ readIds.push(id); localStorage.setItem('readNotifs_'+studentId,JSON.stringify(readIds)); }
+  el.classList.remove('unread');
+}
+
+function toggleNotifPanel(){
+  const p=document.getElementById('notifPanel');
+  p.classList.toggle('open');
+}
+
+function showInAppNotif(title,body){
+  const n=document.createElement('div');
+  n.style.cssText='position:fixed;top:70px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:12px 20px;border-radius:14px;font-size:.82rem;font-weight:700;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.3);border:1px solid rgba(212,160,60,.3);max-width:320px;text-align:center;animation:fadeDown .3s ease';
+  n.innerHTML=`<div style="color:var(--gold);margin-bottom:4px">${title}</div><div style="opacity:.8;font-size:.75rem">${body}</div>`;
+  document.body.appendChild(n);
+  setTimeout(()=>n.remove(),5000);
 }
 
 /* ── AI Chat (ChatGPT) ── */
