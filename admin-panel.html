@@ -1949,18 +1949,6 @@ async function sendReply(msgId, inputId){
   const reply=document.getElementById(inputId).value.trim();
   if(!reply){alert('أدخل نص الرد');return;}
   await db.collection('messages').doc(msgId).update({reply, replyAt:Date.now(), replyRead:false});
-  // Send notification to student
-  const msgDoc=await db.collection('messages').doc(msgId).get();
-  const studentId=msgDoc.data()?.studentId;
-  if(studentId){
-    await db.collection('notifications').add({
-      title:'💬 رد جديد من المدرب',
-      body:reply.substring(0,100),
-      target:studentId,
-      sentAt:Date.now(),
-      sentBy:'admin'
-    });
-  }
   renderMessages();
 }
 
