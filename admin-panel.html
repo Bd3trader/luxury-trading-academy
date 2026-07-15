@@ -756,7 +756,7 @@ const ADMIN_EMAIL = 'bd3trader@gmail.com';
     await emailjs.send(EMAILJS_SVC, EMAILJS_TPL,{
       to_email: ADMIN_EMAIL,
       subject:'🚨 تنبيه أمني — محاولة وصول للوحة التحكم',
-      message:`⚠️ شخص حاول الوصول مباشرة للوحة التحكم بدون صلاحية!\n\nالـ IP: ${ip}\nالمتصفح: ${navigator.userAgent.slice(0,120)}\nالوقت: ${now.toLocaleString('ar-SA')}\nالرابط: ${location.href}`
+      message:`⚠️ شخص حاول الوصول مباشرة للوحة التحكم بدون صلاحية!\n\nالـ IP: ${ip}\nالمتصفح: ${navigator.userAgent.slice(0,120)}\nالوقت: ${now.toLocaleString('ar-SA',{calendar:'gregory',numberingSystem:'latn'})}\nالرابط: ${location.href}`
     });
   }catch(e){ console.warn(e); }
   window.location.href='admin.html';
@@ -777,7 +777,7 @@ let cache = {
 };
 
 /* ═══ Helpers ═══ */
-function fmtTime(ts){ if(!ts) return '—'; const d=new Date(ts); return d.toLocaleDateString('ar-SA')+' '+d.toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'}); }
+function fmtTime(ts){ if(!ts) return '—'; const d=new Date(ts); return d.toLocaleDateString('ar-SA',{calendar:'gregory',numberingSystem:'latn'})+' '+d.toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit',calendar:'gregory',numberingSystem:'latn'}); }
 function fmtDur(ms){ if(!ms||ms<0) return '—'; const m=Math.floor(ms/60000); const h=Math.floor(m/60); return h>0?h+'س '+(m%60)+'د':m+'د'; }
 function isOnline(s){ return s.isOnline && s.lastSeen && (Date.now()-s.lastSeen)<120000; }
 function uid(){ return Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7); }
@@ -1637,7 +1637,7 @@ async function renderMessages(){
     }
     div.innerHTML = msgs.map(m=>{
       const d = new Date(m.sentAt);
-      const dateStr = d.toLocaleDateString('ar-SA')+' '+d.toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});
+      const dateStr = d.toLocaleDateString('ar-SA',{calendar:'gregory',numberingSystem:'latn'})+' '+d.toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit',calendar:'gregory',numberingSystem:'latn'});
       return `<div class="lec-card" style="border-right:4px solid ${m.read?'var(--muted)':'var(--gold)'}">
         <div class="lec-info" style="gap:6px">
           <div class="lec-title" style="display:flex;justify-content:space-between;align-items:center">
@@ -1692,7 +1692,7 @@ async function renderRequests(){
     snap.forEach(doc => {
       const r = {id:doc.id,...doc.data()};
       const isReset = r.type === 'password_reset';
-      const date = r.sentAt ? new Date(r.sentAt).toLocaleString('ar-SA') : '—';
+      const date = r.sentAt ? new Date(r.sentAt).toLocaleString('ar-SA',{calendar:'gregory',numberingSystem:'latn'}) : '—';
       const statusColor = r.status==='done' ? '#059669' : r.status==='rejected' ? '#dc2626' : '#B8860B';
       const statusLabel = r.status==='done' ? 'تم التنفيذ' : r.status==='rejected' ? 'مرفوض' : 'قيد المراجعة';
       const card = document.createElement('div');
@@ -1823,7 +1823,7 @@ function renderSchedule(){
   tbody.innerHTML = sessions.map((s,i)=>{
     const isPast = s.date < today;
     const isToday = s.date === today;
-    const dateFmt = new Date(s.date+'T00:00').toLocaleDateString('ar-SA',{weekday:'short',year:'numeric',month:'short',day:'numeric'});
+    const dateFmt = new Date(s.date+'T00:00').toLocaleDateString('ar-SA',{weekday:'short',year:'numeric',month:'short',day:'numeric',calendar:'gregory',numberingSystem:'latn'});
     const todayBadge = isToday ? '<span style="background:#fef3c7;color:#d97706;font-size:.7rem;font-weight:800;padding:2px 7px;border-radius:20px;margin-right:5px">اليوم</span>' : '';
     return`<tr style="${isPast?'opacity:.55':''}">
       <td>${i+1}</td>
@@ -1930,7 +1930,7 @@ async function renderNotifications(){
   el.innerHTML='';
   snap.forEach(doc=>{
     const n={id:doc.id,...doc.data()};
-    const date=n.sentAt?new Date(n.sentAt).toLocaleString('ar-SA'):'—';
+    const date=n.sentAt?new Date(n.sentAt).toLocaleString('ar-SA',{calendar:'gregory',numberingSystem:'latn'}):'—';
     const card=document.createElement('div');
     card.style.cssText='background:#fff;border-radius:12px;padding:16px 20px;border:1px solid rgba(0,0,0,.07);display:flex;justify-content:space-between;align-items:center;gap:12px';
     card.innerHTML=`
@@ -1990,7 +1990,7 @@ function displaySecAlerts(){
   }
   list.innerHTML = filtered.map(a=>{
     const meta = secTypeLabels[a.type]||{label:a.type,color:'#6b7280'};
-    const t = new Date(a.time).toLocaleString('ar-SA');
+    const t = new Date(a.time).toLocaleString('ar-SA',{calendar:'gregory',numberingSystem:'latn'});
     return`<div class="sec-alert-card ${a.read?'':'unread'} type-${a.type}" data-id="${a.id}" onclick="markSecRead('${a.id}',this)">
       <div class="sec-alert-header">
         <span class="sec-alert-type" style="color:${meta.color};background:${meta.color}18">${meta.label}</span>

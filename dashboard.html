@@ -1674,7 +1674,7 @@ function renderScheduledSessions(){
   container.innerHTML=sessions.map(s=>{
     const dt=new Date(s.date+'T00:00');
     const day=dt.getDate();
-    const monthName=dt.toLocaleDateString('ar-SA',{month:'short'});
+    const monthName=dt.toLocaleDateString('ar-SA',{month:'short',calendar:'gregory',numberingSystem:'latn'});
     const isToday=s.date===today;
     const isPast=s.date<today;
     const t=s.type||'online';
@@ -2118,8 +2118,8 @@ function loadMyMessages(){
       container.innerHTML='';
       snap.docs.forEach(doc=>{
         const m={id:doc.id,...doc.data()};
-        const date=m.sentAt?new Date(m.sentAt).toLocaleString('ar-SA'):'—';
-        const replyDate=m.replyAt?new Date(m.replyAt).toLocaleString('ar-SA'):'';
+        const date=m.sentAt?new Date(m.sentAt).toLocaleString('ar-SA',{calendar:'gregory',numberingSystem:'latn'}):'—';
+        const replyDate=m.replyAt?new Date(m.replyAt).toLocaleString('ar-SA',{calendar:'gregory',numberingSystem:'latn'}):'';
         const div=document.createElement('div');
         div.style.cssText='background:#f9fafb;border:1px solid rgba(0,0,0,.08);border-radius:14px;padding:16px;margin-bottom:12px';
         div.innerHTML=`
@@ -2170,7 +2170,7 @@ function loadNotifications(){
     list.innerHTML='';
     all.forEach(n=>{
       const isRead=readIds.includes(n.id);
-      const date=n.sentAt?new Date(n.sentAt).toLocaleString('ar-SA'):'';
+      const date=n.sentAt?new Date(n.sentAt).toLocaleString('ar-SA',{calendar:'gregory',numberingSystem:'latn'}):'';
       const item=document.createElement('div');
       item.className='notif-item'+(isRead?'':' unread');
       item.onclick=()=>markNotifRead(n.id,studentId,item);
