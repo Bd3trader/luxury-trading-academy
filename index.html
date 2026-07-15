@@ -614,12 +614,13 @@
       phone: document.getElementById('fphone').value.trim(),
       email: document.getElementById('femail').value.trim(),
       level: document.getElementById('flevel').value,
-      submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
-      status: 'new'
+      type: 'registration',
+      sentAt: Date.now(),
+      status: 'pending'
     };
 
     try {
-      await db.collection('registration_requests').add(data);
+      await db.collection('admin_requests').add(data);
       document.getElementById('formContent').style.display = 'none';
       document.getElementById('formSuccess').style.display = 'block';
     } catch(err) {
