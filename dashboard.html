@@ -2160,13 +2160,14 @@ function loadNotifications(){
     const sbBadge=document.getElementById('sbNotifBadge');
     const readIds=JSON.parse(localStorage.getItem('readNotifs_'+studentId)||'[]');
     const all=Object.values(notifCache).sort((a,b)=>(b.sentAt||0)-(a.sentAt||0)).slice(0,30);
-    let unread=0;
+    // Count unread always (for badge), even if panel is hidden
+    let unread=all.filter(n=>!readIds.includes(n.id)).length;
+    updateBadge(unread,badge,sbBadge);
     if(!list) return;
-    if(all.length===0){ list.innerHTML='<div class="notif-empty">لا توجد إشعارات حتى الآن</div>'; updateBadge(0,badge,sbBadge); return; }
+    if(all.length===0){ list.innerHTML='<div class="notif-empty">لا توجد إشعارات حتى الآن</div>'; return; }
     list.innerHTML='';
     all.forEach(n=>{
       const isRead=readIds.includes(n.id);
-      if(!isRead) unread++;
       const date=n.sentAt?new Date(n.sentAt).toLocaleString('ar-SA'):'';
       const item=document.createElement('div');
       item.className='notif-item'+(isRead?'':' unread');
@@ -2177,7 +2178,6 @@ function loadNotifications(){
         <div class="notif-item-time">${date}</div>`;
       list.appendChild(item);
     });
-    updateBadge(unread,badge,sbBadge);
   }
 
   // استعلام 1: الإشعارات للجميع
