@@ -2183,9 +2183,10 @@ function loadNotifications(){
   }
 
   // استعلام 1: الإشعارات للجميع
+  const isReplyNotif=d=>d.title&&d.title.includes('رد جديد من المدرب');
   notifUnsubAll=db.collection('notifications').where('target','==','all')
     .onSnapshot(snap=>{
-      snap.docs.forEach(d=>{ notifCache[d.id]={id:d.id,...d.data()}; });
+      snap.docs.forEach(d=>{ const n={id:d.id,...d.data()}; if(!isReplyNotif(n)) notifCache[d.id]=n; });
       snap.docChanges().forEach(ch=>{ if(ch.type==='removed') delete notifCache[ch.doc.id]; });
       renderNotifCache();
     }, err=>console.error('notif-all:',err));
@@ -2196,8 +2197,10 @@ function loadNotifications(){
       let hasNew=false;
       snap.docChanges().forEach(ch=>{
         if(ch.type==='added'||ch.type==='modified'){
+          const n={id:ch.doc.id,...ch.doc.data()};
+          if(isReplyNotif(n)) return;
           const wasNew=!notifCache[ch.doc.id];
-          notifCache[ch.doc.id]={id:ch.doc.id,...ch.doc.data()};
+          notifCache[ch.doc.id]=n;
           if(wasNew && ch.type==='added') hasNew=true;
         }
         if(ch.type==='removed') delete notifCache[ch.doc.id];
