@@ -142,6 +142,20 @@
     .mob-header-logo sub{display:block;font-size:.5rem;color:var(--gold);letter-spacing:2px;text-transform:uppercase}
     .mob-notif-btn{position:relative;background:rgba(255,255,255,.08);border:1px solid rgba(212,160,60,.2);border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;cursor:pointer;border:none}
     .mob-notif-badge{position:absolute;top:-4px;right:-4px;background:#dc2626;color:#fff;font-size:.55rem;font-weight:900;min-width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;display:none}
+    .mob-user-btn{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.08);border:1px solid rgba(212,160,60,.25);border-radius:12px;padding:5px 10px 5px 7px;cursor:pointer;position:relative}
+    .mob-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#b8860b);color:var(--navy);font-weight:900;font-size:.8rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .mob-user-name{color:#fff;font-size:.78rem;font-weight:800;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .mob-dropdown{display:none;position:absolute;top:calc(100% + 8px);right:0;width:220px;background:#fff;border-radius:16px;box-shadow:0 16px 48px rgba(0,0,0,.25);border:1px solid rgba(0,0,0,.07);overflow:hidden;z-index:9999;animation:dropIn .2s ease}
+    .mob-dropdown.open{display:block}
+    .mob-dd-head{background:linear-gradient(135deg,var(--navy),#0d1e3d);padding:12px 14px;display:flex;align-items:center;gap:10px}
+    .mob-dd-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#b8860b);color:var(--navy);font-weight:900;font-size:.9rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .mob-dd-name{color:#fff;font-size:.82rem;font-weight:900}
+    .mob-dd-email{color:rgba(255,255,255,.6);font-size:.68rem;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:150px}
+    .mob-dd-item{display:flex;align-items:center;gap:10px;width:100%;padding:10px 14px;border:none;background:none;font-family:'Cairo',sans-serif;font-size:.82rem;color:var(--navy);cursor:pointer;text-align:right;transition:background .15s}
+    .mob-dd-item:hover{background:#f9fafb}
+    .mob-dd-item-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
+    .mob-dd-sep{height:1px;background:rgba(0,0,0,.07);margin:4px 0}
+    .mob-dd-logout{color:#dc2626!important}
 
     /* Notifications panel */
     .notif-panel{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:9000;background:rgba(0,0,0,.5);backdrop-filter:blur(4px)}
@@ -610,6 +624,43 @@
 <!-- Main wrap -->
 <!-- Mobile Header -->
 <div class="mob-header" id="mobHeader">
+  <!-- User button left -->
+  <div class="mob-user-btn" onclick="toggleMobDropdown()">
+    <div class="mob-avatar" id="mobAvatar">؟</div>
+    <span class="mob-user-name" id="mobUserName">...</span>
+    <span style="color:rgba(255,255,255,.5);font-size:.6rem">▼</span>
+    <!-- Dropdown -->
+    <div class="mob-dropdown" id="mobDropdown" onclick="event.stopPropagation()">
+      <div class="mob-dd-head">
+        <div class="mob-dd-av" id="mobDdAv">؟</div>
+        <div>
+          <div class="mob-dd-name" id="mobDdName">—</div>
+          <div class="mob-dd-email" id="mobDdEmail">—</div>
+        </div>
+      </div>
+      <div style="padding:4px 0">
+        <button class="mob-dd-item" onclick="openModal('infoModal');closeMobDropdown()">
+          <div class="mob-dd-item-icon" style="background:#f0f4ff">👤</div>
+          <span>المعلومات الشخصية</span>
+        </button>
+        <button class="mob-dd-item" onclick="openModal('themeModal');closeMobDropdown()">
+          <div class="mob-dd-item-icon" style="background:#fdf4ff">🎨</div>
+          <span>تغيير المظهر</span>
+        </button>
+        <button class="mob-dd-item" onclick="openModal('supportModal');closeMobDropdown()">
+          <div class="mob-dd-item-icon" style="background:#f0fdf4">🎧</div>
+          <span>طلب دعم فني</span>
+        </button>
+        <div class="mob-dd-sep"></div>
+        <button class="mob-dd-item mob-dd-logout" onclick="logout()">
+          <div class="mob-dd-item-icon" style="background:#fef2f2">🚪</div>
+          <span>تسجيل الخروج</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Logo center -->
   <div class="mob-header-logo">
     <img src="logo.svg" alt="3B"/>
     <div>
@@ -617,6 +668,8 @@
       <sub>BUILD · BELIEVE · BENEFIT</sub>
     </div>
   </div>
+
+  <!-- Notifications right -->
   <button class="mob-notif-btn" onclick="toggleNotifPanel()">
     🔔
     <span class="mob-notif-badge" id="mobNotifBadge">0</span>
@@ -1259,6 +1312,12 @@ async function init(){
   document.getElementById('udAvatar').textContent=initLetter;
   document.getElementById('udName').textContent=sub.name;
   document.getElementById('udEmail').textContent=sub.email||'—';
+  // Populate mobile header
+  document.getElementById('mobAvatar').textContent=initLetter;
+  document.getElementById('mobUserName').textContent=sub.name;
+  document.getElementById('mobDdAv').textContent=initLetter;
+  document.getElementById('mobDdName').textContent=sub.name;
+  document.getElementById('mobDdEmail').textContent=sub.email||'—';
   // Populate info modal
   document.getElementById('info-name').textContent=sub.name||'—';
   document.getElementById('info-email').textContent=sub.email||'—';
@@ -1648,9 +1707,17 @@ function closeUserMenu(){
   document.getElementById('userDropdown').classList.remove('open');
   document.getElementById('menuArrow').textContent='▼';
 }
+function toggleMobDropdown(){
+  document.getElementById('mobDropdown').classList.toggle('open');
+}
+function closeMobDropdown(){
+  document.getElementById('mobDropdown').classList.remove('open');
+}
 document.addEventListener('click',function(e){
   const wrap=document.querySelector('.user-menu-wrap');
   if(wrap&&!wrap.contains(e.target))closeUserMenu();
+  const mobBtn=document.querySelector('.mob-user-btn');
+  if(mobBtn&&!mobBtn.contains(e.target))closeMobDropdown();
 });
 
 /* ── Modals ── */
@@ -1738,6 +1805,9 @@ function showSection(id){
   const mnavMap={'sec-home':'mnav-home','sec-schools':'mnav-schools','sec-chart':'mnav-chart','sec-news':'mnav-news','sec-sessions':'mnav-sessions'};
   const mId=mnavMap[id];
   if(mId){ const mb=document.getElementById(mId); if(mb) mb.classList.add('active'); }
+  // AI FAB: show only on home section
+  const fab=document.getElementById('aiFab');
+  if(fab){ fab.style.display=(id==='sec-home')?'flex':'none'; }
 }
 
 let tvSym='XAUUSD', tvTF='60', tvOpen=false;
