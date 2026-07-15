@@ -583,7 +583,7 @@ async function doLogin() {
 
   db.collection('subscribers').doc(sub.id).update({ isOnline:true, lastSeen:Date.now() }).catch(console.error);
   db.collection('login_sessions').add({ studentId:sub.id, studentName:sub.name, loginTime:Date.now(), logoutTime:null }).catch(console.error);
-  sessionStorage.setItem('currentSubscriber', JSON.stringify({...sub, isOnline:true, lastSeen:Date.now()}));
+  sessionStorage.setItem('currentSubscriber', JSON.stringify({id:sub.id,...sub, isOnline:true, lastSeen:Date.now()}));
   sessionStorage.setItem('sessionId', sessionId);
   window.location.href = 'dashboard.html';
 }

@@ -568,6 +568,10 @@
     <button class="sb-item" onclick="openModal('supportModal')">
       <div class="sb-item-icon">🎧</div> الدعم الفني
     </button>
+    <button class="sb-item" onclick="toggleNotifPanel()" style="position:relative">
+      <div class="sb-item-icon">🔔</div> الإشعارات
+      <span id="sbNotifBadge" style="display:none;position:absolute;left:14px;top:50%;transform:translateY(-50%);background:#dc2626;color:#fff;font-size:.55rem;font-weight:900;min-width:16px;height:16px;border-radius:50%;align-items:center;justify-content:center">0</span>
+    </button>
   </nav>
 
   <!-- Bottom: contact + logout + copyright -->
@@ -905,7 +909,7 @@
 
   <!-- رسائلي والردود -->
   <div style="margin-top:24px">
-    <div class="sec-title"><div class="sec-title-bar"></div> رسائلي والردود</div>
+    <div class="sec-title"><div class="sec-title-bar"></div> الأسئلة والاستفسارات</div>
     <div id="myMessagesList" style="margin-top:16px">
       <div style="text-align:center;padding:24px;color:#9ca3af;font-size:.85rem">جاري التحميل...</div>
     </div>
@@ -2003,7 +2007,7 @@ async function sendToWhatsApp(){
   const btn=document.getElementById('waSendBtn');
   btn.disabled=true; btn.textContent='جاري الإرسال...';
   try{
-    const studentId=sessionStorage.getItem('studentId')||'unknown';
+    const studentId=sub?.id||'unknown';
     await db.collection('messages').add({
       studentId,
       name: sub?.name||'طالب',
@@ -2030,7 +2034,7 @@ async function sendToWhatsApp(){
 /* ── My Messages (student view) ── */
 let msgUnsubscribe=null;
 function loadMyMessages(){
-  const studentId=sessionStorage.getItem('studentId')||'unknown';
+  const studentId=sub?.id||'unknown';
   const container=document.getElementById('myMessagesList');
   if(!container) return;
   if(msgUnsubscribe) msgUnsubscribe();
@@ -2062,6 +2066,7 @@ function loadMyMessages(){
         // Mark reply as read
         if(m.reply && !m.replyRead){
           db.collection('messages').doc(m.id).update({replyRead:true}).catch(()=>{});
+          showInAppNotif('💬 رد جديد من المدرب', m.reply.substring(0,80));
         }
       });
     });
@@ -2070,7 +2075,7 @@ function loadMyMessages(){
 /* ── Notifications ── */
 let notifUnsubscribe=null;
 function loadNotifications(){
-  const studentId=sessionStorage.getItem('studentId')||'unknown';
+  const studentId=sub?.id||'unknown';
   if(notifUnsubscribe) notifUnsubscribe();
   notifUnsubscribe=db.collection('notifications')
     .where('target','in',['all', studentId])
@@ -2107,14 +2112,16 @@ function loadNotifications(){
     });
 
   // Also listen for new replies in messages
+  let firstReplySnap=true;
   db.collection('messages').where('studentId','==',studentId).where('reply','!=',null).where('replyRead','==',false)
     .onSnapshot(snap=>{
-      if(!snap.empty){
-        snap.docs.forEach(doc=>{
-          const m=doc.data();
-          showInAppNotif('💬 رد جديد من المدرب', m.reply?.substring(0,60)+'...');
-        });
-      }
+      if(firstReplySnap){ firstReplySnap=false; return; }
+      snap.docChanges().forEach(ch=>{
+        if(ch.type==='added'){
+          const m=ch.doc.data();
+          showInAppNotif('💬 رد جديد من المدرب', m.reply?.substring(0,60));
+        }
+      });
     });
 }
 
