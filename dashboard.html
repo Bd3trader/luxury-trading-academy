@@ -961,15 +961,17 @@ async function loadFirestoreContent(){
     tasks.push(db.collection('books_classic').orderBy('order').get().then(s=>{firestoreContent.content.classic.books=s.docs.map(d=>({id:d.id,...d.data()}));}));
     tasks.push(db.collection('images_classic').orderBy('order').get().then(s=>{firestoreContent.content.classic.images=s.docs.map(d=>({id:d.id,...d.data()}));}));
   }
+  if(schools.includes('classic')){
+    tasks.push(db.collection('liquidity_classic').orderBy('order').get().then(s=>{firestoreContent.content.classic.liquidity=s.docs.map(d=>({id:d.id,...d.data()}));}));
+    tasks.push(db.collection('reviews_classic').orderBy('order').get().then(s=>{firestoreContent.content.classic.reviews=s.docs.map(d=>({id:d.id,...d.data()}));}));
+    tasks.push(db.collection('strategies_classic').orderBy('order').get().then(s=>{firestoreContent.content.classic.strategies=s.docs.map(d=>({id:d.id,...d.data()}));}));
+  }
   if(schools.includes('advanced')){
     tasks.push(db.collection('lectures_advanced').orderBy('order').get().then(s=>{firestoreContent.content.advanced.lectures=s.docs.map(d=>({id:d.id,...d.data()}));}));
     tasks.push(db.collection('books_advanced').orderBy('order').get().then(s=>{firestoreContent.content.advanced.books=s.docs.map(d=>({id:d.id,...d.data()}));}));
     tasks.push(db.collection('images_advanced').orderBy('order').get().then(s=>{firestoreContent.content.advanced.images=s.docs.map(d=>({id:d.id,...d.data()}));}));
-    tasks.push(db.collection('liquidity_classic').orderBy('order').get().then(s=>{firestoreContent.content.classic.liquidity=s.docs.map(d=>({id:d.id,...d.data()}));}));
     tasks.push(db.collection('liquidity_advanced').orderBy('order').get().then(s=>{firestoreContent.content.advanced.liquidity=s.docs.map(d=>({id:d.id,...d.data()}));}));
-    tasks.push(db.collection('reviews_classic').orderBy('order').get().then(s=>{firestoreContent.content.classic.reviews=s.docs.map(d=>({id:d.id,...d.data()}));}));
     tasks.push(db.collection('reviews_advanced').orderBy('order').get().then(s=>{firestoreContent.content.advanced.reviews=s.docs.map(d=>({id:d.id,...d.data()}));}));
-    tasks.push(db.collection('strategies_classic').orderBy('order').get().then(s=>{firestoreContent.content.classic.strategies=s.docs.map(d=>({id:d.id,...d.data()}));}));
     tasks.push(db.collection('strategies_advanced').orderBy('order').get().then(s=>{firestoreContent.content.advanced.strategies=s.docs.map(d=>({id:d.id,...d.data()}));}));
   }
   tasks.push(db.collection('scheduled_sessions').get().then(s=>{firestoreContent.scheduledSessions=s.docs.map(d=>({id:d.id,...d.data()}));}));
