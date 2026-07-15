@@ -2144,55 +2144,80 @@ function loadMyMessages(){
 
 /* ── Notifications ── */
 let notifUnsubscribe=null;
+/* ── نظام الإشعارات ── */
+// نستخدم استعلامين منفصلين لتجنب الحاجة لـ Composite Index
+let notifUnsubAll=null, notifUnsubMe=null;
+const notifCache={};
+
 function loadNotifications(){
   const studentId=sub?.id||'unknown';
-  if(notifUnsubscribe) notifUnsubscribe();
-  notifUnsubscribe=db.collection('notifications')
-    .where('target','in',['all', studentId])
-    .orderBy('sentAt','desc')
-    .limit(30)
-    .onSnapshot(snap=>{
-      const list=document.getElementById('notifList');
-      const badge=document.getElementById('mobNotifBadge');
-      const sbBadge=document.getElementById('sbNotifBadge');
-      const readIds=JSON.parse(localStorage.getItem('readNotifs_'+studentId)||'[]');
-      let unread=0;
-      if(snap.empty){
-        if(list) list.innerHTML='<div class="notif-empty">لا توجد إشعارات حتى الآن</div>';
-        return;
-      }
-      if(list) list.innerHTML='';
-      snap.docs.forEach(doc=>{
-        const n={id:doc.id,...doc.data()};
-        const isRead=readIds.includes(n.id);
-        if(!isRead) unread++;
-        const date=n.sentAt?new Date(n.sentAt).toLocaleString('ar-SA'):'';
-        const item=document.createElement('div');
-        item.className='notif-item'+(isRead?'':' unread');
-        item.onclick=()=>markNotifRead(n.id,studentId,item);
-        item.innerHTML=`
-          <div class="notif-item-title">${n.title||'إشعار جديد'}</div>
-          <div class="notif-item-body">${n.body||''}</div>
-          <div class="notif-item-time">${date}</div>`;
-        if(list) list.appendChild(item);
-      });
-      // Check message replies too
-      db.collection('messages').where('studentId','==',studentId).where('reply','!=',null).where('replyRead','==',false).get().then(s=>{ unread+=s.size; updateBadge(unread,badge,sbBadge); });
-      updateBadge(unread,badge,sbBadge);
-    });
+  if(notifUnsubAll) notifUnsubAll();
+  if(notifUnsubMe) notifUnsubMe();
 
-  // Also listen for new replies in messages
+  function renderNotifCache(){
+    const list=document.getElementById('notifList');
+    const badge=document.getElementById('mobNotifBadge');
+    const sbBadge=document.getElementById('sbNotifBadge');
+    const readIds=JSON.parse(localStorage.getItem('readNotifs_'+studentId)||'[]');
+    const all=Object.values(notifCache).sort((a,b)=>(b.sentAt||0)-(a.sentAt||0)).slice(0,30);
+    let unread=0;
+    if(!list) return;
+    if(all.length===0){ list.innerHTML='<div class="notif-empty">لا توجد إشعارات حتى الآن</div>'; updateBadge(0,badge,sbBadge); return; }
+    list.innerHTML='';
+    all.forEach(n=>{
+      const isRead=readIds.includes(n.id);
+      if(!isRead) unread++;
+      const date=n.sentAt?new Date(n.sentAt).toLocaleString('ar-SA'):'';
+      const item=document.createElement('div');
+      item.className='notif-item'+(isRead?'':' unread');
+      item.onclick=()=>markNotifRead(n.id,studentId,item);
+      item.innerHTML=`
+        <div class="notif-item-title">${n.title||'إشعار جديد'}</div>
+        <div class="notif-item-body">${n.body||''}</div>
+        <div class="notif-item-time">${date}</div>`;
+      list.appendChild(item);
+    });
+    updateBadge(unread,badge,sbBadge);
+  }
+
+  // استعلام 1: الإشعارات للجميع
+  notifUnsubAll=db.collection('notifications').where('target','==','all')
+    .onSnapshot(snap=>{
+      snap.docs.forEach(d=>{ notifCache[d.id]={id:d.id,...d.data()}; });
+      snap.docChanges().forEach(ch=>{ if(ch.type==='removed') delete notifCache[ch.doc.id]; });
+      renderNotifCache();
+    }, err=>console.error('notif-all:',err));
+
+  // استعلام 2: الإشعارات الخاصة بالمتدرب
+  notifUnsubMe=db.collection('notifications').where('target','==',studentId)
+    .onSnapshot(snap=>{
+      let hasNew=false;
+      snap.docChanges().forEach(ch=>{
+        if(ch.type==='added'||ch.type==='modified'){
+          const wasNew=!notifCache[ch.doc.id];
+          notifCache[ch.doc.id]={id:ch.doc.id,...ch.doc.data()};
+          if(wasNew && ch.type==='added') hasNew=true;
+        }
+        if(ch.type==='removed') delete notifCache[ch.doc.id];
+      });
+      if(hasNew){
+        const newest=snap.docChanges().find(c=>c.type==='added');
+        if(newest){ const d=newest.doc.data(); showInAppNotif(d.title||'إشعار جديد',d.body||''); }
+      }
+      renderNotifCache();
+    }, err=>console.error('notif-me:',err));
+
+  // مراقبة الردود الجديدة على الرسائل
   let firstReplySnap=true;
-  db.collection('messages').where('studentId','==',studentId).where('reply','!=',null).where('replyRead','==',false)
+  db.collection('messages').where('studentId','==',studentId).where('reply','!=',null)
     .onSnapshot(snap=>{
       if(firstReplySnap){ firstReplySnap=false; return; }
       snap.docChanges().forEach(ch=>{
-        if(ch.type==='added'){
-          const m=ch.doc.data();
-          showInAppNotif('💬 رد جديد من المدرب', m.reply?.substring(0,60));
+        if(ch.type==='modified'&&ch.doc.data().reply&&!ch.doc.data().replyRead){
+          showInAppNotif('💬 رد جديد من المدرب', ch.doc.data().reply.substring(0,60));
         }
       });
-    });
+    }, err=>console.error('reply-watch:',err));
 }
 
 function updateBadge(count,badge,sbBadge){
