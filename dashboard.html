@@ -582,10 +582,6 @@
     <button class="sb-item" onclick="openModal('supportModal')">
       <div class="sb-item-icon">🎧</div> الدعم الفني
     </button>
-    <button class="sb-item" onclick="toggleNotifPanel()" style="position:relative">
-      <div class="sb-item-icon">🔔</div> الإشعارات
-      <span id="sbNotifBadge" style="display:none;position:absolute;left:14px;top:50%;transform:translateY(-50%);background:#dc2626;color:#fff;font-size:.55rem;font-weight:900;min-width:16px;height:16px;border-radius:50%;align-items:center;justify-content:center">0</span>
-    </button>
   </nav>
 
   <!-- Bottom: contact + logout + copyright -->
@@ -696,9 +692,15 @@
     <span class="th-date-icon">📅</span>
     <span class="th-date-text" id="thDate">—</span>
   </div>
-  <div class="th-time-box">
-    <span style="font-size:.85rem;opacity:.7">🕐</span>
-    <span class="th-time-text" id="thTime">00:00:00</span>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="th-time-box">
+      <span style="font-size:.85rem;opacity:.7">🕐</span>
+      <span class="th-time-text" id="thTime">00:00:00</span>
+    </div>
+    <button onclick="toggleNotifPanel()" style="position:relative;background:rgba(255,255,255,.08);border:1px solid rgba(212,160,60,.25);border-radius:10px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;cursor:pointer;transition:background .2s" onmouseover="this.style.background='rgba(255,255,255,.15)'" onmouseout="this.style.background='rgba(255,255,255,.08)'">
+      🔔
+      <span id="sbNotifBadge" style="display:none;position:absolute;top:-5px;left:-5px;background:#dc2626;color:#fff;font-size:.55rem;font-weight:900;min-width:17px;height:17px;border-radius:50%;align-items:center;justify-content:center">0</span>
+    </button>
   </div>
 </div>
 
