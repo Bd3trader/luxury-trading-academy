@@ -1189,7 +1189,11 @@ function toDriveEmbed(url){
   if(!url) return '';
   url = url.trim();
   const m = url.match(/\/file\/d\/([^\/\?]+)/);
-  if(m) return 'https://drive.google.com/file/d/'+m[1]+'/preview';
+  if(m){
+    const id = m[1];
+    const direct = 'https://drive.google.com/uc?id='+id+'&export=download';
+    return 'https://docs.google.com/viewer?embedded=true&url='+encodeURIComponent(direct);
+  }
   return url;
 }
 
