@@ -1151,6 +1151,19 @@ async function uploadFile(file, path, progressFill, progressBar){
   const publicUrl = `${SUPA_URL}/storage/v1/object/public/${SUPA_BUCKET}/${path}`;
   const uploadUrl = `${SUPA_URL}/storage/v1/object/${SUPA_BUCKET}/${path}`;
 
+  // اختبار اتصال Supabase أولاً
+  try {
+    const ping = await fetch(`${SUPA_URL}/storage/v1/bucket`, {
+      headers: { Authorization: 'Bearer ' + SUPA_KEY }
+    });
+    if(!ping.ok) {
+      const pingText = await ping.text();
+      throw new Error(`Supabase غير متاح (${ping.status}): ${pingText}`);
+    }
+  } catch(pingErr) {
+    throw new Error('تعذر الاتصال بـ Supabase: ' + pingErr.message);
+  }
+
   return new Promise((resolve, reject)=>{
     const xhr = new XMLHttpRequest();
     xhr.open('POST', uploadUrl, true);
@@ -1170,7 +1183,7 @@ async function uploadFile(file, path, progressFill, progressBar){
         reject(new Error('خطأ ' + xhr.status + ': ' + xhr.responseText));
       }
     };
-    xhr.onerror = () => reject(new Error('فشل الاتصال بالخادم'));
+    xhr.onerror = () => reject(new Error('فشل الاتصال أثناء الرفع - تحقق من Console'));
     xhr.send(file);
   });
 }
