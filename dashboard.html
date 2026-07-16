@@ -1543,8 +1543,10 @@ function filePath(key, section, filename){
 function getViewerUrl(url){
   if(!url) return '';
   // Google Drive
-  const dm=url.match(/\/file\/d\/([^\/\?]+)/);
-  if(dm){const id=dm[1];const direct='https://drive.google.com/uc?id='+id+'&export=download';return 'https://docs.google.com/viewer?embedded=true&url='+encodeURIComponent(direct);}
+  const dm=url.match(/drive\.google\.com\/file\/d\/([^\/\?]+)/);
+  if(dm) return 'https://drive.google.com/file/d/'+dm[1]+'/preview';
+  // Supabase / direct PDF
+  if(url.match(/\.pdf(\?|$)/i)) return 'https://docs.google.com/viewer?embedded=true&url='+encodeURIComponent(url);
   // Vimeo
   const vm=url.match(/(?:vimeo\.com\/|player\.vimeo\.com\/video\/)(\d+)/);
   if(vm) return `https://player.vimeo.com/video/${vm[1]}`;
