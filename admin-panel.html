@@ -523,12 +523,12 @@
       <div class="field"><label>الوصف</label><textarea id="b-desc" placeholder="وصف مختصر..."></textarea></div>
       <div class="field">
         <label>📎 رفع ملف (PDF / صورة)</label>
-        <div class="file-upload-wrap" onclick="document.getElementById('b-file').click()">
-          <input type="file" id="b-file" accept="application/pdf,image/*" onchange="handleBookFile(this)"/>
+        <label class="file-upload-wrap" for="b-file">
+          <input type="file" id="b-file" accept="application/pdf,image/*" onchange="handleBookFile(this)" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none"/>
           <div class="file-upload-text">📂 اضغط لاختيار ملف PDF أو صورة</div>
           <div class="upload-progress" id="b-progress"><div class="upload-progress-fill" id="b-progress-fill"></div></div>
           <div id="b-file-label" class="current-file none">لم يتم اختيار ملف</div>
-        </div>
+        </label>
       </div>
     </div>
     <div class="modal-footer">
@@ -554,12 +554,12 @@
       <div class="field"><label>الوصف</label><textarea id="i-desc" placeholder="وصف مختصر..."></textarea></div>
       <div class="field">
         <label>📎 رفع صورة (JPG / PNG / WebP)</label>
-        <div class="file-upload-wrap" onclick="document.getElementById('i-file').click()">
-          <input type="file" id="i-file" accept="image/*" onchange="handleImageFile(this)"/>
+        <label class="file-upload-wrap" for="i-file">
+          <input type="file" id="i-file" accept="image/*" onchange="handleImageFile(this)" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none"/>
           <div class="file-upload-text">🖼️ اضغط لاختيار صورة أو اسحبها هنا</div>
           <div class="upload-progress" id="i-progress"><div class="upload-progress-fill" id="i-progress-fill"></div></div>
           <div id="i-file-label" class="current-file none">لم يتم اختيار صورة</div>
-        </div>
+        </label>
       </div>
     </div>
     <div class="modal-footer">
