@@ -522,13 +522,9 @@
       <div class="field"><label>العنوان *</label><input type="text" id="b-title" placeholder="عنوان الكتاب أو الملخص"/></div>
       <div class="field"><label>الوصف</label><textarea id="b-desc" placeholder="وصف مختصر..."></textarea></div>
       <div class="field">
-        <label>📎 ارفع ملف PDF من الجهاز</label>
-        <div class="file-upload-wrap" onclick="document.getElementById('b-file').click()">
-          <input type="file" id="b-file" accept="application/pdf" style="display:none" onchange="handleBookFile(this)"/>
-          <div class="file-upload-text">📂 اضغط لاختيار ملف PDF أو اسحبه هنا</div>
-          <div class="upload-progress" id="b-progress"><div class="upload-progress-fill" id="b-progress-fill"></div></div>
-          <div id="b-file-label" class="current-file none">لم يتم اختيار ملف</div>
-        </div>
+        <label>🔗 رابط Google Drive للملف (PDF أو صورة)</label>
+        <input type="text" id="b-fileurl" placeholder="https://drive.google.com/file/d/.../view" style="width:100%;padding:10px 14px;border:1.5px solid rgba(0,0,0,.1);border-radius:10px;font-family:'Cairo',sans-serif;font-size:.88rem;outline:none"/>
+        <div style="font-size:.73rem;color:#9ca3af;margin-top:5px">افتح الملف في Drive ← Share ← Anyone with the link ← انسخ الرابط</div>
       </div>
     </div>
     <div class="modal-footer">
@@ -553,13 +549,9 @@
       <div class="field"><label>عنوان الصورة *</label><input type="text" id="i-title" placeholder="عنوان الصورة"/></div>
       <div class="field"><label>الوصف</label><textarea id="i-desc" placeholder="وصف مختصر..."></textarea></div>
       <div class="field">
-        <label>📎 رفع صورة (JPG / PNG / WebP)</label>
-        <div class="file-upload-wrap" onclick="document.getElementById('i-file').click()">
-          <input type="file" id="i-file" accept="image/*" style="display:none" onchange="handleImageFile(this)"/>
-          <div class="file-upload-text">🖼️ اضغط لاختيار صورة أو اسحبها هنا</div>
-          <div class="upload-progress" id="i-progress"><div class="upload-progress-fill" id="i-progress-fill"></div></div>
-          <div id="i-file-label" class="current-file none">لم يتم اختيار صورة</div>
-        </div>
+        <label>🔗 رابط Google Drive للصورة</label>
+        <input type="text" id="i-driveurl" placeholder="https://drive.google.com/file/d/.../view" style="width:100%;padding:10px 14px;border:1.5px solid rgba(0,0,0,.1);border-radius:10px;font-family:'Cairo',sans-serif;font-size:.88rem;outline:none"/>
+        <div style="font-size:.73rem;color:#9ca3af;margin-top:5px">افتح الصورة في Drive ← Share ← Anyone with the link ← انسخ الرابط</div>
       </div>
     </div>
     <div class="modal-footer">
@@ -1193,6 +1185,14 @@ function handleBookFile(input){
 
 /* ── Lecture CRUD ── */
 /* تحويل الروابط إلى روابط embed */
+function toDriveEmbed(url){
+  if(!url) return '';
+  url = url.trim();
+  const m = url.match(/\/file\/d\/([^\/\?]+)/);
+  if(m) return 'https://drive.google.com/file/d/'+m[1]+'/preview';
+  return url;
+}
+
 function normalizeDriveUrl(url){
   if(!url) return url;
   url = url.trim();
@@ -1313,13 +1313,8 @@ function openAddBook(key){
   document.getElementById('bookModalTitle').textContent = 'إضافة كتاب / ملخص';
   document.getElementById('editBookId').value = '';
   document.getElementById('editBookSchool').value = key;
-  ['b-order','b-title','b-desc'].forEach(id=>document.getElementById(id).value='');
+  ['b-order','b-title','b-desc','b-fileurl'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('b-type').value = 'book';
-  document.getElementById('b-file-label').textContent = 'لم يتم اختيار ملف';
-  document.getElementById('b-file-label').className = 'current-file none';
-  document.getElementById('b-progress').style.display = 'none';
-  document.getElementById('b-progress-fill').style.width = '0%';
-  pendingBookFile = null;
   openModal('bookModal');
 }
 
@@ -1333,12 +1328,7 @@ function openEditBook(key, id){
   document.getElementById('b-type').value = b.type||'book';
   document.getElementById('b-title').value = b.title;
   document.getElementById('b-desc').value = b.desc||'';
-  const label = document.getElementById('b-file-label');
-  label.textContent = b.fileURL ? '✅ يوجد ملف — اختر ملفاً جديداً للاستبدال' : 'لم يتم اختيار ملف';
-  label.className = b.fileURL ? 'current-file has' : 'current-file none';
-  document.getElementById('b-progress').style.display = 'none';
-  document.getElementById('b-progress-fill').style.width = '0%';
-  pendingBookFile = null;
+  document.getElementById('b-fileurl').value = b.fileURL||'';
   openModal('bookModal');
 }
 
@@ -1353,18 +1343,11 @@ async function saveBook(){
   const btn = document.getElementById('saveBookBtn');
   btn.disabled = true; btn.textContent = 'جاري الحفظ...';
 
-  let fileURL = '';
-  if(pendingBookFile){
-    try {
-      btn.textContent = 'جاري رفع الملف...';
-      const safeName = Date.now() + '_' + pendingBookFile.name.replace(/[^\w.\-]/g, '_');
-      const path = `${key}/${safeName}`;
-      fileURL = await uploadFile(pendingBookFile, path, document.getElementById('b-progress-fill'), document.getElementById('b-progress'));
-    } catch(err){ toast('فشل رفع الملف: '+err.message,'error'); btn.disabled=false; btn.textContent='💾 حفظ'; return; }
-  } else {
-    // الاحتفاظ بالرابط القديم عند التعديل بدون رفع ملف جديد
-    const editId = document.getElementById('editBookId').value;
-    if(editId){ const old = (cache.books[key]||[]).find(x=>x.id===editId); fileURL = old?.fileURL||''; }
+  const rawUrl = document.getElementById('b-fileurl').value.trim();
+  let fileURL = rawUrl ? toDriveEmbed(rawUrl) : '';
+  if(!fileURL && editId){
+    const old = (cache.books[key]||[]).find(x=>x.id===editId);
+    fileURL = old?.fileURL||'';
   }
 
   const today = new Date().toISOString().slice(0,10);
@@ -1411,13 +1394,7 @@ function openAddImage(key){
   document.getElementById('imageModalTitle').textContent = 'إضافة صورة جديدة';
   document.getElementById('editImageId').value = '';
   document.getElementById('editImageSchool').value = key;
-  document.getElementById('i-fileurl').value = '';
-  ['i-order','i-title','i-desc'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('i-file-label').textContent = 'لم يتم اختيار صورة';
-  document.getElementById('i-file-label').className = 'current-file none';
-  document.getElementById('i-progress').style.display = 'none';
-  document.getElementById('i-progress-fill').style.width = '0%';
-  pendingImageFile = null;
+  ['i-order','i-title','i-desc','i-driveurl'].forEach(id=>document.getElementById(id).value='');
   openModal('imageModal');
 }
 
@@ -1430,12 +1407,7 @@ function openEditImage(key, id){
   document.getElementById('i-order').value = img.order;
   document.getElementById('i-title').value = img.title;
   document.getElementById('i-desc').value = img.desc||'';
-  document.getElementById('i-fileurl').value = img.fileURL||'';
-  const label = document.getElementById('i-file-label');
-  label.textContent = img.fileURL ? '✅ صورة مرفوعة — اختر صورة جديدة للاستبدال' : 'لم يتم اختيار صورة';
-  label.className = img.fileURL ? 'current-file has' : 'current-file none';
-  document.getElementById('i-progress').style.display = 'none';
-  pendingImageFile = null;
+  document.getElementById('i-driveurl').value = img.fileURL||'';
   openModal('imageModal');
 }
 
@@ -1449,14 +1421,11 @@ async function saveImage(){
   const btn = document.getElementById('saveImgBtn');
   btn.disabled = true; btn.textContent = 'جاري الحفظ...';
 
-  let fileURL = document.getElementById('i-fileurl').value;
-  if(pendingImageFile){
-    try {
-      btn.textContent = 'جاري رفع الصورة...';
-      const safeName = Date.now() + '_' + pendingImageFile.name.replace(/[^\w.\-]/g,'_');
-      const path = `images/${key}/${safeName}`;
-      fileURL = await uploadFile(pendingImageFile, path, document.getElementById('i-progress-fill'), document.getElementById('i-progress'));
-    } catch(err){ toast('فشل رفع الصورة: '+err.message,'error'); btn.disabled=false; btn.textContent='💾 حفظ الصورة'; return; }
+  const rawImgUrl = document.getElementById('i-driveurl').value.trim();
+  let fileURL = rawImgUrl ? toDriveEmbed(rawImgUrl) : '';
+  if(!fileURL && editId){
+    const old = (cache.images[key]||[]).find(x=>x.id===editId);
+    fileURL = old?.fileURL||'';
   }
 
   const data = {order, title, desc, fileURL};

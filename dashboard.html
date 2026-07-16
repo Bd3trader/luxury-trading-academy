@@ -1585,12 +1585,11 @@ function renderBooks(key,d,section){
   el.innerHTML=books.map(b=>{
     const isBook=b.type==='book'||!b.type;
     const rawHref=b.fileURL||(b.filename?filePath(key,section,b.filename):'');
-    const viewUrl=getViewerUrl(rawHref);
+    const isDrive=rawHref&&rawHref.includes('drive.google.com');
+    const viewUrl=isDrive?rawHref:getViewerUrl(rawHref);
     const hasFile=!!viewUrl;
-    const isImg=/\.(jpe?g|png|gif|webp|svg)$/i.test(rawHref);
-    const isPdfFile=/\.pdf$/i.test(rawHref);
-    const fIcon=isImg?'🖼️':isPdfFile?'📄':'📖';
-    const btnLabel=isImg?'🖼️ عرض':isPdfFile?'📄 فتح PDF':'▶ فتح';
+    const fIcon=isDrive?'📄':'📖';
+    const btnLabel=isDrive?'📄 فتح':'▶ فتح';
     const titleEsc=b.title.replace(/'/g,"\\'");
     return`<div class="book-card">
       <div class="book-top">
@@ -1613,9 +1612,11 @@ function renderImages(key,d,section){
   if(images.length===0){el.innerHTML='<div class="empty"><div class="empty-icon">🖼️</div><div class="empty-text">لا توجد صور بعد</div></div>';return;}
   el.innerHTML=images.map(img=>{
     const titleEsc=(img.title||'').replace(/'/g,"\\'");
+    const isDrive=img.fileURL&&img.fileURL.includes('drive.google.com');
+    const thumb=isDrive?img.fileURL.replace('/preview','/preview'):'';
     return`<div class="book-card">
       <div class="book-top"><div class="book-icon">🖼️</div></div>
-      <img src="${img.fileURL||''}" alt="${img.title||''}" style="width:100%;border-radius:10px;object-fit:cover;max-height:160px;margin:8px 0" loading="lazy"/>
+      ${isDrive?`<div style="width:100%;height:130px;border-radius:10px;overflow:hidden;margin:8px 0;position:relative;background:#f0f0f0;cursor:pointer" onclick="openViewer('${img.fileURL}','${titleEsc}')"><iframe src="${thumb}" style="width:100%;height:100%;border:none;pointer-events:none" scrolling="no"></iframe><div style="position:absolute;inset:0"></div></div>`:''}
       <div class="book-title">${img.title||''}</div>
       <div class="book-desc">${img.desc||''}</div>
       ${img.fileURL?`<button class="book-btn has-file" onclick="openViewer('${img.fileURL}','${titleEsc}')">🖼️ عرض</button>`:`<button class="book-btn no-file" disabled>⌛ قريباً</button>`}
@@ -2601,8 +2602,11 @@ function openViewer(url, title){
   } else if(isImageUrl(url)){
     img.src = url;
     img.style.display = 'block';
+  } else if(url && url.includes('drive.google.com')){
+    // Google Drive → preview iframe (no download button)
+    frm.src = url;
+    frm.style.display = 'block';
   } else {
-    // PDF / Drive / YouTube / Vimeo → iframe
     frm.src = url;
     frm.style.display = 'block';
   }
@@ -2610,6 +2614,9 @@ function openViewer(url, title){
   document.getElementById('fileViewer').style.display = 'flex';
   document.body.style.overflow = 'hidden';
 }
+
+// منع التحميل بالزر الأيمن داخل العارض
+document.getElementById('fileViewer').addEventListener('contextmenu',e=>e.preventDefault());
 
 function closeViewer(){
   const vid = document.getElementById('viewerVideo');
