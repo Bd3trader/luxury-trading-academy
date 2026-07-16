@@ -2502,7 +2502,14 @@ function updateLevel(){
 }
 
 let _internalNav=false;
-window.addEventListener('beforeunload',()=>{ if(!_internalNav) logout(); });
+window.addEventListener('beforeunload',()=>{ if(!_internalNav){ sessionStorage.clear(); } });
+// إذا المتصفح رجع للصفحة من الكاش (back button) امسح الجلسة وأعد التوجيه
+window.addEventListener('pageshow',(e)=>{
+  if(e.persisted || performance.getEntriesByType('navigation')[0]?.type==='back_forward'){
+    sessionStorage.clear();
+    window.location.replace('login.html');
+  }
+});
 init();
 
 /* ── Top header date + live clock ── */
