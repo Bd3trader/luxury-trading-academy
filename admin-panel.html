@@ -1143,40 +1143,35 @@ function renderSubTab(key, tab){
   }
 }
 
-/* ── File Upload via Supabase Resumable (TUS) ── */
+/* ── File Upload via Supabase REST (direct) ── */
 async function uploadFile(file, path, progressFill, progressBar){
   progressBar.style.display = 'block';
   progressFill.style.width = '0%';
 
   const publicUrl = `${SUPA_URL}/storage/v1/object/public/${SUPA_BUCKET}/${path}`;
+  const uploadUrl = `${SUPA_URL}/storage/v1/object/${SUPA_BUCKET}/${path}`;
 
   return new Promise((resolve, reject)=>{
-    const upload = new tus.Upload(file, {
-      endpoint: `${SUPA_URL}/storage/v1/upload/resumable`,
-      retryDelays: [0, 3000, 5000, 10000],
-      headers: {
-        authorization: 'Bearer ' + SUPA_KEY,
-        'x-upsert': 'true'
-      },
-      uploadDataDuringCreation: true,
-      removeFingerprintOnSuccess: true,
-      metadata: {
-        bucketName: SUPA_BUCKET,
-        objectName: path,
-        contentType: file.type || 'application/octet-stream',
-        cacheControl: '3600'
-      },
-      chunkSize: 6 * 1024 * 1024,
-      onError: err => reject(new Error(err.message || 'فشل الرفع')),
-      onProgress: (uploaded, total) => {
-        progressFill.style.width = (uploaded / total * 100).toFixed(0) + '%';
-      },
-      onSuccess: () => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', uploadUrl, true);
+    xhr.setRequestHeader('Authorization', 'Bearer ' + SUPA_KEY);
+    xhr.setRequestHeader('x-upsert', 'true');
+    xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
+    xhr.upload.onprogress = e => {
+      if(e.lengthComputable){
+        progressFill.style.width = (e.loaded / e.total * 100).toFixed(0) + '%';
+      }
+    };
+    xhr.onload = () => {
+      if(xhr.status >= 200 && xhr.status < 300){
         progressFill.style.width = '100%';
         resolve(publicUrl);
+      } else {
+        reject(new Error('خطأ ' + xhr.status + ': ' + xhr.responseText));
       }
-    });
-    upload.start();
+    };
+    xhr.onerror = () => reject(new Error('فشل الاتصال بالخادم'));
+    xhr.send(file);
   });
 }
 
