@@ -212,6 +212,7 @@
     <div class="sb-section">الأمان</div>
     <button class="sb-link" onclick="showPanel('security')"><span class="icon">🛡️</span> تنبيهات الأمان<span class="sb-badge" id="secBadge" style="display:none">0</span></button>
     <div class="sb-section">النظام</div>
+    <button class="sb-link" onclick="showPanel('services')"><span class="icon">🔧</span> الخدمات والاشتراكات</button>
     <button class="sb-link" onclick="showPanel('settings')"><span class="icon">⚙️</span> الإعدادات</button>
   </nav>
   <div class="sb-footer">
@@ -382,6 +383,136 @@
       </div>
       <div id="secAlertsList" style="display:flex;flex-direction:column;gap:10px">
         <div style="text-align:center;padding:40px;color:var(--muted)">جاري التحميل...</div>
+      </div>
+    </div>
+
+    <!-- ── SERVICES PANEL ── -->
+    <div class="panel" id="panel-services">
+      <h2 style="font-size:1.1rem;font-weight:900;margin-bottom:20px">🔧 الخدمات والاشتراكات</h2>
+
+      <!-- Status Cards -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:28px">
+
+        <!-- Bunny -->
+        <div class="settings-card" style="padding:18px 20px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:1.4rem">🐰</span>
+              <div>
+                <div style="font-weight:800;font-size:.95rem">Bunny Stream</div>
+                <div style="font-size:.75rem;color:var(--muted)">استضافة الفيديوهات</div>
+              </div>
+            </div>
+            <span id="bunny-badge" style="font-size:.72rem;font-weight:800;padding:3px 10px;border-radius:20px;background:rgba(100,116,139,.15);color:var(--muted)">جاري الفحص...</span>
+          </div>
+          <div style="font-size:.8rem;color:var(--muted);margin-bottom:12px">Library ID: 698050 · الدفع حسب الاستخدام</div>
+          <div id="bunny-detail" style="font-size:.8rem;color:var(--muted);margin-bottom:12px"></div>
+          <a href="https://dash.bunny.net" target="_blank" class="btn-primary" style="font-size:.8rem;padding:7px 16px;text-decoration:none;display:inline-block">فتح لوحة Bunny ↗</a>
+        </div>
+
+        <!-- Supabase -->
+        <div class="settings-card" style="padding:18px 20px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:1.4rem">🟩</span>
+              <div>
+                <div style="font-weight:800;font-size:.95rem">Supabase Storage</div>
+                <div style="font-size:.75rem;color:var(--muted)">تخزين الملفات والصور</div>
+              </div>
+            </div>
+            <span id="supa-badge" style="font-size:.72rem;font-weight:800;padding:3px 10px;border-radius:20px;background:rgba(100,116,139,.15);color:var(--muted)">جاري الفحص...</span>
+          </div>
+          <div style="font-size:.8rem;color:var(--muted);margin-bottom:12px">Bucket: lectures · يتوقف بعد 7 أيام عدم نشاط</div>
+          <div id="supa-detail" style="font-size:.8rem;color:var(--muted);margin-bottom:12px"></div>
+          <a href="https://app.supabase.com" target="_blank" class="btn-primary" style="font-size:.8rem;padding:7px 16px;text-decoration:none;display:inline-block">فتح لوحة Supabase ↗</a>
+        </div>
+
+        <!-- Firebase -->
+        <div class="settings-card" style="padding:18px 20px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:1.4rem">🔥</span>
+              <div>
+                <div style="font-weight:800;font-size:.95rem">Firebase Firestore</div>
+                <div style="font-size:.75rem;color:var(--muted)">قاعدة البيانات الرئيسية</div>
+              </div>
+            </div>
+            <span id="firebase-badge" style="font-size:.72rem;font-weight:800;padding:3px 10px;border-radius:20px;background:rgba(100,116,139,.15);color:var(--muted)">جاري الفحص...</span>
+          </div>
+          <div style="font-size:.8rem;color:var(--muted);margin-bottom:12px">Spark Plan · 50K قراءة / 20K كتابة يومياً</div>
+          <a href="https://console.firebase.google.com" target="_blank" class="btn-primary" style="font-size:.8rem;padding:7px 16px;text-decoration:none;display:inline-block">فتح Firebase Console ↗</a>
+        </div>
+
+        <!-- OpenAI -->
+        <div class="settings-card" style="padding:18px 20px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:1.4rem">🤖</span>
+              <div>
+                <div style="font-weight:800;font-size:.95rem">OpenAI API</div>
+                <div style="font-size:.75rem;color:var(--muted)">المساعد الذكي</div>
+              </div>
+            </div>
+            <span id="openai-badge" style="font-size:.72rem;font-weight:800;padding:3px 10px;border-radius:20px;background:rgba(100,116,139,.15);color:var(--muted)">جاري الفحص...</span>
+          </div>
+          <div style="font-size:.8rem;color:var(--muted);margin-bottom:12px">Pay-as-you-go · المفتاح محفوظ في Firestore</div>
+          <a href="https://platform.openai.com/usage" target="_blank" class="btn-primary" style="font-size:.8rem;padding:7px 16px;text-decoration:none;display:inline-block">فتح OpenAI Dashboard ↗</a>
+        </div>
+
+        <!-- Domain -->
+        <div class="settings-card" style="padding:18px 20px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:1.4rem">🌐</span>
+              <div>
+                <div style="font-weight:800;font-size:.95rem">3btrading.net</div>
+                <div style="font-size:.75rem;color:var(--muted)">النطاق — يجدد سنوياً</div>
+              </div>
+            </div>
+            <span style="font-size:.72rem;font-weight:800;padding:3px 10px;border-radius:20px;background:rgba(217,119,6,.12);color:#d97706;border:1px solid rgba(217,119,6,.25)">تحقق يدوياً</span>
+          </div>
+          <div style="font-size:.8rem;color:var(--muted);margin-bottom:12px">راجع تاريخ الانتهاء عند مزود النطاق قبل شهر من موعده</div>
+          <a href="https://github.com/Bd3trader/luxury-trading-academy" target="_blank" class="btn-primary" style="font-size:.8rem;padding:7px 16px;text-decoration:none;display:inline-block">GitHub Repo ↗</a>
+        </div>
+
+      </div>
+
+      <!-- Checklist -->
+      <h3 style="font-size:.95rem;font-weight:900;margin-bottom:12px">📋 قائمة المتابعة الدورية</h3>
+      <div style="background:var(--surface2,rgba(255,255,255,.04));border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:28px">
+        <div style="display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--border);font-size:.75rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">
+          <span>المهمة</span><span>التكرار</span><span>الأولوية</span>
+        </div>
+        <div id="checklist-rows"></div>
+      </div>
+
+      <!-- Security -->
+      <h3 style="font-size:.95rem;font-weight:900;margin-bottom:12px">🛡️ أنظمة الحماية المطبّقة</h3>
+      <div style="background:var(--surface2,rgba(255,255,255,.04));border:1px solid var(--border);border-radius:14px;overflow:hidden">
+        <div style="display:flex;align-items:flex-start;gap:12px;padding:13px 18px;border-bottom:1px solid var(--border)">
+          <span style="color:#22c55e;font-weight:900;margin-top:2px">✓</span>
+          <div><div style="font-size:.88rem;font-weight:700">حماية تسجيل الدخول — OTP عبر Firebase</div><div style="font-size:.78rem;color:var(--muted)">رمز تحقق على البريد الإلكتروني، لا كلمة مرور ثابتة</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:12px;padding:13px 18px;border-bottom:1px solid var(--border)">
+          <span style="color:#22c55e;font-weight:900;margin-top:2px">✓</span>
+          <div><div style="font-size:.88rem;font-weight:700">حماية زر الرجوع (bfcache)</div><div style="font-size:.78rem;color:var(--muted)">أي رجوع للخلف يُعيد التوجيه لصفحة تسجيل الدخول تلقائياً</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:12px;padding:13px 18px;border-bottom:1px solid var(--border)">
+          <span style="color:#22c55e;font-weight:900;margin-top:2px">✓</span>
+          <div><div style="font-size:.88rem;font-weight:700">مفاتيح API مقسّمة ومحمية</div><div style="font-size:.78rem;color:var(--muted)">مفتاح Bunny مقسّم لجزأين — GitHub push protection يمنع رفعه كاملاً</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:12px;padding:13px 18px;border-bottom:1px solid var(--border)">
+          <span style="color:#22c55e;font-weight:900;margin-top:2px">✓</span>
+          <div><div style="font-size:.88rem;font-weight:700">OpenAI Key في Firestore فقط</div><div style="font-size:.78rem;color:var(--muted)">لا يوجد في أي ملف — يُقرأ من قاعدة البيانات عند الحاجة</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:12px;padding:13px 18px;border-bottom:1px solid var(--border)">
+          <span style="color:#22c55e;font-weight:900;margin-top:2px">✓</span>
+          <div><div style="font-size:.88rem;font-weight:700">رابط لوحة الأدمن مخفي</div><div style="font-size:.78rem;color:var(--muted)">غير مرتبط من أي صفحة عامة — يصل إليه الأدمن بالرابط المباشر فقط</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:12px;padding:13px 18px">
+          <span style="color:#22c55e;font-weight:900;margin-top:2px">✓</span>
+          <div><div style="font-size:.88rem;font-weight:700">منع التنزيل بالزر الأيمن</div><div style="font-size:.78rem;color:var(--muted)">contextmenu مُعطّل داخل عارض الملفات والفيديوهات</div></div>
+        </div>
       </div>
     </div>
 
@@ -837,7 +968,7 @@ async function loadAndRender(){
 }
 
 /* ═══ Navigation ═══ */
-const panelTitles = { dashboard:'الرئيسية', online:'المتواجدون الآن', subscribers:'إدارة المشتركين', sessions:'سجل الجلسات', schedule:'الجلسات المجدولة', courses:'المدارس والمحاضرات', messages:'رسائل الطلاب', requests:'طلبات الانضمام', notifications:'🔔 إشعارات المتدربين', security:'🛡️ تنبيهات الأمان', settings:'الإعدادات' };
+const panelTitles = { dashboard:'الرئيسية', online:'المتواجدون الآن', subscribers:'إدارة المشتركين', sessions:'سجل الجلسات', schedule:'الجلسات المجدولة', courses:'المدارس والمحاضرات', messages:'رسائل الطلاب', requests:'طلبات الانضمام', notifications:'🔔 إشعارات المتدربين', security:'🛡️ تنبيهات الأمان', services:'🔧 الخدمات والاشتراكات', settings:'الإعدادات' };
 let currentSchool = 'classic';
 let currentSubTab = 'lectures';
 
@@ -849,6 +980,7 @@ function showPanel(name){
   document.getElementById('pageTitle').textContent = panelTitles[name]||name;
   renderPanel(name);
   if(name==='settings') loadOpenAIKeyStatus();
+  if(name==='services') loadServicesPanel();
 }
 
 function renderPanel(name){
@@ -2066,6 +2198,92 @@ loadAndRender();
 setInterval(()=>{ loadData().then(updateOnlineCounts); }, 30000);
 if(window.innerWidth<=900) document.getElementById('menuBtn').style.display='block';
 window.addEventListener('resize',()=>{ document.getElementById('menuBtn').style.display=window.innerWidth<=900?'block':'none'; });
+
+/* ── Services Panel ── */
+function setBadge(id, text, type){
+  const el = document.getElementById(id);
+  if(!el) return;
+  const styles = {
+    ok:      'background:rgba(34,197,94,.15);color:#16a34a;border:1px solid rgba(34,197,94,.3)',
+    error:   'background:rgba(220,38,38,.15);color:#dc2626;border:1px solid rgba(220,38,38,.3)',
+    warning: 'background:rgba(217,119,6,.15);color:#d97706;border:1px solid rgba(217,119,6,.3)',
+    info:    'background:rgba(100,116,139,.15);color:#64748b;border:1px solid rgba(100,116,139,.2)'
+  };
+  el.textContent = text;
+  el.style.cssText = `font-size:.72rem;font-weight:800;padding:3px 10px;border-radius:20px;${styles[type]||styles.info}`;
+}
+
+async function loadServicesPanel(){
+  // Checklist
+  const checklist = [
+    {task:'شحن رصيد Bunny Stream',         freq:'أسبوعياً',    priority:'🔴 عالية', link:'https://dash.bunny.net'},
+    {task:'تنشيط مشروع Supabase (Resume)',  freq:'أسبوعياً',    priority:'🔴 عالية', link:'https://app.supabase.com'},
+    {task:'مراجعة رصيد OpenAI',             freq:'شهرياً',      priority:'🟠 متوسطة', link:'https://platform.openai.com/usage'},
+    {task:'مراجعة استخدام Firebase',        freq:'شهرياً',      priority:'🟠 متوسطة', link:'https://console.firebase.google.com'},
+    {task:'مراجعة مساحة Supabase Storage',  freq:'شهرياً',      priority:'🟡 منخفضة', link:'https://app.supabase.com'},
+    {task:'تجديد نطاق 3btrading.net',       freq:'سنوياً',      priority:'🔴 عالية',  link:''},
+    {task:'اختبار تسجيل دخول متدرب',       freq:'شهرياً',      priority:'🟡 منخفضة', link:'https://3btrading.net/login.html'},
+    {task:'مراجعة GitHub Actions (نشر)',    freq:'عند كل تحديث',priority:'🟡 منخفضة', link:'https://github.com/Bd3trader/luxury-trading-academy/actions'},
+  ];
+  const rows = document.getElementById('checklist-rows');
+  if(rows) rows.innerHTML = checklist.map(c=>`
+    <div style="display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--border)">
+      <span style="font-size:.85rem;font-weight:600">${c.task}</span>
+      <span style="font-size:.78rem;color:var(--muted);white-space:nowrap">${c.freq}</span>
+      <span style="font-size:.75rem;white-space:nowrap">${c.priority}</span>
+    </div>`).join('').replace(/border-bottom[^"]+";(?=\s*<\/div>\s*$)/, '');
+
+  // Check Bunny
+  try {
+    const r = await fetch(`https://video.bunnycdn.com/library/${BUNNY_LIB}/videos?page=1&itemsPerPage=1`,
+      {headers:{'AccessKey':BUNNY_KEY}});
+    if(r.ok){
+      const d = await r.json();
+      setBadge('bunny-badge','✅ يعمل','ok');
+      const det = document.getElementById('bunny-detail');
+      if(det) det.textContent = `${d.totalItems||0} فيديو في المكتبة`;
+    } else {
+      setBadge('bunny-badge','⚠️ خطأ '+r.status,'error');
+    }
+  } catch(e){
+    setBadge('bunny-badge','❌ لا يستجيب','error');
+  }
+
+  // Check Supabase
+  try {
+    const r = await fetch(`${SUPA_URL}/storage/v1/bucket`,
+      {headers:{Authorization:'Bearer '+SUPA_KEY}});
+    if(r.ok){
+      setBadge('supa-badge','✅ يعمل','ok');
+      const det = document.getElementById('supa-detail');
+      if(det) det.textContent = 'الاتصال بـ Supabase ناجح';
+    } else {
+      setBadge('supa-badge','⚠️ '+r.status,'error');
+    }
+  } catch(e){
+    setBadge('supa-badge','❌ متوقف','error');
+  }
+
+  // Check Firebase (already connected if page loaded)
+  try {
+    await db.collection('settings').doc('ping_check').get();
+    setBadge('firebase-badge','✅ يعمل','ok');
+  } catch(e){
+    setBadge('firebase-badge','⚠️ تحقق','warning');
+  }
+
+  // Check OpenAI key exists
+  try {
+    const snap = await db.collection('settings').doc('openai').get();
+    if(snap.exists && snap.data().key){
+      setBadge('openai-badge','✅ مفتاح موجود','ok');
+    } else {
+      setBadge('openai-badge','⚠️ لا يوجد مفتاح','warning');
+    }
+  } catch(e){
+    setBadge('openai-badge','غير معروف','info');
+  }
+}
 </script>
 </body>
 </html>
