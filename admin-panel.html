@@ -1109,6 +1109,7 @@ async function saveSubscriber(){
       const ref = await db.collection('subscribers').add({name,username,password,email,phone,schools,joinDate:date,active,isOnline:false,lastSeen:null,createdAt:Date.now()});
       cache.subscribers.push({id:ref.id,name,username,password,email,phone,schools,joinDate:date,active,isOnline:false,lastSeen:null});
       toast('✅ تمت إضافة المشترك بنجاح');
+      if(window._pendingReqId){ await db.collection('admin_requests').doc(window._pendingReqId).update({status:'done'}); window._pendingReqId=null; if(document.getElementById('panel-requests').style.display!=='none') renderRequests(); checkPendingRequests(); }
     }
     closeModal('subModal');
     renderSubscribers();
@@ -1865,6 +1866,7 @@ async function renderRequests(){
   try {
     const snap = await db.collection('admin_requests').orderBy('sentAt','desc').get();
     if(snap.empty){ el.innerHTML='<div style="color:var(--muted);text-align:center;padding:40px">لا توجد طلبات حتى الآن</div>'; return; }
+    cache.requests = snap.docs.map(d=>({id:d.id,...d.data()}));
     el.innerHTML = '';
     snap.forEach(doc => {
       const r = {id:doc.id,...doc.data()};
@@ -1898,7 +1900,7 @@ async function renderRequests(){
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
           <span style="font-size:.75rem;font-weight:700;color:${statusColor}">● ${statusLabel}</span>
           <div style="display:flex;gap:8px">
-            ${r.status!=='done' ? `<button onclick="updateReqStatus('${r.id}','done')" style="background:#059669;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-family:'Cairo',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer">✓ تم التنفيذ</button>` : ''}
+            ${r.status!=='done' ? `<button onclick="addSubFromRequest('${r.id}')" style="background:#059669;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-family:'Cairo',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer">✓ تم التنفيذ + إضافة مشترك</button>` : ''}
             ${r.status!=='rejected' ? `<button onclick="updateReqStatus('${r.id}','rejected')" style="background:#dc2626;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-family:'Cairo',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer">✗ رفض</button>` : ''}
             <button onclick="deleteReq('${r.id}')" style="background:#f3f4f6;color:#6b7280;border:none;border-radius:8px;padding:6px 14px;font-family:'Cairo',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer">🗑 حذف</button>
           </div>
@@ -1912,6 +1914,25 @@ async function updateReqStatus(id, status){
   await db.collection('admin_requests').doc(id).update({status});
   renderRequests();
   checkPendingRequests();
+}
+
+function addSubFromRequest(reqId){
+  const r = cache.requests ? cache.requests.find(x=>x.id===reqId) : null;
+  document.getElementById('subModalTitle').textContent = 'إضافة مشترك جديد';
+  document.getElementById('editSubId').value = '';
+  document.getElementById('f-name').value = r ? (r.name||'') : '';
+  document.getElementById('f-username').value = r ? (r.username||r.email||'') : '';
+  document.getElementById('f-password').value = '';
+  document.getElementById('f-email').value = r ? (r.email||'') : '';
+  document.getElementById('f-phone').value = r ? (r.phone||'') : '';
+  document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
+  document.getElementById('f-classic').checked = r && (r.level==='classic'||r.level==='both');
+  document.getElementById('f-advanced').checked = r && (r.level==='advanced'||r.level==='both');
+  document.getElementById('f-active').value = 'true';
+  // mark request done after saving
+  const origSave = window._pendingReqId;
+  window._pendingReqId = reqId;
+  openModal('subModal');
 }
 
 async function deleteReq(id){
