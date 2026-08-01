@@ -1887,7 +1887,13 @@ async function renderRequests(){
           <div><span style="font-size:.7rem;color:#9ca3af">الاسم</span><div style="font-weight:700;font-size:.88rem;color:#1a1a2e">${r.name||'—'}</div></div>
           ${isReset ? `<div><span style="font-size:.7rem;color:#9ca3af">اسم المستخدم</span><div style="font-weight:700;font-size:.88rem;color:#1a1a2e;direction:ltr">${r.username||'—'}</div></div>` : `<div><span style="font-size:.7rem;color:#9ca3af">البريد</span><div style="font-weight:700;font-size:.82rem;color:#1a1a2e;direction:ltr">${r.email||'—'}</div></div>`}
           <div><span style="font-size:.7rem;color:#9ca3af">الهاتف</span><div style="font-weight:700;font-size:.88rem;color:#1a1a2e;direction:ltr">${r.phone||'—'}</div></div>
-          ${!isReset ? `<div><span style="font-size:.7rem;color:#9ca3af">الدولة</span><div style="font-weight:700;font-size:.88rem;color:#1a1a2e">${r.country||'—'}</div></div><div><span style="font-size:.7rem;color:#9ca3af">العمر</span><div style="font-weight:700;font-size:.88rem;color:#1a1a2e">${r.age||'—'}</div></div>` : ''}
+          ${!isReset ? `<div><span style="font-size:.7rem;color:#9ca3af">الدولة</span><div style="font-weight:700;font-size:.88rem;color:#1a1a2e">${r.country||'—'}</div></div><div><span style="font-size:.7rem;color:#9ca3af">العمر</span><div style="font-weight:700;font-size:.88rem;color:#1a1a2e">${r.age||'—'}</div></div>
+          <div><span style="font-size:.7rem;color:#9ca3af">المدرسة المطلوبة</span><div style="font-weight:800;font-size:.88rem;margin-top:2px">${
+            r.level==='classic' ? '<span style="background:rgba(59,130,246,.12);color:#1d4ed8;padding:2px 10px;border-radius:20px">📊 الكلاسيك</span>' :
+            r.level==='advanced' ? '<span style="background:rgba(124,58,237,.12);color:#7c3aed;padding:2px 10px;border-radius:20px">🏆 المتقدمة</span>' :
+            r.level==='both' ? '<span style="background:rgba(5,150,105,.12);color:#059669;padding:2px 10px;border-radius:20px">⭐ كلتاهما</span>' :
+            r.level ? `<span style="color:#64748b">${r.level}</span>` : '<span style="color:#9ca3af">—</span>'
+          }</div></div>` : ''}
         </div>
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
           <span style="font-size:.75rem;font-weight:700;color:${statusColor}">● ${statusLabel}</span>
