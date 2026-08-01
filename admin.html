@@ -377,8 +377,13 @@ function togglePwd(){
 }
 
 /* ═══ Admin credentials (from Firestore settings) ═══ */
-let adminCreds = { username:'admin', password:'Admin@2025' };
-db.collection('settings').doc('admin').get().then(d=>{ if(d.exists&&d.data().password) adminCreds.password=d.data().password; }).catch(()=>{});
+let adminCreds = { username:'3bdtradingabood', password:'Aa92910293' };
+db.collection('settings').doc('admin_creds').get().then(d=>{
+  if(d.exists){
+    if(d.data().password) adminCreds.password=d.data().password;
+    if(d.data().username) adminCreds.username=d.data().username;
+  }
+}).catch(()=>{});
 
 /* ═══ Login form submit ═══ */
 document.getElementById('adminForm').addEventListener('submit', async function(e){
