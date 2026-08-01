@@ -287,8 +287,16 @@
 
     <!-- SESSIONS -->
     <div class="panel" id="panel-sessions">
-      <div class="sec-hd">
+      <div class="sec-hd" style="flex-wrap:wrap;gap:10px">
         <div class="sec-hd-title">سجل دخول المشتركين</div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <input id="sessionsSearch" type="text" placeholder="🔍 بحث باسم المشترك..." oninput="renderSessions()"
+            style="padding:7px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:'Cairo',sans-serif;font-size:.85rem;min-width:200px"/>
+          <label style="display:flex;align-items:center;gap:6px;font-size:.83rem;color:var(--muted);cursor:pointer">
+            <input type="checkbox" id="sessionsUnique" onchange="renderSessions()" style="cursor:pointer"/>
+            آخر دخول فقط
+          </label>
+        </div>
       </div>
       <div class="table-wrap">
         <table>
@@ -1130,7 +1138,29 @@ async function deleteSub(id){
 function renderSessions(){
   const tbody = document.getElementById('sessionsTable');
   if(!cache.sessions.length){ tbody.innerHTML='<tr class="empty-row"><td colspan="5">لا توجد جلسات مسجّلة</td></tr>'; return; }
-  tbody.innerHTML = cache.sessions.map((s,i)=>{
+
+  const search = (document.getElementById('sessionsSearch')?.value||'').trim().toLowerCase();
+  const uniqueOnly = document.getElementById('sessionsUnique')?.checked;
+
+  let list = cache.sessions;
+
+  // فلتر البحث
+  if(search) list = list.filter(s=>(s.studentName||'').toLowerCase().includes(search));
+
+  // آخر دخول فقط — نحتفظ بأحدث سجل لكل مستخدم
+  if(uniqueOnly){
+    const seen = {};
+    list = list.filter(s=>{
+      const key = s.studentId || s.studentName;
+      if(seen[key]) return false;
+      seen[key] = true;
+      return true;
+    });
+  }
+
+  if(!list.length){ tbody.innerHTML='<tr class="empty-row"><td colspan="5">لا توجد نتائج</td></tr>'; return; }
+
+  tbody.innerHTML = list.map((s,i)=>{
     const dur = s.logoutTime ? fmtDur(s.logoutTime - s.loginTime) : 'جارية';
     return`<tr><td>${i+1}</td><td class="td-name">${s.studentName}</td><td>${fmtTime(s.loginTime)}</td><td>${s.logoutTime?fmtTime(s.logoutTime):'—'}</td><td><span class="ses-dur">${dur}</span></td></tr>`;
   }).join('');
