@@ -736,15 +736,24 @@
         <button onclick="toggleEditField('password')" style="background:rgba(19,42,87,.1);color:var(--navy);border:none;border-radius:8px;padding:5px 12px;font-family:'Cairo',sans-serif;font-size:.75rem;font-weight:700;cursor:pointer;flex-shrink:0">تعديل</button>
       </div>
       <div id="edit-password-box" style="display:none;flex-direction:column;gap:8px">
-        <input id="cur-password" type="password" placeholder="كلمة المرور الحالية"
-          style="padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:9px;font-family:'Cairo',sans-serif;font-size:.85rem;outline:none;direction:ltr;width:100%;box-sizing:border-box"
-          onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='#e2e8f0'"/>
-        <input id="new-password" type="password" placeholder="كلمة المرور الجديدة (8+ أحرف، كبير وصغير)"
-          style="padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:9px;font-family:'Cairo',sans-serif;font-size:.85rem;outline:none;direction:ltr;width:100%;box-sizing:border-box"
-          oninput="checkPassRules()" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='#e2e8f0'"/>
-        <input id="confirm-password" type="password" placeholder="تأكيد كلمة المرور"
-          style="padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:9px;font-family:'Cairo',sans-serif;font-size:.85rem;outline:none;direction:ltr;width:100%;box-sizing:border-box"
-          onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='#e2e8f0'"/>
+        <div style="position:relative">
+          <input id="cur-password" type="password" placeholder="كلمة المرور الحالية"
+            style="padding:9px 36px 9px 12px;border:1.5px solid #e2e8f0;border-radius:9px;font-family:'Cairo',sans-serif;font-size:.85rem;outline:none;direction:ltr;width:100%;box-sizing:border-box"
+            onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='#e2e8f0'"/>
+          <button type="button" onclick="togglePassView('cur-password',this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:.85rem;opacity:.4;padding:0;line-height:1" title="إظهار/إخفاء">👁</button>
+        </div>
+        <div style="position:relative">
+          <input id="new-password" type="password" placeholder="كلمة المرور الجديدة (8+ أحرف، كبير وصغير)"
+            style="padding:9px 36px 9px 12px;border:1.5px solid #e2e8f0;border-radius:9px;font-family:'Cairo',sans-serif;font-size:.85rem;outline:none;direction:ltr;width:100%;box-sizing:border-box"
+            oninput="checkPassRules()" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='#e2e8f0'"/>
+          <button type="button" onclick="togglePassView('new-password',this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:.85rem;opacity:.4;padding:0;line-height:1" title="إظهار/إخفاء">👁</button>
+        </div>
+        <div style="position:relative">
+          <input id="confirm-password" type="password" placeholder="تأكيد كلمة المرور"
+            style="padding:9px 36px 9px 12px;border:1.5px solid #e2e8f0;border-radius:9px;font-family:'Cairo',sans-serif;font-size:.85rem;outline:none;direction:ltr;width:100%;box-sizing:border-box"
+            onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='#e2e8f0'"/>
+          <button type="button" onclick="togglePassView('confirm-password',this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:.85rem;opacity:.4;padding:0;line-height:1" title="إظهار/إخفاء">👁</button>
+        </div>
         <div style="background:#f8fafc;border-radius:8px;padding:8px 12px;font-size:.75rem;display:flex;gap:12px;flex-wrap:wrap">
           <span id="rule-len" style="color:#9ca3af">⬜ 8 أحرف</span>
           <span id="rule-upper" style="color:#9ca3af">⬜ حرف كبير</span>
@@ -2678,6 +2687,13 @@ function closeViewer(){
 document.getElementById('fileViewer').addEventListener('click', function(e){
   if(e.target===this) closeViewer();
 });
+
+function togglePassView(inputId, btn){
+  const inp = document.getElementById(inputId);
+  if(!inp) return;
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  btn.style.opacity = inp.type === 'text' ? '1' : '.4';
+}
 
 function toggleEditField(type){
   const box = document.getElementById('edit-'+type+'-box');
