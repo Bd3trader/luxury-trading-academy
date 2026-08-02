@@ -130,7 +130,8 @@
     .checkbox-item{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.88rem;font-weight:600}
     .checkbox-item input[type=checkbox]{width:16px;height:16px;accent-color:var(--gold);cursor:pointer}
     .inp-wrap{position:relative}
-    .pwd-eye{position:absolute;left:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:.9rem;color:var(--muted);padding:2px}
+    .pwd-eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);padding:2px;opacity:.45;transition:opacity .2s;line-height:1}
+    .pwd-eye:hover{opacity:1}
     .tabs{display:flex;gap:4px;padding:4px;background:var(--bg);border-radius:10px;margin-bottom:20px;width:fit-content}
     .tab{padding:8px 20px;border-radius:8px;font-family:'Cairo',sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;border:none;background:none;color:var(--muted);transition:all .2s}
     .tab.active{background:var(--white);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.1)}
@@ -532,7 +533,7 @@
           <label>المفتاح (sk-proj-...)</label>
           <div class="inp-wrap">
             <input type="password" id="openaiKeyInp" placeholder="sk-proj-..." dir="ltr"/>
-            <button type="button" class="pwd-eye" onclick="toggleKeyVisibility()">👁</button>
+            <button type="button" class="pwd-eye" onclick="toggleKeyVisibility()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
           </div>
         </div>
         <div id="openaiKeyStatus" style="font-size:.82rem;margin-bottom:12px"></div>
@@ -572,7 +573,7 @@
           <label>كلمة المرور *</label>
           <div class="inp-wrap">
             <input type="password" id="f-password" placeholder="••••••••" dir="ltr"/>
-            <button type="button" class="pwd-eye" onclick="toggleSubPwd()">👁</button>
+            <button type="button" class="pwd-eye" onclick="toggleSubPwd()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
           </div>
         </div>
       </div>
