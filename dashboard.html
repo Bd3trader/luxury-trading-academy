@@ -14,7 +14,7 @@
       --border:rgba(212,160,60,.2);--green:#0a9e78;--red:#dc2626;--blue:#3b82f6;
       --sidebar-w:270px;
     }
-    body{font-family:'Cairo',sans-serif;background:#f0f4f8;color:var(--text);min-height:100vh}
+    body{font-family:'Cairo',sans-serif;background:#f0f4f8;color:var(--text);min-height:100vh} 
 
     /* ── Sidebar ── */
     .sidebar{position:fixed;top:0;right:0;width:var(--sidebar-w);height:100vh;background:linear-gradient(180deg,var(--navy) 0%,#0d1e3d 100%);display:flex;flex-direction:column;z-index:200;box-shadow:-4px 0 30px rgba(0,0,0,.2)}
@@ -576,6 +576,9 @@
     <button class="sb-item" id="nav-sessions" onclick="showSection('sec-sessions')">
       <div class="sb-item-icon">📅</div> الجلسات المجدولة
     </button>
+    <button class="sb-item" id="nav-profile" onclick="showSection('sec-profile')">
+      <div class="sb-item-icon">👤</div> بياناتي
+    </button>
     <div class="sb-section-label">الدعم</div>
     <button class="sb-item" onclick="openModal('supportModal')">
       <div class="sb-item-icon">🎧</div> الدعم الفني
@@ -995,6 +998,71 @@
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ── بياناتي ── -->
+<div class="dash-section" id="sec-profile">
+  <div class="sec-title"><div class="sec-title-bar"></div> بياناتي الشخصية</div>
+  <div style="max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:20px">
+
+    <!-- معلومات الحساب الحالية -->
+    <div style="background:#fff;border-radius:16px;padding:24px;border:1px solid rgba(0,0,0,.07);box-shadow:0 2px 12px rgba(0,0,0,.06)">
+      <div style="font-weight:800;font-size:.95rem;color:var(--navy);margin-bottom:16px">📋 معلومات حسابك الحالية</div>
+      <div style="display:grid;gap:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#f8fafc;border-radius:10px">
+          <span style="color:#6b7280;font-size:.82rem">الاسم</span>
+          <span style="font-weight:700;font-size:.9rem;color:var(--navy)" id="prof-name">—</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#f8fafc;border-radius:10px">
+          <span style="color:#6b7280;font-size:.82rem">اسم المستخدم</span>
+          <span style="font-weight:700;font-size:.9rem;color:var(--navy);direction:ltr" id="prof-username">—</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#f8fafc;border-radius:10px">
+          <span style="color:#6b7280;font-size:.82rem">كلمة المرور</span>
+          <span style="font-weight:700;font-size:.9rem;color:var(--navy);direction:ltr;letter-spacing:3px" id="prof-pass">••••••••</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#f8fafc;border-radius:10px">
+          <span style="color:#6b7280;font-size:.82rem">البريد الإلكتروني</span>
+          <span style="font-weight:700;font-size:.9rem;color:var(--navy);direction:ltr" id="prof-email">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- تغيير اسم المستخدم -->
+    <div style="background:#fff;border-radius:16px;padding:24px;border:1px solid rgba(0,0,0,.07);box-shadow:0 2px 12px rgba(0,0,0,.06)">
+      <div style="font-weight:800;font-size:.95rem;color:var(--navy);margin-bottom:16px">✏️ تغيير اسم المستخدم</div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <input id="new-username" type="text" placeholder="اسم المستخدم الجديد" autocomplete="off"
+          style="padding:11px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-family:'Cairo',sans-serif;font-size:.88rem;outline:none;direction:ltr;transition:border .2s"
+          onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='#e2e8f0'"/>
+        <button onclick="changeUsername()" style="background:var(--gold);color:#fff;border:none;border-radius:10px;padding:11px;font-family:'Cairo',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer">حفظ اسم المستخدم</button>
+      </div>
+    </div>
+
+    <!-- تغيير كلمة المرور -->
+    <div style="background:#fff;border-radius:16px;padding:24px;border:1px solid rgba(0,0,0,.07);box-shadow:0 2px 12px rgba(0,0,0,.06)">
+      <div style="font-weight:800;font-size:.95rem;color:var(--navy);margin-bottom:16px">🔑 تغيير كلمة المرور</div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <input id="cur-password" type="password" placeholder="كلمة المرور الحالية"
+          style="padding:11px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-family:'Cairo',sans-serif;font-size:.88rem;outline:none;direction:ltr;transition:border .2s"
+          onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='#e2e8f0'"/>
+        <input id="new-password" type="password" placeholder="كلمة المرور الجديدة"
+          style="padding:11px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-family:'Cairo',sans-serif;font-size:.88rem;outline:none;direction:ltr;transition:border .2s"
+          onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='#e2e8f0'"/>
+        <input id="confirm-password" type="password" placeholder="تأكيد كلمة المرور الجديدة"
+          style="padding:11px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-family:'Cairo',sans-serif;font-size:.88rem;outline:none;direction:ltr;transition:border .2s"
+          onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='#e2e8f0'"/>
+        <!-- شروط كلمة المرور -->
+        <div style="background:#f8fafc;border-radius:10px;padding:12px 14px;font-size:.78rem;display:flex;flex-direction:column;gap:5px" id="pass-rules">
+          <div id="rule-len"  style="color:#9ca3af">⬜ 8 أحرف على الأقل</div>
+          <div id="rule-upper" style="color:#9ca3af">⬜ حرف كبير (A-Z)</div>
+          <div id="rule-lower" style="color:#9ca3af">⬜ حرف صغير (a-z)</div>
+        </div>
+        <button onclick="changePassword()" style="background:var(--navy);color:#fff;border:none;border-radius:10px;padding:11px;font-family:'Cairo',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer">حفظ كلمة المرور</button>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -1800,12 +1868,13 @@ function showSection(id){
   }
   // Sidebar nav
   document.querySelectorAll('.sb-item[id^="nav-"]').forEach(b=>b.classList.remove('active'));
-  const navMap={'sec-home':'nav-home','sec-schools':'nav-schools','sec-chart':'nav-chart','sec-news':'nav-news','sec-sessions':'nav-sessions'};
+  const navMap={'sec-home':'nav-home','sec-schools':'nav-schools','sec-chart':'nav-chart','sec-news':'nav-news','sec-sessions':'nav-sessions','sec-profile':'nav-profile'};
   const navId=navMap[id];
+  if(id==='sec-profile') loadProfileSection();
   if(navId){ const nb=document.getElementById(navId); if(nb) nb.classList.add('active'); }
   // Mobile nav
   document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.remove('active'));
-  const mnavMap={'sec-home':'mnav-home','sec-schools':'mnav-schools','sec-chart':'mnav-chart','sec-news':'mnav-news','sec-sessions':'mnav-sessions'};
+  const mnavMap={'sec-home':'mnav-home','sec-schools':'mnav-schools','sec-chart':'mnav-chart','sec-news':'mnav-news','sec-sessions':'mnav-sessions','sec-profile':'mnav-profile'};
   const mId=mnavMap[id];
   if(mId){ const mb=document.getElementById(mId); if(mb) mb.classList.add('active'); }
   // AI FAB: show only on home section
@@ -2639,6 +2708,73 @@ function closeViewer(){
 document.getElementById('fileViewer').addEventListener('click', function(e){
   if(e.target===this) closeViewer();
 });
+
+/* ── Profile Section ── */
+function loadProfileSection(){
+  if(!sub) return;
+  document.getElementById('prof-name').textContent = sub.name || '—';
+  document.getElementById('prof-username').textContent = sub.username || '—';
+  document.getElementById('prof-email').textContent = sub.email || '—';
+  // live password rules on input
+  const np = document.getElementById('new-password');
+  if(np && !np._rulesAttached){
+    np._rulesAttached = true;
+    np.addEventListener('input', checkPassRules);
+  }
+}
+
+function checkPassRules(){
+  const v = document.getElementById('new-password').value;
+  const ok = (id, pass) => {
+    const el = document.getElementById(id);
+    el.style.color = pass ? '#059669' : '#9ca3af';
+    el.textContent = (pass ? '✅ ' : '⬜ ') + el.textContent.replace(/^[✅⬜] /,'');
+  };
+  ok('rule-len',   v.length >= 8);
+  ok('rule-upper', /[A-Z]/.test(v));
+  ok('rule-lower', /[a-z]/.test(v));
+}
+
+function showProfileToast(msg, type){
+  const t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = `position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:${type==='error'?'#dc2626':'#059669'};color:#fff;padding:10px 22px;border-radius:10px;font-size:.85rem;font-weight:700;z-index:9999;font-family:'Cairo',sans-serif`;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 3000);
+}
+
+async function changeUsername(){
+  const newU = document.getElementById('new-username').value.trim();
+  if(!newU){ showProfileToast('أدخل اسم المستخدم الجديد','error'); return; }
+  if(newU === sub.username){ showProfileToast('هذا هو اسم المستخدم الحالي','error'); return; }
+  // check duplicate
+  const dup = await db.collection('subscribers').where('username','==',newU).get();
+  if(!dup.empty){ showProfileToast('اسم المستخدم مسجّل بالفعل','error'); return; }
+  await db.collection('subscribers').doc(sub.id).update({username: newU});
+  sub.username = newU;
+  localStorage.setItem('loggedInStudent', JSON.stringify(sub));
+  document.getElementById('prof-username').textContent = newU;
+  document.getElementById('new-username').value = '';
+  showProfileToast('✅ تم تغيير اسم المستخدم بنجاح');
+}
+
+async function changePassword(){
+  const cur  = document.getElementById('cur-password').value;
+  const np   = document.getElementById('new-password').value;
+  const conf = document.getElementById('confirm-password').value;
+  if(!cur){ showProfileToast('أدخل كلمة المرور الحالية','error'); return; }
+  if(cur !== sub.password){ showProfileToast('كلمة المرور الحالية غير صحيحة','error'); return; }
+  if(np.length < 8 || !/[A-Z]/.test(np) || !/[a-z]/.test(np)){
+    showProfileToast('كلمة المرور لا تستوفي الشروط المطلوبة','error'); return;
+  }
+  if(np !== conf){ showProfileToast('كلمة المرور وتأكيدها غير متطابقتين','error'); return; }
+  await db.collection('subscribers').doc(sub.id).update({password: np});
+  sub.password = np;
+  localStorage.setItem('loggedInStudent', JSON.stringify(sub));
+  ['cur-password','new-password','confirm-password'].forEach(id => document.getElementById(id).value='');
+  checkPassRules();
+  showProfileToast('✅ تم تغيير كلمة المرور بنجاح');
+}
 </script>
 
 </div><!-- /main-wrap -->
@@ -2661,6 +2797,9 @@ document.getElementById('fileViewer').addEventListener('click', function(e){
     <button class="mob-nav-btn" id="mnav-sessions" onclick="showSection('sec-sessions')">
       <span class="mob-icon">🎯</span>الجلسات
     </button>
+    <button class="mob-nav-btn" id="mnav-profile" onclick="showSection('sec-profile')">
+      <span class="mob-icon">👤</span>بياناتي
+    </button>
   </div>
 </nav>
 
@@ -2681,7 +2820,7 @@ document.getElementById('fileViewer').addEventListener('click', function(e){
         </div>
         <p style="font-size:.8rem;line-height:1.8;color:rgba(255,255,255,.55);max-width:280px">أكاديمية متخصصة في تعليم التداول المالي وتطوير مهارات المتداولين بأساليب احترافية ومنهجية.</p>
       </div>
-      <!-- Contact -->
+      <!-- التواصل -->
       <div style="min-width:160px">
         <div style="font-size:.8rem;font-weight:900;letter-spacing:1px;color:var(--gold);text-transform:uppercase;margin-bottom:14px">تواصل معنا</div>
         <div style="display:flex;flex-direction:column;gap:9px">
@@ -2696,7 +2835,7 @@ document.getElementById('fileViewer').addEventListener('click', function(e){
           <span style="color:rgba(255,255,255,.45);font-size:.78rem;display:flex;align-items:center;gap:6px">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
             الدعم متاح 24/7
-          </span>
+          </span> 
         </div>
       </div>
     </div>
