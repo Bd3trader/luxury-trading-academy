@@ -254,11 +254,12 @@
       box-shadow: 0 0 0 4px rgba(212,160,60,.1);
     }
     .pwd-toggle {
-      position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
+      position: absolute; right: 13px; top: 50%; transform: translateY(-50%);
       background: none; border: none; cursor: pointer;
-      color: #a0aec0; padding: 4px;
-      transition: color .2s;
+      color: #a0aec0; padding: 4px; opacity: .5;
+      transition: color .2s, opacity .2s;
     }
+    .pwd-toggle:hover { opacity: 1; }
     .pwd-toggle:hover { color: var(--navy); }
     .pwd-toggle svg { width: 16px; height: 16px; }
 
