@@ -212,6 +212,8 @@
     <button class="sb-link" onclick="showPanel('notifications')"><span class="icon">🔔</span> إشعارات المتدربين</button>
     <div class="sb-section">الأمان</div>
     <button class="sb-link" onclick="showPanel('security')"><span class="icon">🛡️</span> تنبيهات الأمان<span class="sb-badge" id="secBadge" style="display:none">0</span></button>
+    <div class="sb-section">المحتوى</div>
+    <button class="sb-link" onclick="showPanel('analyses')"><span class="icon">📊</span> التحليلات اليومية</button>
     <div class="sb-section">النظام</div>
     <button class="sb-link" onclick="showPanel('services')"><span class="icon">🔧</span> الخدمات والاشتراكات</button>
     <button class="sb-link" onclick="showPanel('settings')"><span class="icon">⚙️</span> الإعدادات</button>
@@ -392,6 +394,17 @@
       </div>
       <div id="secAlertsList" style="display:flex;flex-direction:column;gap:10px">
         <div style="text-align:center;padding:40px;color:var(--muted)">جاري التحميل...</div>
+      </div>
+    </div>
+
+    <!-- ── ANALYSES PANEL ── -->
+    <div class="panel" id="panel-analyses">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:22px">
+        <h2 style="font-size:1.1rem;font-weight:900;margin:0">📊 التحليلات اليومية</h2>
+        <button onclick="openAnalysisModal()" class="btn-primary" style="font-size:.82rem;padding:8px 18px">+ إضافة تحليل جديد</button>
+      </div>
+      <div id="adminAnalysisList" style="display:flex;flex-direction:column;gap:16px">
+        <div style="text-align:center;padding:32px;color:var(--muted)">جاري التحميل...</div>
       </div>
     </div>
 
@@ -788,6 +801,71 @@
   </div>
 </div>
 
+<!-- ── Analysis Modal ── -->
+<div class="modal-overlay" id="analysisModal">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-header">
+      <div class="modal-title" id="analysisModalTitle">إضافة تحليل جديد</div>
+      <button class="modal-close" onclick="closeModal('analysisModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editAnalysisId"/>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="field">
+          <label>الزوج / العملة *</label>
+          <input type="text" id="an-pair" placeholder="مثال: XAUUSD" dir="ltr"/>
+        </div>
+        <div class="field">
+          <label>الفريم الزمني *</label>
+          <select id="an-tf" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:'Cairo',sans-serif;font-size:.88rem;background:#fff;color:var(--text);outline:none">
+            <option value="M1">M1</option><option value="M5">M5</option><option value="M15">M15</option>
+            <option value="M30">M30</option><option value="H1">H1</option><option value="H4">H4</option>
+            <option value="D1">D1 (يومي)</option><option value="W1">W1 (أسبوعي)</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>الاتجاه *</label>
+        <div style="display:flex;gap:10px">
+          <label style="flex:1;display:flex;align-items:center;gap:8px;padding:10px 14px;border:2px solid #e2e8f0;border-radius:10px;cursor:pointer;transition:all .2s" id="lbl-buy">
+            <input type="radio" name="an-dir" value="buy" id="an-buy" onchange="highlightDir()"/> <span style="font-weight:700;color:#059669">🟢 شراء</span>
+          </label>
+          <label style="flex:1;display:flex;align-items:center;gap:8px;padding:10px 14px;border:2px solid #e2e8f0;border-radius:10px;cursor:pointer;transition:all .2s" id="lbl-sell">
+            <input type="radio" name="an-dir" value="sell" id="an-sell" onchange="highlightDir()"/> <span style="font-weight:700;color:#dc2626">🔴 بيع</span>
+          </label>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="field"><label>نقطة الدخول</label><input type="text" id="an-entry" placeholder="1920.50" dir="ltr"/></div>
+        <div class="field"><label>وقف الخسارة</label><input type="text" id="an-sl" placeholder="1910.00" dir="ltr"/></div>
+      </div>
+      <div class="field">
+        <label>الأهداف (افصل بينها بفاصلة)</label>
+        <input type="text" id="an-targets" placeholder="1930, 1940, 1950" dir="ltr"/>
+      </div>
+      <div class="field">
+        <label>ملاحظات التحليل</label>
+        <textarea id="an-notes" rows="3" placeholder="اكتب تفاصيل التحليل هنا..." style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:'Cairo',sans-serif;font-size:.88rem;resize:vertical;outline:none;box-sizing:border-box"></textarea>
+      </div>
+      <div class="field">
+        <label>صورة التحليل (الشارت)</label>
+        <div style="position:relative">
+          <label for="an-img-file" style="display:flex;align-items:center;gap:8px;padding:10px 14px;border:2px dashed #cbd5e1;border-radius:10px;cursor:pointer;color:#64748b;font-size:.85rem;transition:border .2s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='#cbd5e1'">
+            🖼️ <span id="an-img-label">اختر صورة الشارت</span>
+          </label>
+          <input type="file" id="an-img-file" accept="image/*" onchange="handleAnalysisImg(this)" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none"/>
+        </div>
+        <div id="an-img-preview" style="display:none;margin-top:8px"><img id="an-img-thumb" style="width:100%;border-radius:10px;max-height:200px;object-fit:cover"/></div>
+        <div id="an-img-progress" style="display:none;margin-top:8px"><div style="background:#e2e8f0;border-radius:20px;height:6px"><div id="an-img-fill" style="background:var(--gold);height:6px;border-radius:20px;width:0%;transition:width .3s"></div></div></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('analysisModal')">إلغاء</button>
+      <button class="btn-primary" id="saveAnalysisBtn" onclick="saveAnalysis()">💾 حفظ التحليل</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <!-- Firebase SDK -->
@@ -977,7 +1055,7 @@ async function loadAndRender(){
 }
 
 /* ═══ Navigation ═══ */
-const panelTitles = { dashboard:'الرئيسية', online:'المتواجدون الآن', subscribers:'إدارة المشتركين', sessions:'سجل الجلسات', schedule:'الجلسات المجدولة', courses:'المدارس والمحاضرات', messages:'رسائل الطلاب', requests:'طلبات الانضمام', notifications:'🔔 إشعارات المتدربين', security:'🛡️ تنبيهات الأمان', services:'🔧 الخدمات والاشتراكات', settings:'الإعدادات' };
+const panelTitles = { dashboard:'الرئيسية', online:'المتواجدون الآن', subscribers:'إدارة المشتركين', sessions:'سجل الجلسات', schedule:'الجلسات المجدولة', courses:'المدارس والمحاضرات', messages:'رسائل الطلاب', requests:'طلبات الانضمام', notifications:'🔔 إشعارات المتدربين', security:'🛡️ تنبيهات الأمان', analyses:'📊 التحليلات اليومية', services:'🔧 الخدمات والاشتراكات', settings:'الإعدادات' };
 let currentSchool = 'classic';
 let currentSubTab = 'lectures';
 
@@ -990,6 +1068,7 @@ function showPanel(name){
   renderPanel(name);
   if(name==='settings') loadOpenAIKeyStatus();
   if(name==='services') loadServicesPanel();
+  if(name==='analyses') loadAdminAnalyses();
 }
 
 function renderPanel(name){
@@ -2269,6 +2348,140 @@ function setBadge(id, text, type){
   };
   el.textContent = text;
   el.style.cssText = `font-size:.72rem;font-weight:800;padding:3px 10px;border-radius:20px;${styles[type]||styles.info}`;
+}
+
+/* ══════════════ التحليلات اليومية ══════════════ */
+let pendingAnalysisImg = null;
+
+async function loadAdminAnalyses(){
+  const el = document.getElementById('adminAnalysisList');
+  el.innerHTML='<div style="text-align:center;padding:32px;color:var(--muted)">جاري التحميل...</div>';
+  try{
+    const snap = await db.collection('daily_analyses').orderBy('createdAt','desc').get();
+    if(snap.empty){ el.innerHTML='<div style="text-align:center;padding:32px;color:var(--muted)">لا توجد تحليلات بعد</div>'; return; }
+    el.innerHTML='';
+    snap.forEach(doc=>{
+      const a={id:doc.id,...doc.data()};
+      const dirLabel = a.direction==='buy'?'🟢 شراء':'🔴 بيع';
+      const dirColor = a.direction==='buy'?'#059669':'#dc2626';
+      const date = a.createdAt?new Date(a.createdAt).toLocaleString('ar-SA',{calendar:'gregory',numberingSystem:'latn'}):'—';
+      const card=document.createElement('div');
+      card.style.cssText='background:#fff;border-radius:14px;padding:16px 18px;border:1px solid rgba(0,0,0,.07);box-shadow:0 2px 8px rgba(0,0,0,.05);display:flex;align-items:center;gap:14px;flex-wrap:wrap';
+      card.innerHTML=`
+        ${a.imageUrl?`<img src="${a.imageUrl}" style="width:72px;height:56px;object-fit:cover;border-radius:8px;flex-shrink:0"/>`:'<div style="width:72px;height:56px;background:#f1f5f9;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0">📊</div>'}
+        <div style="flex:1;min-width:180px">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
+            <span style="font-weight:800;font-size:.95rem;color:var(--navy)">${a.pair||'—'}</span>
+            <span style="background:#f1f5f9;color:#475569;padding:2px 10px;border-radius:20px;font-size:.72rem;font-weight:700">${a.timeframe||'—'}</span>
+            <span style="color:${dirColor};font-weight:800;font-size:.82rem">${dirLabel}</span>
+          </div>
+          <div style="font-size:.72rem;color:#9ca3af">${date}</div>
+          ${a.notes?`<div style="font-size:.78rem;color:#374151;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:300px">${a.notes}</div>`:''}
+        </div>
+        <div style="display:flex;gap:8px;flex-shrink:0">
+          <button onclick="openAnalysisModal('${a.id}')" class="action-btn btn-edit">✏️ تعديل</button>
+          <button onclick="deleteAnalysis('${a.id}')" class="action-btn btn-del">🗑</button>
+        </div>`;
+      el.appendChild(card);
+    });
+  }catch(e){ el.innerHTML='<div style="color:#dc2626;text-align:center;padding:32px">حدث خطأ</div>'; }
+}
+
+function highlightDir(){
+  const buy=document.getElementById('an-buy').checked;
+  document.getElementById('lbl-buy').style.borderColor=buy?'#059669':'#e2e8f0';
+  document.getElementById('lbl-buy').style.background=buy?'rgba(5,150,105,.06)':'';
+  document.getElementById('lbl-sell').style.borderColor=!buy?'#dc2626':'#e2e8f0';
+  document.getElementById('lbl-sell').style.background=!buy?'rgba(220,38,38,.06)':'';
+}
+
+function handleAnalysisImg(input){
+  const file=input.files[0]; if(!file) return;
+  pendingAnalysisImg=file;
+  document.getElementById('an-img-label').textContent=file.name;
+  const reader=new FileReader();
+  reader.onload=e=>{ document.getElementById('an-img-thumb').src=e.target.result; document.getElementById('an-img-preview').style.display='block'; };
+  reader.readAsDataURL(file);
+}
+
+async function openAnalysisModal(id){
+  document.getElementById('editAnalysisId').value=id||'';
+  document.getElementById('analysisModalTitle').textContent=id?'تعديل التحليل':'إضافة تحليل جديد';
+  ['an-pair','an-entry','an-sl','an-targets','an-notes'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('an-tf').value='H1';
+  document.getElementById('an-buy').checked=false; document.getElementById('an-sell').checked=false;
+  document.getElementById('an-img-label').textContent='اختر صورة الشارت';
+  document.getElementById('an-img-preview').style.display='none';
+  document.getElementById('an-img-progress').style.display='none';
+  document.getElementById('lbl-buy').style.borderColor='#e2e8f0'; document.getElementById('lbl-buy').style.background='';
+  document.getElementById('lbl-sell').style.borderColor='#e2e8f0'; document.getElementById('lbl-sell').style.background='';
+  pendingAnalysisImg=null;
+  if(id){
+    const doc=await db.collection('daily_analyses').doc(id).get();
+    const a=doc.data();
+    document.getElementById('an-pair').value=a.pair||'';
+    document.getElementById('an-tf').value=a.timeframe||'H1';
+    document.getElementById('an-entry').value=a.entry||'';
+    document.getElementById('an-sl').value=a.stopLoss||'';
+    document.getElementById('an-targets').value=(a.targets||[]).join(', ');
+    document.getElementById('an-notes').value=a.notes||'';
+    if(a.direction){ document.getElementById('an-'+a.direction).checked=true; highlightDir(); }
+    if(a.imageUrl){ document.getElementById('an-img-thumb').src=a.imageUrl; document.getElementById('an-img-preview').style.display='block'; document.getElementById('an-img-label').textContent='صورة محفوظة'; }
+  }
+  openModal('analysisModal');
+}
+
+async function saveAnalysis(){
+  const pair=document.getElementById('an-pair').value.trim();
+  const direction=document.querySelector('input[name="an-dir"]:checked')?.value;
+  if(!pair||!direction){ toast('الزوج والاتجاه مطلوبان','error'); return; }
+  const btn=document.getElementById('saveAnalysisBtn');
+  btn.disabled=true; btn.textContent='جاري الحفظ...';
+  try{
+    let imageUrl='';
+    const editId=document.getElementById('editAnalysisId').value;
+    if(editId){ const d=await db.collection('daily_analyses').doc(editId).get(); imageUrl=d.data()?.imageUrl||''; }
+    if(pendingAnalysisImg){
+      const fill=document.getElementById('an-img-fill');
+      document.getElementById('an-img-progress').style.display='block';
+      const path=`analyses/${Date.now()}_${pendingAnalysisImg.name}`;
+      const uploadUrl=`${SUPA_URL}/storage/v1/object/${SUPA_BUCKET}/${path}`;
+      imageUrl=await new Promise((res,rej)=>{
+        const xhr=new XMLHttpRequest();
+        xhr.open('POST',uploadUrl,true);
+        xhr.setRequestHeader('Authorization','Bearer '+SUPA_KEY);
+        xhr.setRequestHeader('x-upsert','true');
+        xhr.setRequestHeader('Content-Type',pendingAnalysisImg.type||'image/jpeg');
+        xhr.upload.onprogress=e=>{ if(e.lengthComputable) fill.style.width=(e.loaded/e.total*100).toFixed(0)+'%'; };
+        xhr.onload=()=>xhr.status<300?res(`${SUPA_URL}/storage/v1/object/public/${SUPA_BUCKET}/${path}`):rej(new Error(xhr.responseText));
+        xhr.onerror=()=>rej(new Error('فشل الرفع'));
+        xhr.send(pendingAnalysisImg);
+      });
+    }
+    const data={
+      pair: pair.toUpperCase(),
+      timeframe: document.getElementById('an-tf').value,
+      direction,
+      entry: document.getElementById('an-entry').value.trim(),
+      stopLoss: document.getElementById('an-sl').value.trim(),
+      targets: document.getElementById('an-targets').value.split(',').map(t=>t.trim()).filter(Boolean),
+      notes: document.getElementById('an-notes').value.trim(),
+      imageUrl,
+      updatedAt: Date.now()
+    };
+    if(editId){ await db.collection('daily_analyses').doc(editId).update(data); toast('✅ تم تحديث التحليل'); }
+    else{ data.createdAt=Date.now(); await db.collection('daily_analyses').add(data); toast('✅ تم إضافة التحليل'); }
+    closeModal('analysisModal');
+    loadAdminAnalyses();
+  }catch(e){ toast('خطأ: '+e.message,'error'); }
+  btn.disabled=false; btn.textContent='💾 حفظ التحليل';
+}
+
+async function deleteAnalysis(id){
+  if(!confirm('حذف هذا التحليل؟')) return;
+  await db.collection('daily_analyses').doc(id).delete();
+  toast('🗑 تم الحذف');
+  loadAdminAnalyses();
 }
 
 async function loadServicesPanel(){
