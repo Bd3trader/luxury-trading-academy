@@ -663,11 +663,17 @@
     <img src="logo.svg" alt="3B"/>
   </div>
 
-  <!-- Notifications right -->
-  <button class="mob-notif-btn" onclick="toggleNotifPanel()">
-    🔔
-    <span class="mob-notif-badge" id="mobNotifBadge">0</span>
-  </button>
+  <!-- Right: analysis + notifications -->
+  <div style="display:flex;align-items:center;gap:7px">
+    <button onclick="showSection('sec-analysis')" style="display:flex;align-items:center;gap:5px;background:rgba(212,160,60,.18);border:1px solid rgba(212,160,60,.45);border-radius:9px;padding:6px 10px;color:var(--gold);font-family:'Cairo',sans-serif;font-size:.72rem;font-weight:800;cursor:pointer">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      تحليل
+    </button>
+    <button class="mob-notif-btn" onclick="toggleNotifPanel()">
+      🔔
+      <span class="mob-notif-badge" id="mobNotifBadge">0</span>
+    </button>
+  </div>
 </div>
 
 <!-- Notifications Panel -->
@@ -691,6 +697,8 @@
     <div class="th-date-box">
       <span class="th-date-icon">📅</span>
       <span class="th-date-text" id="thDate">—</span>
+      <span style="color:rgba(255,255,255,.3);margin:0 4px">|</span>
+      <span class="th-time-text" id="thTime" style="font-size:.75rem;font-weight:700;color:rgba(255,255,255,.6);direction:ltr;letter-spacing:.5px;font-variant-numeric:tabular-nums">00:00</span>
     </div>
   </div>
   <!-- الإشعار + التحليل اليومي -->
