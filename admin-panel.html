@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>لوحة التحكم | منصة تعليم التداول</title>
+  <title>لوحة التحكم   3btrading</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -803,49 +803,56 @@
 
 <!-- ── Analysis Modal ── -->
 <div class="modal-overlay" id="analysisModal">
-  <div class="modal" style="max-width:560px">
+  <div class="modal" style="max-width:600px">
     <div class="modal-header">
       <div class="modal-title" id="analysisModalTitle">إضافة تحليل جديد</div>
       <button class="modal-close" onclick="closeModal('analysisModal')">✕</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="editAnalysisId"/>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
         <div class="field">
           <label>الزوج / العملة *</label>
           <input type="text" id="an-pair" placeholder="مثال: XAUUSD" dir="ltr"/>
         </div>
         <div class="field">
-          <label>الفريم الزمني *</label>
+          <label>الفريم الزمني</label>
           <select id="an-tf" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:'Cairo',sans-serif;font-size:.88rem;background:#fff;color:var(--text);outline:none">
             <option value="M1">M1</option><option value="M5">M5</option><option value="M15">M15</option>
-            <option value="M30">M30</option><option value="H1">H1</option><option value="H4">H4</option>
+            <option value="M30">M30</option><option value="H1" selected>H1</option><option value="H4">H4</option>
             <option value="D1">D1 (يومي)</option><option value="W1">W1 (أسبوعي)</option>
           </select>
         </div>
-      </div>
-      <div class="field">
-        <label>الاتجاه *</label>
-        <div style="display:flex;gap:10px">
-          <label style="flex:1;display:flex;align-items:center;gap:8px;padding:10px 14px;border:2px solid #e2e8f0;border-radius:10px;cursor:pointer;transition:all .2s" id="lbl-buy">
-            <input type="radio" name="an-dir" value="buy" id="an-buy" onchange="highlightDir()"/> <span style="font-weight:700;color:#059669">🟢 شراء</span>
-          </label>
-          <label style="flex:1;display:flex;align-items:center;gap:8px;padding:10px 14px;border:2px solid #e2e8f0;border-radius:10px;cursor:pointer;transition:all .2s" id="lbl-sell">
-            <input type="radio" name="an-dir" value="sell" id="an-sell" onchange="highlightDir()"/> <span style="font-weight:700;color:#dc2626">🔴 بيع</span>
-          </label>
+        <div class="field">
+          <label>السعر الحالي</label>
+          <input type="text" id="an-price" placeholder="4151.17" dir="ltr"/>
         </div>
       </div>
+      <div class="field">
+        <label>التحليل العام (الاتجاه)</label>
+        <textarea id="an-trend" rows="2" placeholder="بشكل عام الاتجاه هابط / صاعد... اكتب وصف الحركة العامة للسوق" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:'Cairo',sans-serif;font-size:.88rem;resize:vertical;outline:none;box-sizing:border-box"></textarea>
+      </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div class="field"><label>نقطة الدخول</label><input type="text" id="an-entry" placeholder="1920.50" dir="ltr"/></div>
-        <div class="field"><label>وقف الخسارة</label><input type="text" id="an-sl" placeholder="1910.00" dir="ltr"/></div>
+        <div class="field">
+          <label>مناطق المقاومة</label>
+          <input type="text" id="an-resistance" placeholder="4178.53, 4200" dir="ltr"/>
+        </div>
+        <div class="field">
+          <label>مناطق الدعم</label>
+          <input type="text" id="an-support" placeholder="4135, 4121" dir="ltr"/>
+        </div>
       </div>
       <div class="field">
-        <label>الأهداف (افصل بينها بفاصلة)</label>
-        <input type="text" id="an-targets" placeholder="1930, 1940, 1950" dir="ltr"/>
+        <label>السيناريو الصاعد 🟢</label>
+        <textarea id="an-bull" rows="2" placeholder="ثبات فوق 4155 وكسر 4178 يوصل للمناطق 4190 و 4234..." style="width:100%;padding:9px 12px;border:1.5px solid #d1fae5;border-radius:9px;font-family:'Cairo',sans-serif;font-size:.88rem;resize:vertical;outline:none;box-sizing:border-box"></textarea>
       </div>
       <div class="field">
-        <label>ملاحظات التحليل</label>
-        <textarea id="an-notes" rows="3" placeholder="اكتب تفاصيل التحليل هنا..." style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:'Cairo',sans-serif;font-size:.88rem;resize:vertical;outline:none;box-sizing:border-box"></textarea>
+        <label>السيناريو الهابط 🔴</label>
+        <textarea id="an-bear" rows="2" placeholder="كسر 4135 يعيد الضغط نحو 4115 و 4100..." style="width:100%;padding:9px 12px;border:1.5px solid #fee2e2;border-radius:9px;font-family:'Cairo',sans-serif;font-size:.88rem;resize:vertical;outline:none;box-sizing:border-box"></textarea>
+      </div>
+      <div class="field">
+        <label>ملاحظة</label>
+        <textarea id="an-notes" rows="2" placeholder="السوق اليوم متقلب بسبب إغلاق..." style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:'Cairo',sans-serif;font-size:.88rem;resize:vertical;outline:none;box-sizing:border-box"></textarea>
       </div>
       <div class="field">
         <label>صورة التحليل (الشارت)</label>
@@ -2362,8 +2369,6 @@ async function loadAdminAnalyses(){
     el.innerHTML='';
     snap.forEach(doc=>{
       const a={id:doc.id,...doc.data()};
-      const dirLabel = a.direction==='buy'?'🟢 شراء':'🔴 بيع';
-      const dirColor = a.direction==='buy'?'#059669':'#dc2626';
       const date = a.createdAt?new Date(a.createdAt).toLocaleString('ar-SA',{calendar:'gregory',numberingSystem:'latn'}):'—';
       const card=document.createElement('div');
       card.style.cssText='background:#fff;border-radius:14px;padding:16px 18px;border:1px solid rgba(0,0,0,.07);box-shadow:0 2px 8px rgba(0,0,0,.05);display:flex;align-items:center;gap:14px;flex-wrap:wrap';
@@ -2373,10 +2378,10 @@ async function loadAdminAnalyses(){
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
             <span style="font-weight:800;font-size:.95rem;color:var(--navy)">${a.pair||'—'}</span>
             <span style="background:#f1f5f9;color:#475569;padding:2px 10px;border-radius:20px;font-size:.72rem;font-weight:700">${a.timeframe||'—'}</span>
-            <span style="color:${dirColor};font-weight:800;font-size:.82rem">${dirLabel}</span>
+            ${a.price?`<span style="color:var(--gold);font-weight:700;font-size:.82rem">⏱ ${a.price}</span>`:''}
           </div>
           <div style="font-size:.72rem;color:#9ca3af">${date}</div>
-          ${a.notes?`<div style="font-size:.78rem;color:#374151;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:300px">${a.notes}</div>`:''}
+          ${a.trend?`<div style="font-size:.78rem;color:#374151;margin-top:4px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical">${a.trend}</div>`:''}
         </div>
         <div style="display:flex;gap:8px;flex-shrink:0">
           <button onclick="openAnalysisModal('${a.id}')" class="action-btn btn-edit">✏️ تعديل</button>
@@ -2385,14 +2390,6 @@ async function loadAdminAnalyses(){
       el.appendChild(card);
     });
   }catch(e){ el.innerHTML='<div style="color:#dc2626;text-align:center;padding:32px">حدث خطأ</div>'; }
-}
-
-function highlightDir(){
-  const buy=document.getElementById('an-buy').checked;
-  document.getElementById('lbl-buy').style.borderColor=buy?'#059669':'#e2e8f0';
-  document.getElementById('lbl-buy').style.background=buy?'rgba(5,150,105,.06)':'';
-  document.getElementById('lbl-sell').style.borderColor=!buy?'#dc2626':'#e2e8f0';
-  document.getElementById('lbl-sell').style.background=!buy?'rgba(220,38,38,.06)':'';
 }
 
 function handleAnalysisImg(input){
@@ -2407,25 +2404,24 @@ function handleAnalysisImg(input){
 async function openAnalysisModal(id){
   document.getElementById('editAnalysisId').value=id||'';
   document.getElementById('analysisModalTitle').textContent=id?'تعديل التحليل':'إضافة تحليل جديد';
-  ['an-pair','an-entry','an-sl','an-targets','an-notes'].forEach(i=>document.getElementById(i).value='');
+  ['an-pair','an-price','an-trend','an-resistance','an-support','an-bull','an-bear','an-notes'].forEach(i=>document.getElementById(i).value='');
   document.getElementById('an-tf').value='H1';
-  document.getElementById('an-buy').checked=false; document.getElementById('an-sell').checked=false;
   document.getElementById('an-img-label').textContent='اختر صورة الشارت';
   document.getElementById('an-img-preview').style.display='none';
   document.getElementById('an-img-progress').style.display='none';
-  document.getElementById('lbl-buy').style.borderColor='#e2e8f0'; document.getElementById('lbl-buy').style.background='';
-  document.getElementById('lbl-sell').style.borderColor='#e2e8f0'; document.getElementById('lbl-sell').style.background='';
   pendingAnalysisImg=null;
   if(id){
     const doc=await db.collection('daily_analyses').doc(id).get();
     const a=doc.data();
     document.getElementById('an-pair').value=a.pair||'';
     document.getElementById('an-tf').value=a.timeframe||'H1';
-    document.getElementById('an-entry').value=a.entry||'';
-    document.getElementById('an-sl').value=a.stopLoss||'';
-    document.getElementById('an-targets').value=(a.targets||[]).join(', ');
+    document.getElementById('an-price').value=a.price||'';
+    document.getElementById('an-trend').value=a.trend||'';
+    document.getElementById('an-resistance').value=a.resistance||'';
+    document.getElementById('an-support').value=a.support||'';
+    document.getElementById('an-bull').value=a.bullScenario||'';
+    document.getElementById('an-bear').value=a.bearScenario||'';
     document.getElementById('an-notes').value=a.notes||'';
-    if(a.direction){ document.getElementById('an-'+a.direction).checked=true; highlightDir(); }
     if(a.imageUrl){ document.getElementById('an-img-thumb').src=a.imageUrl; document.getElementById('an-img-preview').style.display='block'; document.getElementById('an-img-label').textContent='صورة محفوظة'; }
   }
   openModal('analysisModal');
@@ -2433,8 +2429,7 @@ async function openAnalysisModal(id){
 
 async function saveAnalysis(){
   const pair=document.getElementById('an-pair').value.trim();
-  const direction=document.querySelector('input[name="an-dir"]:checked')?.value;
-  if(!pair||!direction){ toast('الزوج والاتجاه مطلوبان','error'); return; }
+  if(!pair){ toast('اسم الزوج مطلوب','error'); return; }
   const btn=document.getElementById('saveAnalysisBtn');
   btn.disabled=true; btn.textContent='جاري الحفظ...';
   try{
@@ -2461,10 +2456,12 @@ async function saveAnalysis(){
     const data={
       pair: pair.toUpperCase(),
       timeframe: document.getElementById('an-tf').value,
-      direction,
-      entry: document.getElementById('an-entry').value.trim(),
-      stopLoss: document.getElementById('an-sl').value.trim(),
-      targets: document.getElementById('an-targets').value.split(',').map(t=>t.trim()).filter(Boolean),
+      price: document.getElementById('an-price').value.trim(),
+      trend: document.getElementById('an-trend').value.trim(),
+      resistance: document.getElementById('an-resistance').value.trim(),
+      support: document.getElementById('an-support').value.trim(),
+      bullScenario: document.getElementById('an-bull').value.trim(),
+      bearScenario: document.getElementById('an-bear').value.trim(),
       notes: document.getElementById('an-notes').value.trim(),
       imageUrl,
       updatedAt: Date.now()
