@@ -2439,7 +2439,8 @@ async function saveAnalysis(){
     if(pendingAnalysisImg){
       const fill=document.getElementById('an-img-fill');
       document.getElementById('an-img-progress').style.display='block';
-      const path=`analyses/${Date.now()}_${pendingAnalysisImg.name}`;
+      const safeName=pendingAnalysisImg.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+      const path=`analyses/${Date.now()}_${safeName}`;
       const uploadUrl=`${SUPA_URL}/storage/v1/object/${SUPA_BUCKET}/${path}`;
       imageUrl=await new Promise((res,rej)=>{
         const xhr=new XMLHttpRequest();
