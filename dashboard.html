@@ -1512,7 +1512,12 @@ function openSection(key,sec,btn){
   // liquidity / reviews / strategies: flat arrays from Firestore
   const flatArr = Array.isArray(secObj) ? secObj : null;
   // Check Firestore strategies data
-  const stratArr = sec==='strategies' ? (firestoreContent.content?.[key]?.strategies||[]) : null;
+  // للمتقدمة: ادمج استراتيجيات الكلاسيك + المتقدمة معاً
+  const stratArr = sec==='strategies' ? (
+    key==='advanced'
+      ? [...(firestoreContent.content?.classic?.strategies||[]), ...(firestoreContent.content?.advanced?.strategies||[])]
+      : (firestoreContent.content?.[key]?.strategies||[])
+  ) : null;
   const firestoreFlat = flatArr || (sec==='liquidity'||sec==='reviews' ? secObj : null);
 
   if(stratArr && stratArr.length>0){
