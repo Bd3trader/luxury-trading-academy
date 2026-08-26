@@ -174,9 +174,11 @@
     .current-file{font-size:.75rem;margin-top:6px;padding:5px 10px;border-radius:6px;font-weight:700}
     .current-file.has{background:rgba(5,150,105,.1);color:var(--green)}
     .current-file.none{color:var(--muted)}
+    #sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:199}
     @media(max-width:900px){
       #sidebar{transform:translateX(240px)}
       #sidebar.open{transform:translateX(0)}
+      #sidebar.open ~ #sidebar-overlay{display:block}
       #main{margin-right:0}
       .stats-row{grid-template-columns:repeat(2,1fr)}
       #topbar{padding:0 16px}
@@ -188,6 +190,7 @@
 </head>
 <body>
 
+<div id="sidebar-overlay" onclick="closeSidebar()"></div>
 <div id="sidebar">
   <div class="sb-logo">
     <div class="sb-logo-icon">🛡️</div>
@@ -1072,6 +1075,7 @@ function showPanel(name){
   document.getElementById('panel-'+name).classList.add('active');
   document.querySelectorAll('.sb-link').forEach(l=>{ if(l.getAttribute('onclick')===`showPanel('${name}')`) l.classList.add('active'); });
   document.getElementById('pageTitle').textContent = panelTitles[name]||name;
+  if(window.innerWidth<=900) closeSidebar();
   renderPanel(name);
   if(name==='settings') loadOpenAIKeyStatus();
   if(name==='services') loadServicesPanel();
@@ -2182,6 +2186,7 @@ document.querySelectorAll('.modal-overlay').forEach(o=>{
 
 /* ═══ Sidebar ═══ */
 function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); }
+function closeSidebar(){ document.getElementById('sidebar').classList.remove('open'); }
 function adminLogout(){ sessionStorage.removeItem('adminLoggedIn'); window.location.href='admin.html'; }
 
 /* ══════════════════════════════════════════
