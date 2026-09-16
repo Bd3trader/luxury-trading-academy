@@ -1138,7 +1138,7 @@ const firebaseConfig={apiKey:"AIzaSyCp4YfzewPiH6XkVHo6Sp86hyy5gB-eUSY",authDomai
 if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db=firebase.firestore();
 
-let firestoreContent={content:{classic:{lectures:[],books:[],images:[],liquidity:[],reviews:[],strategies:[]},advanced:{lectures:[],books:[],images:[],liquidity:[],reviews:[],strategies:[]}},scheduledSessions:[]};
+let firestoreContent={content:{classic:{lectures:[],books:[],images:[],liquidity:[],reviews:[],strategies:[],heikinashi:[]},advanced:{lectures:[],books:[],images:[],liquidity:[],reviews:[],strategies:[],heikinashi:[]}},scheduledSessions:[]};
 function getData(){return firestoreContent;}
 function saveData(d){}  // no-op — Firestore is the source of truth
 
@@ -1163,6 +1163,7 @@ async function loadFirestoreContent(){
     tasks.push(db.collection('liquidity_advanced').orderBy('order').get().then(s=>{firestoreContent.content.advanced.liquidity=s.docs.map(d=>({id:d.id,...d.data()}));}));
     tasks.push(db.collection('reviews_advanced').orderBy('order').get().then(s=>{firestoreContent.content.advanced.reviews=s.docs.map(d=>({id:d.id,...d.data()}));}));
     tasks.push(db.collection('strategies_advanced').orderBy('order').get().then(s=>{firestoreContent.content.advanced.strategies=s.docs.map(d=>({id:d.id,...d.data()}));}));
+    tasks.push(db.collection('heikinashi').orderBy('order').get().then(s=>{const arr=s.docs.map(d=>({id:d.id,...d.data()})); firestoreContent.content.classic.heikinashi=arr; firestoreContent.content.advanced.heikinashi=arr;}));
   }
   tasks.push(db.collection('scheduled_sessions').get().then(s=>{firestoreContent.scheduledSessions=s.docs.map(d=>({id:d.id,...d.data()}));}));
   await Promise.all(tasks).catch(console.error);
@@ -1457,6 +1458,7 @@ function renderSchools(){
              <div class="sc-sections">
                <button class="sc-sec-btn" onclick="openSection('${key}','liquidity',this)">دروس السيولة</button>
                <button class="sc-sec-btn" onclick="openSection('${key}','strategies',this)">الاستراتيجيات والمؤشرات</button>
+               <button class="sc-sec-btn" onclick="openSection('${key}','heikinashi',this)">🕯️ مدرسة الهايكناشي</button>
                <button class="sc-sec-btn" onclick="openSection('${key}','reviews',this)" style="grid-column:1/-1">المحاضرات والمراجعات</button>
              </div>`
           :`<button class="sc-btn-locked">غير متاح — تواصل مع المسؤول</button>`
@@ -1503,6 +1505,7 @@ function openSchool(key){
 const sectionMeta={
   liquidity:{name:'دروس السيولة',icon:'💧'},
   strategies:{name:'الاستراتيجيات والمؤشرات',icon:'📐'},
+  heikinashi:{name:'مدرسة الهايكناشي',icon:'🕯️'},
   reviews:{name:'المحاضرات والمراجعات',icon:'🎥'}
 };
 
@@ -1534,11 +1537,10 @@ function openSection(key,sec,btn){
     key==='advanced'
       ? [...(firestoreContent.content?.classic?.strategies||[]), ...(firestoreContent.content?.advanced?.strategies||[])]
       : (firestoreContent.content?.[key]?.strategies||[])
-  ) : null;
+  ) : sec==='heikinashi' ? (firestoreContent.content?.[key]?.heikinashi||[]) : null;
   const firestoreFlat = flatArr || (sec==='liquidity'||sec==='reviews' ? secObj : null);
 
   if(stratArr && stratArr.length>0){
-    // strategies from Firestore admin
     document.querySelector('.tabs-bar').style.display='flex';
     renderSectionItems(key, stratArr, sec);
     switchTab('lectures',document.getElementById('tab-lectures'));

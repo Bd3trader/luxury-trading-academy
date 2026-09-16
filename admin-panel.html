@@ -1019,6 +1019,7 @@ let cache = {
   liquidity: { classic: [], advanced: [] },
   reviews: { classic: [], advanced: [] },
   strategies: { classic: [], advanced: [] },
+  heikinashi: [],
   sessions: [],
   scheduledSessions: [],
   adminPassword: 'Admin@2025'
@@ -1035,7 +1036,7 @@ function toggleSubPwd(){ const i=document.getElementById('f-password'); i.type=i
 /* ═══ Load Data from Firebase ═══ */
 async function loadData(){
   try {
-    const [subsSnap, classicLecsSnap, advancedLecsSnap, classicBooksSnap, advancedBooksSnap, classicImgsSnap, advancedImgsSnap, liqClassicSnap, liqAdvancedSnap, revClassicSnap, revAdvancedSnap, strClassicSnap, strAdvancedSnap, sesSnap, schedSnap, settingsSnap] = await Promise.all([
+    const [subsSnap, classicLecsSnap, advancedLecsSnap, classicBooksSnap, advancedBooksSnap, classicImgsSnap, advancedImgsSnap, liqClassicSnap, liqAdvancedSnap, revClassicSnap, revAdvancedSnap, strClassicSnap, strAdvancedSnap, heikinashiSnap, sesSnap, schedSnap, settingsSnap] = await Promise.all([
       db.collection('subscribers').get(),
       db.collection('lectures_classic').orderBy('order').get(),
       db.collection('lectures_advanced').orderBy('order').get(),
@@ -1049,6 +1050,7 @@ async function loadData(){
       db.collection('reviews_advanced').orderBy('order').get(),
       db.collection('strategies_classic').orderBy('order').get(),
       db.collection('strategies_advanced').orderBy('order').get(),
+      db.collection('heikinashi').orderBy('order').get(),
       db.collection('login_sessions').orderBy('loginTime','desc').limit(100).get(),
       db.collection('scheduled_sessions').get(),
       db.collection('settings').doc('admin').get()
@@ -1066,6 +1068,7 @@ async function loadData(){
     cache.reviews.advanced = revAdvancedSnap.docs.map(d=>({id:d.id,...d.data()}));
     cache.strategies.classic = strClassicSnap.docs.map(d=>({id:d.id,...d.data()}));
     cache.strategies.advanced = strAdvancedSnap.docs.map(d=>({id:d.id,...d.data()}));
+    cache.heikinashi = heikinashiSnap.docs.map(d=>({id:d.id,...d.data()}));
     cache.sessions = sesSnap.docs.map(d=>({id:d.id,...d.data()}));
     cache.scheduledSessions = schedSnap.docs.map(d=>({id:d.id,...d.data()}));
     if(settingsSnap.exists) cache.adminPassword = settingsSnap.data().password || cache.adminPassword;
@@ -1312,6 +1315,7 @@ function renderSchool(key){
       <button class="sub-tab ${currentSubTab==='liquidity'?'active':''}" onclick="switchSubTab('liquidity',this)">💧 دروس السيولة (${(cache.liquidity&&cache.liquidity[key]||[]).length})</button>
       <button class="sub-tab ${currentSubTab==='reviews'?'active':''}" onclick="switchSubTab('reviews',this)">🎥 المراجعات (${(cache.reviews&&cache.reviews[key]||[]).length})</button>
       <button class="sub-tab ${currentSubTab==='strategies'?'active':''}" onclick="switchSubTab('strategies',this)">📐 الاستراتيجيات (${(cache.strategies&&cache.strategies[key]||[]).length})</button>
+      <button class="sub-tab ${currentSubTab==='heikinashi'?'active':''}" onclick="switchSubTab('heikinashi',this)">🕯️ هايكناشي (${(cache.heikinashi||[]).length})</button>
     </div>
     <div id="schoolSubContent"></div>`;
   renderSubTab(key, currentSubTab);
@@ -1387,6 +1391,28 @@ function renderSubTab(key, tab){
             </div>
             <button class="action-btn btn-edit" onclick="openEditImage('${key}','${img.id}')">✏️ تعديل</button>
             <button class="action-btn btn-del" onclick="deleteImage('${key}','${img.id}')">🗑</button>
+          </div>`).join('')}
+      </div>`;
+  } else if(tab==='heikinashi'){
+    const items = (cache.heikinashi||[]).slice().sort((a,b)=>a.order-b.order);
+    const typeIcon = it => it.type==='image'?'🖼️':it.type==='file'?'📄':'🎬';
+    div.innerHTML=`
+      <div class="sec-hd">
+        <div class="sec-hd-title">🕯️ مدرسة الهايكناشي <span style="font-size:.7rem;background:rgba(212,160,60,.15);color:var(--gold);padding:2px 10px;border-radius:20px;margin-right:8px">مشتركة بين المدرستين</span></div>
+        <button class="btn-add" onclick="openAddSection('${key}','heikinashi')">+ إضافة محاضرة</button>
+      </div>
+      <div id="secList">
+        ${items.length===0?'<div class="no-online">لا توجد محاضرات بعد — اضغط لإضافة أول محاضرة</div>':
+          items.map(l=>`<div class="lec-card">
+            <div class="lec-order">${l.order}</div>
+            <div class="lec-info">
+              <div class="lec-title">${typeIcon(l)} ${l.title}</div>
+              <div class="lec-meta"><span>⏱ ${l.duration||'—'}</span>
+                <span class="lec-file ${l.fileURL?'file-ok':'file-none'}">${l.fileURL?'✅ مرفوع':'⌛ لا يوجد ملف'}</span>
+              </div>
+            </div>
+            <button class="action-btn btn-edit" onclick="openEditSection('${key}','heikinashi','${l.id}')">✏️ تعديل</button>
+            <button class="action-btn btn-del" onclick="deleteSection('${key}','heikinashi','${l.id}')">🗑</button>
           </div>`).join('')}
       </div>`;
   } else if(tab==='liquidity' || tab==='reviews' || tab==='strategies'){
@@ -1807,9 +1833,10 @@ function onSvTypeChange(){
 function openAddSection(key, secType){
   editingSectionId = null;
   currentSectionType = secType;
-  document.getElementById('secModalTitle').textContent = 'إضافة — '+secLabels[secType];
+  document.getElementById('secModalTitle').textContent = 'إضافة — '+(secLabels[secType]||'🕯️ هايكناشي');
   ['sv-title','sv-duration','sv-driveurl'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('sv-order').value = (cache[secType][key]||[]).length+1;
+  const cacheArr = secType==='heikinashi' ? cache.heikinashi : (cache[secType][key]||[]);
+  document.getElementById('sv-order').value = cacheArr.length+1;
   document.getElementById('sv-type').value = 'video';
   document.getElementById('sv-video-name').textContent = 'لم يتم اختيار ملف';
   document.getElementById('sv-progress').style.display='none';
@@ -1820,7 +1847,8 @@ function openAddSection(key, secType){
 }
 
 function openEditSection(key, secType, id){
-  const item = (cache[secType][key]||[]).find(x=>x.id===id);
+  const cacheArr2 = secType==='heikinashi' ? cache.heikinashi : (cache[secType][key]||[]);
+  const item = cacheArr2.find(x=>x.id===id);
   if(!item) return;
   editingSectionId = id;
   currentSectionType = secType;
@@ -1853,7 +1881,8 @@ async function saveSection(){
   const order = parseInt(document.getElementById('sv-order').value)||1;
   const duration = document.getElementById('sv-duration').value.trim();
   const type = document.getElementById('sv-type').value;
-  let fileURL = editingSectionId ? (cache[secType][key]||[]).find(x=>x.id===editingSectionId)?.fileURL||'' : '';
+  const cacheRef = secType==='heikinashi' ? cache.heikinashi : (cache[secType][key]||[]);
+  let fileURL = editingSectionId ? cacheRef.find(x=>x.id===editingSectionId)?.fileURL||'' : '';
   const manualUrl = document.getElementById('sv-driveurl').value.trim();
 
   const btn = document.getElementById('saveSectionBtn');
@@ -1880,13 +1909,15 @@ async function saveSection(){
       fileURL = manualUrl;
     }
     const data = {title, order, duration, type, fileURL, updatedAt: Date.now()};
+    const colName = secType==='heikinashi' ? 'heikinashi' : secType+'_'+key;
+    const cacheTarget = secType==='heikinashi' ? cache.heikinashi : cache[secType][key];
     if(editingSectionId){
-      await db.collection(secType+'_'+key).doc(editingSectionId).update(data);
-      const idx = cache[secType][key].findIndex(x=>x.id===editingSectionId);
-      if(idx>=0) cache[secType][key][idx]={...cache[secType][key][idx],...data};
+      await db.collection(colName).doc(editingSectionId).update(data);
+      const idx = cacheTarget.findIndex(x=>x.id===editingSectionId);
+      if(idx>=0) cacheTarget[idx]={...cacheTarget[idx],...data};
     } else {
-      const ref = await db.collection(secType+'_'+key).add({...data, createdAt:Date.now()});
-      cache[secType][key].push({id:ref.id,...data});
+      const ref = await db.collection(colName).add({...data, createdAt:Date.now()});
+      cacheTarget.push({id:ref.id,...data});
     }
     closeModal('sectionModal');
     currentSubTab = secType;
@@ -1901,8 +1932,10 @@ async function saveSection(){
 
 async function deleteSection(key, secType, id){
   if(!confirm('هل تريد حذف هذا العنصر؟')) return;
-  await db.collection(secType+'_'+key).doc(id).delete();
-  cache[secType][key] = (cache[secType][key]||[]).filter(x=>x.id!==id);
+  const delCol = secType==='heikinashi' ? 'heikinashi' : secType+'_'+key;
+  await db.collection(delCol).doc(id).delete();
+  if(secType==='heikinashi') cache.heikinashi = cache.heikinashi.filter(x=>x.id!==id);
+  else cache[secType][key] = (cache[secType][key]||[]).filter(x=>x.id!==id);
   renderSchool(key);
   toast('🗑 تم الحذف','error');
 }
