@@ -555,6 +555,26 @@
         <div id="openaiKeyStatus" style="font-size:.82rem;margin-bottom:12px"></div>
         <button class="btn-primary" onclick="saveOpenAIKey()">💾 حفظ المفتاح</button>
       </div>
+      <div class="settings-card" style="border:2px solid rgba(220,38,38,.2)">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div>
+            <h3 style="margin:0 0 6px">🚧 وضع الصيانة</h3>
+            <p style="font-size:.82rem;color:var(--muted);margin:0">عند التفعيل تُوقف صفحة المنصة للطلاب وتظهر رسالة صيانة. لا يؤثر على لوحة الأدمن.</p>
+          </div>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none">
+            <span id="maintLabel" style="font-size:.85rem;font-weight:700;color:#9ca3af">متوقف</span>
+            <div style="position:relative;width:52px;height:28px" onclick="toggleMaintenance()">
+              <div id="maintTrack" style="width:52px;height:28px;border-radius:20px;background:#e2e8f0;transition:background .25s;cursor:pointer"></div>
+              <div id="maintThumb" style="position:absolute;top:3px;right:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.25);transition:transform .25s"></div>
+            </div>
+          </label>
+        </div>
+        <div id="maintMsgWrap" style="margin-top:14px;display:none">
+          <label style="font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:6px;display:block">رسالة الصيانة (تظهر للطلاب)</label>
+          <textarea id="maintMsg" rows="2" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:'Cairo',sans-serif;font-size:.88rem;resize:vertical;outline:none;box-sizing:border-box">المنصة تحت الصيانة، سيتم العودة قريباً ⚙️</textarea>
+          <button class="btn-primary" onclick="saveMaintMsg()" style="margin-top:10px;background:#dc2626">💾 حفظ الرسالة</button>
+        </div>
+      </div>
       <div class="settings-card">
         <h3>🔑 تغيير كلمة مرور المسؤول</h3>
         <div class="field"><label>كلمة المرور الحالية</label><input type="password" id="curPwd" placeholder="••••••••" dir="ltr"/></div>
@@ -1077,7 +1097,7 @@ function showPanel(name){
   document.getElementById('pageTitle').textContent = panelTitles[name]||name;
   if(window.innerWidth<=900) closeSidebar();
   renderPanel(name);
-  if(name==='settings') loadOpenAIKeyStatus();
+  if(name==='settings'){ loadOpenAIKeyStatus(); loadMaintenanceState(); }
   if(name==='services') loadServicesPanel();
   if(name==='analyses') loadAdminAnalyses();
 }
@@ -2152,6 +2172,53 @@ async function loadOpenAIKeyStatus(){
       st.innerHTML='<span style="color:var(--muted)">لم يتم حفظ أي مفتاح بعد</span>';
     }
   } catch(e){}
+}
+
+// ── Maintenance Mode ──
+let _maintActive = false;
+async function loadMaintenanceState(){
+  try{
+    const doc = await db.collection('settings').doc('maintenance').get();
+    const d = doc.exists ? doc.data() : {};
+    _maintActive = !!d.active;
+    document.getElementById('maintMsg').value = d.message || 'المنصة تحت الصيانة، سيتم العودة قريباً ⚙️';
+    applyMaintUI();
+  }catch(e){}
+}
+function applyMaintUI(){
+  const track = document.getElementById('maintTrack');
+  const thumb = document.getElementById('maintThumb');
+  const label = document.getElementById('maintLabel');
+  const wrap  = document.getElementById('maintMsgWrap');
+  if(_maintActive){
+    track.style.background='#dc2626';
+    thumb.style.transform='translateX(-24px)';
+    label.style.color='#dc2626';
+    label.textContent='مفعّل';
+    wrap.style.display='block';
+  } else {
+    track.style.background='#e2e8f0';
+    thumb.style.transform='translateX(0)';
+    label.style.color='#9ca3af';
+    label.textContent='متوقف';
+    wrap.style.display='none';
+  }
+}
+async function toggleMaintenance(){
+  _maintActive = !_maintActive;
+  applyMaintUI();
+  await db.collection('settings').doc('maintenance').set({
+    active: _maintActive,
+    message: document.getElementById('maintMsg').value.trim() || 'المنصة تحت الصيانة، سيتم العودة قريباً ⚙️',
+    updatedAt: Date.now()
+  }, {merge:true});
+  toast(_maintActive ? '🚧 وضع الصيانة مفعّل — المنصة موقوفة للطلاب' : '✅ وضع الصيانة أُلغي — المنصة تعمل', _maintActive?'error':'success');
+}
+async function saveMaintMsg(){
+  const msg = document.getElementById('maintMsg').value.trim();
+  if(!msg){ toast('الرسالة فارغة','error'); return; }
+  await db.collection('settings').doc('maintenance').set({ message: msg, updatedAt: Date.now() }, {merge:true});
+  toast('✅ تم حفظ الرسالة');
 }
 
 async function saveOpenAIKey(){

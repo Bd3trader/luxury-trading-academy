@@ -1372,6 +1372,23 @@ async function init(){
   if(!raw){window.location.href='login.html';return;}
   sub=JSON.parse(raw);
 
+  // فحص وضع الصيانة
+  try{
+    const mDoc = await db.collection('settings').doc('maintenance').get();
+    if(mDoc.exists && mDoc.data().active){
+      const msg = mDoc.data().message || 'المنصة تحت الصيانة، سيتم العودة قريباً ⚙️';
+      document.body.innerHTML=`
+        <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);padding:32px;font-family:'Cairo',sans-serif;text-align:center">
+          <div style="font-size:4rem;margin-bottom:16px">🚧</div>
+          <div style="color:#d4a03c;font-size:1.5rem;font-weight:800;margin-bottom:12px">المنصة تحت الصيانة</div>
+          <div style="color:rgba(255,255,255,.75);font-size:1rem;max-width:400px;line-height:1.8">${msg}</div>
+          <div style="margin-top:32px;color:rgba(255,255,255,.35);font-size:.8rem">منصة تعليم التداول — 3BTrading</div>
+        </div>`;
+      return;
+    }
+  }catch(e){}
+
+
   const initLetter=sub.name.charAt(0);
   document.getElementById('avatarLetter').textContent=initLetter;
   document.getElementById('userName').textContent=sub.name;
