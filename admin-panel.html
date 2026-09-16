@@ -775,6 +775,19 @@
         </div>
       </div>
       <div class="field" id="sv-url-field"><label>أو رابط YouTube / Drive / رابط مباشر</label><input type="text" id="sv-driveurl" placeholder="https://youtu.be/..."/></div>
+      <div class="field" id="sv-thumb-field" style="display:none">
+        <label>🖼️ صورة الخلفية (Thumbnail)</label>
+        <div style="position:relative">
+          <label for="sv-thumb-file" style="display:flex;align-items:center;gap:8px;padding:10px 14px;border:2px dashed #cbd5e1;border-radius:10px;cursor:pointer;color:#64748b;font-size:.85rem;transition:border .2s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='#cbd5e1'">
+            🖼️ <span id="sv-thumb-name">اختر صورة الخلفية</span>
+          </label>
+          <input type="file" id="sv-thumb-file" accept="image/*" onchange="handleThumbFile(this)" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none"/>
+        </div>
+        <div id="sv-thumb-preview" style="display:none;margin-top:8px;position:relative">
+          <img id="sv-thumb-img" style="width:100%;border-radius:10px;max-height:160px;object-fit:cover"/>
+          <div id="sv-thumb-progress" style="display:none;margin-top:6px;background:#e2e8f0;border-radius:20px;height:6px"><div id="sv-thumb-fill" style="background:var(--gold);height:6px;border-radius:20px;width:0%;transition:width .3s"></div></div>
+        </div>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('sectionModal')">إلغاء</button>
@@ -1806,6 +1819,7 @@ async function deleteImage(key, id){
 let editingSectionId = null;
 let currentSectionType = null;
 let pendingSectionFile = null;
+let pendingThumbFile = null;
 
 const secLabels = {liquidity:'💧 دروس السيولة', reviews:'🎥 المراجعات', strategies:'📐 الاستراتيجيات'};
 
@@ -1842,6 +1856,10 @@ function openAddSection(key, secType){
   document.getElementById('sv-progress').style.display='none';
   document.getElementById('sv-progress-text').textContent='';
   pendingSectionFile = null;
+  pendingThumbFile = null;
+  document.getElementById('sv-thumb-field').style.display = secType==='heikinashi' ? 'block' : 'none';
+  document.getElementById('sv-thumb-name').textContent = 'اختر صورة الخلفية';
+  document.getElementById('sv-thumb-preview').style.display = 'none';
   onSvTypeChange();
   openModal('sectionModal');
 }
@@ -1862,6 +1880,18 @@ function openEditSection(key, secType, id){
   document.getElementById('sv-progress').style.display='none';
   document.getElementById('sv-progress-text').textContent='';
   pendingSectionFile = null;
+  pendingThumbFile = null;
+  // thumbnail field
+  const isHeikin = secType==='heikinashi';
+  document.getElementById('sv-thumb-field').style.display = isHeikin ? 'block' : 'none';
+  if(isHeikin && item.thumbnailURL){
+    document.getElementById('sv-thumb-img').src = item.thumbnailURL;
+    document.getElementById('sv-thumb-preview').style.display = 'block';
+    document.getElementById('sv-thumb-name').textContent = '✅ صورة محفوظة — اختر جديدة للاستبدال';
+  } else {
+    document.getElementById('sv-thumb-preview').style.display = 'none';
+    document.getElementById('sv-thumb-name').textContent = 'اختر صورة الخلفية';
+  }
   onSvTypeChange();
   document.getElementById('sv-type').value = item.type||'video';
   openModal('sectionModal');
@@ -1871,6 +1901,18 @@ function handleSectionFile(input){
   pendingSectionFile = input.files[0];
   if(pendingSectionFile)
     document.getElementById('sv-video-name').textContent = '📎 '+pendingSectionFile.name+' ('+(pendingSectionFile.size/1024/1024).toFixed(1)+' MB)';
+}
+
+function handleThumbFile(input){
+  pendingThumbFile = input.files[0];
+  if(!pendingThumbFile) return;
+  document.getElementById('sv-thumb-name').textContent = '📎 '+pendingThumbFile.name;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('sv-thumb-img').src = e.target.result;
+    document.getElementById('sv-thumb-preview').style.display = 'block';
+  };
+  reader.readAsDataURL(pendingThumbFile);
 }
 
 async function saveSection(){
@@ -1908,7 +1950,18 @@ async function saveSection(){
     } else if(manualUrl){
       fileURL = manualUrl;
     }
+    // رفع صورة الخلفية للهايكناشي
+    let thumbnailURL = editingSectionId ? (cacheRef.find(x=>x.id===editingSectionId)?.thumbnailURL||'') : '';
+    if(pendingThumbFile && secType==='heikinashi'){
+      const safeTName = pendingThumbFile.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+      const thumbPath = `heikinashi/thumbs/${Date.now()}_${safeTName}`;
+      thumbnailURL = await uploadFile(pendingThumbFile, thumbPath,
+        document.getElementById('sv-thumb-fill'),
+        document.getElementById('sv-thumb-progress'));
+      pendingThumbFile = null;
+    }
     const data = {title, order, duration, type, fileURL, updatedAt: Date.now()};
+    if(secType==='heikinashi') data.thumbnailURL = thumbnailURL;
     const colName = secType==='heikinashi' ? 'heikinashi' : secType+'_'+key;
     const cacheTarget = secType==='heikinashi' ? cache.heikinashi : cache[secType][key];
     if(editingSectionId){
