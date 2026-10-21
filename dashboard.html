@@ -2796,7 +2796,7 @@ async function loadAnalyses(){
       card.style.cssText='background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.08);border:1px solid rgba(0,0,0,.06)';
 
       card.innerHTML=`
-        ${a.imageUrl ? `<img src="${a.imageUrl}" alt="تحليل" style="width:100%;max-height:380px;object-fit:cover;display:block"/>` : ''}
+        ${a.imageUrl ? `<img src="${a.imageUrl}" alt="تحليل" style="width:100%;height:auto;display:block"/>` : ''}
         <div style="padding:20px 22px">
           <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:16px">
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
@@ -2822,7 +2822,7 @@ async function loadAnalyses(){
         const postCard = document.createElement('div');
         postCard.style.cssText='background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.08);border:2px solid rgba(5,150,105,.25);margin-top:0';
         postCard.innerHTML=`
-          ${post.postImageUrl?`<img src="${post.postImageUrl}" alt="بعد الأهداف" style="width:100%;max-height:360px;object-fit:cover;display:block"/>`:''}
+          ${post.postImageUrl?`<img src="${post.postImageUrl}" alt="بعد الأهداف" style="width:100%;height:auto;display:block"/>`:''}
           <div style="padding:20px 22px">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
               <span style="background:linear-gradient(135deg,#059669,#047857);color:#fff;padding:5px 16px;border-radius:20px;font-size:.85rem;font-weight:800">🎯 بعد ضرب الأهداف</span>
