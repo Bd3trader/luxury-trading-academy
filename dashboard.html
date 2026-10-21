@@ -2780,7 +2780,14 @@ async function loadAnalyses(){
   const el = document.getElementById('analysisList');
   el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)">جاري التحميل...</div>';
   try {
+    // تحقق من وجود مناقشة "بعد ضرب الأهداف" أحدث من التحليلات
+    const postSnap = await db.collection('post_analyses').orderBy('createdAt','desc').limit(1).get();
+    const lastPost = postSnap.empty ? null : postSnap.docs[0].data();
     const snap = await db.collection('daily_analyses').orderBy('createdAt','desc').limit(10).get();
+    // إذا آخر مناقشة أحدث من آخر تحليل → اعرض فارغة
+    if(!snap.empty && lastPost && lastPost.createdAt > snap.docs[0].data().createdAt){
+      el.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:.9rem">لا يوجد تحليل اليوم بعد</div>'; return;
+    }
     if(snap.empty){ el.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:.9rem">لا يوجد تحليل اليوم بعد</div>'; return; }
     el.innerHTML='';
     snap.forEach(doc=>{

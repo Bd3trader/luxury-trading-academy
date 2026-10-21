@@ -909,6 +909,42 @@
   </div>
 </div>
 
+<!-- Post Analysis Modal -->
+<div class="modal-overlay" id="postAnalysisModal">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header">
+      <div class="modal-title">🎯 بعد ضرب الأهداف</div>
+      <button class="modal-close" onclick="closeModal('postAnalysisModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="postAnalysisId"/>
+      <p style="font-size:.83rem;color:var(--muted);margin:0 0 14px">اكتب مناقشة أو شرح لما حصل في هذا التحليل. عند الحفظ سيُحذف التحليل الأصلي تلقائياً وتظهر صفحة فارغة للطلاب.</p>
+      <div class="field">
+        <label>صورة بعد ضرب الأهداف (اختياري)</label>
+        <div style="position:relative">
+          <label for="post-img-file" style="display:flex;align-items:center;gap:8px;padding:10px 14px;border:2px dashed #cbd5e1;border-radius:10px;cursor:pointer;color:#64748b;font-size:.85rem;transition:border .2s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='#cbd5e1'">
+            🖼️ <span id="post-img-label">اختر صورة الشارت بعد ضرب الأهداف</span>
+          </label>
+          <input type="file" id="post-img-file" accept="image/*" onchange="handlePostImg(this)" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none"/>
+        </div>
+        <div id="post-img-preview" style="display:none;margin-top:8px"><img id="post-img-thumb" style="width:100%;border-radius:10px;max-height:180px;object-fit:cover"/></div>
+        <div id="post-img-progress" style="display:none;margin-top:8px"><div style="background:#e2e8f0;border-radius:20px;height:6px"><div id="post-img-fill" style="background:var(--gold);height:6px;border-radius:20px;width:0%;transition:width .3s"></div></div></div>
+      </div>
+      <div class="field">
+        <label>المناقشة / شرح ما حصل *</label>
+        <textarea id="post-discussion" rows="4" placeholder="تم ضرب الهدف الأول عند... السيناريو الذي تحقق كان..." style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:'Cairo',sans-serif;font-size:.88rem;resize:vertical;outline:none;box-sizing:border-box"></textarea>
+      </div>
+      <div style="background:#fff5f5;border-radius:10px;padding:10px 14px;font-size:.8rem;color:#dc2626;display:flex;align-items:center;gap:8px">
+        ⚠️ سيُحذف التحليل الأصلي فور الحفظ ولا يمكن التراجع
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('postAnalysisModal')">إلغاء</button>
+      <button class="btn-primary" id="savePostBtn" onclick="savePostAnalysis()" style="background:#059669">💾 حفظ وحذف التحليل</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <!-- Firebase SDK -->
@@ -2100,21 +2136,43 @@ async function updateReqStatus(id, status){
   checkPendingRequests();
 }
 
+function genUsername(fullName){
+  // حوّل الاسم إلى حروف إنجليزية + رمزين عشوائيين
+  const map={'أ':'a','ا':'a','إ':'e','آ':'a','ب':'b','ت':'t','ث':'th','ج':'j','ح':'h','خ':'kh','د':'d','ذ':'dh','ر':'r','ز':'z','س':'s','ش':'sh','ص':'s','ض':'d','ط':'t','ظ':'z','ع':'a','غ':'gh','ف':'f','ق':'q','ك':'k','ل':'l','م':'m','ن':'n','ه':'h','و':'w','ي':'y','ى':'a','ة':'a','ء':'a'};
+  const parts = (fullName||'').trim().split(/\s+/);
+  let base = parts.map(p=>p.split('').map(c=>map[c]||(/[a-zA-Z0-9]/.test(c)?c.toLowerCase():'')).join('')).filter(Boolean);
+  let uname = (base[0]||'user') + (base[1]?base[1].charAt(0):'');
+  if(uname.length < 3) uname = 'user';
+  const suffix = Math.floor(10 + Math.random()*90); // رقمين
+  return (uname + suffix).slice(0,16);
+}
+
+function genPassword(){
+  const upper='ABCDEFGHJKLMNPQRSTUVWXYZ';
+  const lower='abcdefghjkmnpqrstuvwxyz';
+  const digits='0123456789';
+  const syms='@#$!_';
+  const r=arr=>arr[Math.floor(Math.random()*arr.length)];
+  let nums=''; for(let i=0;i<6;i++) nums+=r(digits);
+  const pwd = r(upper)+r(lower)+nums+r(syms);
+  // اخلط الترتيب
+  return pwd.split('').sort(()=>Math.random()-.5).join('');
+}
+
 function addSubFromRequest(reqId){
   const r = cache.requests ? cache.requests.find(x=>x.id===reqId) : null;
   document.getElementById('subModalTitle').textContent = 'إضافة مشترك جديد';
   document.getElementById('editSubId').value = '';
-  document.getElementById('f-name').value = r ? (r.name||'') : '';
-  document.getElementById('f-username').value = r ? (r.username||r.email||'') : '';
-  document.getElementById('f-password').value = '';
+  const name = r ? (r.name||'') : '';
+  document.getElementById('f-name').value = name;
+  document.getElementById('f-username').value = genUsername(name);
+  document.getElementById('f-password').value = genPassword();
   document.getElementById('f-email').value = r ? (r.email||'') : '';
   document.getElementById('f-phone').value = r ? (r.phone||'') : '';
   document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
   document.getElementById('f-classic').checked = r && (r.level==='classic'||r.level==='both');
   document.getElementById('f-advanced').checked = r && (r.level==='advanced'||r.level==='both');
   document.getElementById('f-active').value = 'true';
-  // mark request done after saving
-  const origSave = window._pendingReqId;
   window._pendingReqId = reqId;
   openModal('subModal');
 }
@@ -2528,9 +2586,12 @@ async function loadAdminAnalyses(){
           <div style="font-size:.72rem;color:#9ca3af">${date}</div>
           ${a.trend?`<div style="font-size:.78rem;color:#374151;margin-top:4px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical">${a.trend}</div>`:''}
         </div>
-        <div style="display:flex;gap:8px;flex-shrink:0">
-          <button onclick="openAnalysisModal('${a.id}')" class="action-btn btn-edit">✏️ تعديل</button>
-          <button onclick="deleteAnalysis('${a.id}')" class="action-btn btn-del">🗑</button>
+        <div style="display:flex;gap:8px;flex-shrink:0;flex-direction:column;align-items:flex-end">
+          <div style="display:flex;gap:8px">
+            <button onclick="openAnalysisModal('${a.id}')" class="action-btn btn-edit">✏️ تعديل</button>
+            <button onclick="deleteAnalysis('${a.id}')" class="action-btn btn-del">🗑</button>
+          </div>
+          <button onclick="openPostAnalysis('${a.id}')" style="background:rgba(5,150,105,.1);color:#059669;border:1px solid rgba(5,150,105,.3);border-radius:8px;padding:5px 12px;font-family:'Cairo',sans-serif;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap">🎯 بعد ضرب الأهداف</button>
         </div>`;
       el.appendChild(card);
     });
@@ -2625,6 +2686,71 @@ async function deleteAnalysis(id){
   await db.collection('daily_analyses').doc(id).delete();
   toast('🗑 تم الحذف');
   loadAdminAnalyses();
+}
+
+let pendingPostImg = null;
+
+function openPostAnalysis(id){
+  document.getElementById('postAnalysisId').value = id;
+  document.getElementById('post-discussion').value = '';
+  document.getElementById('post-img-label').textContent = 'اختر صورة الشارت بعد ضرب الأهداف';
+  document.getElementById('post-img-preview').style.display = 'none';
+  document.getElementById('post-img-progress').style.display = 'none';
+  pendingPostImg = null;
+  openModal('postAnalysisModal');
+}
+
+function handlePostImg(input){
+  pendingPostImg = input.files[0];
+  if(!pendingPostImg) return;
+  document.getElementById('post-img-label').textContent = '📎 ' + pendingPostImg.name;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('post-img-thumb').src = e.target.result;
+    document.getElementById('post-img-preview').style.display = 'block';
+  };
+  reader.readAsDataURL(pendingPostImg);
+}
+
+async function savePostAnalysis(){
+  const id = document.getElementById('postAnalysisId').value;
+  const discussion = document.getElementById('post-discussion').value.trim();
+  if(!discussion){ toast('المناقشة مطلوبة','error'); return; }
+  const btn = document.getElementById('savePostBtn');
+  btn.disabled = true; btn.textContent = '⏳ جاري الحفظ...';
+  try{
+    let postImageUrl = '';
+    if(pendingPostImg){
+      const safeName = pendingPostImg.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+      const path = `analyses/post/${Date.now()}_${safeName}`;
+      postImageUrl = await new Promise((res,rej)=>{
+        const xhr = new XMLHttpRequest();
+        const uploadUrl = `${SUPA_URL}/storage/v1/object/${SUPA_BUCKET}/${path}`;
+        xhr.open('POST', uploadUrl, true);
+        xhr.setRequestHeader('Authorization','Bearer '+SUPA_KEY);
+        xhr.setRequestHeader('x-upsert','true');
+        xhr.setRequestHeader('Content-Type', pendingPostImg.type||'image/jpeg');
+        xhr.upload.onprogress = e => { if(e.lengthComputable) document.getElementById('post-img-fill').style.width=(e.loaded/e.total*100).toFixed(0)+'%'; };
+        document.getElementById('post-img-progress').style.display = 'block';
+        xhr.onload = () => xhr.status<300 ? res(`${SUPA_URL}/storage/v1/object/public/${SUPA_BUCKET}/${path}`) : rej(new Error(xhr.responseText));
+        xhr.onerror = () => rej(new Error('فشل الرفع'));
+        xhr.send(pendingPostImg);
+      });
+    }
+    // احفظ المناقشة في collection منفصلة
+    await db.collection('post_analyses').add({
+      originalId: id,
+      discussion,
+      postImageUrl,
+      createdAt: Date.now()
+    });
+    // احذف التحليل الأصلي
+    await db.collection('daily_analyses').doc(id).delete();
+    closeModal('postAnalysisModal');
+    toast('✅ تم الحفظ وحُذف التحليل');
+    loadAdminAnalyses();
+  }catch(e){ toast('خطأ: '+e.message,'error'); }
+  btn.disabled = false; btn.textContent = '💾 حفظ وحذف التحليل';
 }
 
 async function loadServicesPanel(){
