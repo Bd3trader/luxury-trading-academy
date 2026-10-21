@@ -2780,16 +2780,8 @@ async function loadAnalyses(){
   const el = document.getElementById('analysisList');
   el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)">جاري التحميل...</div>';
   try {
-    const now = Date.now();
-    // تنظيف المنتهية (client-side trigger)
-    const expSnap = await db.collection('post_analyses').where('deleteAt','<=',now).get();
-    for(const p of expSnap.docs){
-      await db.collection('daily_analyses').doc(p.data().originalId).delete();
-      await p.ref.delete();
-    }
-
-    // جلب المناقشات النشطة
-    const postsSnap = await db.collection('post_analyses').where('deleteAt','>',now).get();
+    // جلب المناقشات
+    const postsSnap = await db.collection('post_analyses').get();
     const postMap = {};
     postsSnap.forEach(d=>{ postMap[d.data().originalId]=d.data(); });
 

@@ -918,7 +918,7 @@
     </div>
     <div class="modal-body">
       <input type="hidden" id="postAnalysisId"/>
-      <p style="font-size:.83rem;color:var(--muted);margin:0 0 14px">اكتب مناقشة أو شرح لما حصل في هذا التحليل. عند الحفظ سيُحذف التحليل الأصلي تلقائياً وتظهر صفحة فارغة للطلاب.</p>
+      <p style="font-size:.83rem;color:var(--muted);margin:0 0 14px">اكتب مناقشة أو شرح لما حصل في هذا التحليل. ستظهر تحت التحليل الأصلي للطلاب.</p>
       <div class="field">
         <label>صورة بعد ضرب الأهداف (اختياري)</label>
         <div style="position:relative">
@@ -934,13 +934,13 @@
         <label>المناقشة / شرح ما حصل *</label>
         <textarea id="post-discussion" rows="4" placeholder="تم ضرب الهدف الأول عند... السيناريو الذي تحقق كان..." style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:'Cairo',sans-serif;font-size:.88rem;resize:vertical;outline:none;box-sizing:border-box"></textarea>
       </div>
-      <div style="background:#fff5f5;border-radius:10px;padding:10px 14px;font-size:.8rem;color:#dc2626;display:flex;align-items:center;gap:8px">
-        ⚠️ سيُحذف التحليل الأصلي فور الحفظ ولا يمكن التراجع
+      <div style="background:#f0fdf4;border-radius:10px;padding:10px 14px;font-size:.8rem;color:#059669;display:flex;align-items:center;gap:8px">
+        ✅ ستظهر المناقشة تحت التحليل للطلاب
       </div>
     </div>
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('postAnalysisModal')">إلغاء</button>
-      <button class="btn-primary" id="savePostBtn" onclick="savePostAnalysis()" style="background:#059669">💾 حفظ وحذف التحليل</button>
+      <button class="btn-primary" id="savePostBtn" onclick="savePostAnalysis()" style="background:#059669">💾 حفظ المناقشة</button>
     </div>
   </div>
 </div>
@@ -2567,14 +2567,20 @@ async function loadAdminAnalyses(){
   const el = document.getElementById('adminAnalysisList');
   el.innerHTML='<div style="text-align:center;padding:32px;color:var(--muted)">جاري التحميل...</div>';
   try{
+    // جلب المناقشات
+    const postsSnap = await db.collection('post_analyses').get();
+    const postMap = {}; // originalId → post data
+    postsSnap.forEach(d=>{ postMap[d.data().originalId]={...d.data(),postId:d.id}; });
+
     const snap = await db.collection('daily_analyses').orderBy('createdAt','desc').get();
     if(snap.empty){ el.innerHTML='<div style="text-align:center;padding:32px;color:var(--muted)">لا توجد تحليلات بعد</div>'; return; }
     el.innerHTML='';
     snap.forEach(doc=>{
       const a={id:doc.id,...doc.data()};
+      const post = postMap[a.id];
       const date = a.createdAt?new Date(a.createdAt).toLocaleString('ar-SA',{calendar:'gregory',numberingSystem:'latn'}):'—';
       const card=document.createElement('div');
-      card.style.cssText='background:#fff;border-radius:14px;padding:16px 18px;border:1px solid rgba(0,0,0,.07);box-shadow:0 2px 8px rgba(0,0,0,.05);display:flex;align-items:center;gap:14px;flex-wrap:wrap';
+      card.style.cssText=`background:#fff;border-radius:14px;padding:16px 18px;border:1.5px solid ${post?'rgba(5,150,105,.25)':'rgba(0,0,0,.07)'};box-shadow:0 2px 8px rgba(0,0,0,.05);display:flex;align-items:center;gap:14px;flex-wrap:wrap`;
       card.innerHTML=`
         ${a.imageUrl?`<img src="${a.imageUrl}" style="width:72px;height:56px;object-fit:cover;border-radius:8px;flex-shrink:0"/>`:'<div style="width:72px;height:56px;background:#f1f5f9;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0">📊</div>'}
         <div style="flex:1;min-width:180px">
@@ -2582,20 +2588,22 @@ async function loadAdminAnalyses(){
             <span style="font-weight:800;font-size:.95rem;color:var(--navy)">${a.pair||'—'}</span>
             <span style="background:#f1f5f9;color:#475569;padding:2px 10px;border-radius:20px;font-size:.72rem;font-weight:700">${a.timeframe||'—'}</span>
             ${a.price?`<span style="color:var(--gold);font-weight:700;font-size:.82rem">⏱ ${a.price}</span>`:''}
+            ${post?`<span style="background:rgba(5,150,105,.1);color:#059669;padding:2px 8px;border-radius:12px;font-size:.68rem;font-weight:700">🎯 مناقشة مضافة</span>`:''}
           </div>
           <div style="font-size:.72rem;color:#9ca3af">${date}</div>
           ${a.trend?`<div style="font-size:.78rem;color:#374151;margin-top:4px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical">${a.trend}</div>`:''}
+          ${post?`<div style="font-size:.75rem;color:#059669;margin-top:3px">🎯 مناقشة مضافة: ${(post.discussion||'').slice(0,60)}${post.discussion?.length>60?'...':''}</div>`:''}
         </div>
         <div style="display:flex;gap:8px;flex-shrink:0;flex-direction:column;align-items:flex-end">
           <div style="display:flex;gap:8px">
             <button onclick="openAnalysisModal('${a.id}')" class="action-btn btn-edit">✏️ تعديل</button>
             <button onclick="deleteAnalysis('${a.id}')" class="action-btn btn-del">🗑</button>
           </div>
-          <button onclick="openPostAnalysis('${a.id}')" style="background:rgba(5,150,105,.1);color:#059669;border:1px solid rgba(5,150,105,.3);border-radius:8px;padding:5px 12px;font-family:'Cairo',sans-serif;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap">🎯 بعد ضرب الأهداف</button>
+          ${!post?`<button onclick="openPostAnalysis('${a.id}')" style="background:rgba(5,150,105,.1);color:#059669;border:1px solid rgba(5,150,105,.3);border-radius:8px;padding:5px 12px;font-family:'Cairo',sans-serif;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap">🎯 بعد ضرب الأهداف</button>`:''}
         </div>`;
       el.appendChild(card);
     });
-  }catch(e){ el.innerHTML='<div style="color:#dc2626;text-align:center;padding:32px">حدث خطأ</div>'; }
+  }catch(e){ el.innerHTML='<div style="color:#dc2626;text-align:center;padding:32px">حدث خطأ</div>'; console.error(e); }
 }
 
 function handleAnalysisImg(input){
@@ -2737,20 +2745,18 @@ async function savePostAnalysis(){
         xhr.send(pendingPostImg);
       });
     }
-    // احفظ المناقشة في collection منفصلة
+    const now = Date.now();
     await db.collection('post_analyses').add({
       originalId: id,
       discussion,
       postImageUrl,
-      createdAt: Date.now()
+      createdAt: now
     });
-    // احذف التحليل الأصلي
-    await db.collection('daily_analyses').doc(id).delete();
     closeModal('postAnalysisModal');
-    toast('✅ تم الحفظ وحُذف التحليل');
+    toast('✅ تم حفظ المناقشة');
     loadAdminAnalyses();
   }catch(e){ toast('خطأ: '+e.message,'error'); }
-  btn.disabled = false; btn.textContent = '💾 حفظ وحذف التحليل';
+  btn.disabled = false; btn.textContent = '💾 حفظ المناقشة';
 }
 
 async function loadServicesPanel(){
