@@ -1273,16 +1273,13 @@ async function saveSubscriber(){
       cache.subscribers.push({id:ref.id,name,username,password,email,phone,schools,joinDate:date,active,isOnline:false,lastSeen:null});
       toast('✅ تمت إضافة المشترك بنجاح');
       if(window._pendingReqId){ await db.collection('admin_requests').doc(window._pendingReqId).update({status:'done'}); window._pendingReqId=null; if(document.getElementById('panel-requests').style.display!=='none') renderRequests(); checkPendingRequests(); }
-      // فتح واتساب مع الرسالة الترحبية جاهزة
-      {
-        const waMsg = encodeURIComponent(`أهلًا وسهلًا فيك من جديد في 3B Trading 🤍📈\n\nهذي بيانات دخولك للمنصة التعليمية:\n\n🔗 رابط المنصة:\nhttps://3btrading.net/login.html\n\n👤 اسم المستخدم:\n${username}\n\n🔐 كلمة المرور:\n${password}\n\nوبعطيك أيضًا رابط قناة التليجرام الخاصة بالمتدربين، وأي تحديث جديد في المنصة، دروس جديدة، تنبيهات أو إضافات بنرسلها لكم هناك.\n\n📲 رابط قناة التليجرام:\nhttps://t.me/trader3b\n\nابدأ الآن بالدروس بهدوء وخطوة بخطوة، وطبّق مع كل درس تشوفه.\n\nوأي نقطة ما فهمتها أو حسيت إنها مو واضحة، لا تتردد ترجع لي وتتواصل وياي، وأنا بساعدك وأشرح لك اللي تحتاجه خطوة بخطوة.\n\nشوف – طبّق – اسأل – وتطور معنا 🚀\n\nنتمنى لك رحلة تعليمية موفقة مع 3B Trading 🤍`);
-        const a = document.createElement('a');
-        a.href = `https://wa.me/96879303776?text=${waMsg}`;
-        a.target = '_blank';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      }
+      // إرسال واتساب تلقائي عبر UltraMsg
+      try{
+        const waBody = `أهلًا وسهلًا فيك من جديد في 3B Trading 🤍📈\n\nهذي بيانات دخولك للمنصة التعليمية:\n\n🔗 رابط المنصة:\nhttps://3btrading.net/login.html\n\n👤 اسم المستخدم:\n${username}\n\n🔐 كلمة المرور:\n${password}\n\nوبعطيك أيضًا رابط قناة التليجرام الخاصة بالمتدربين، وأي تحديث جديد في المنصة، دروس جديدة، تنبيهات أو إضافات بنرسلها لكم هناك.\n\n📲 رابط قناة التليجرام:\nhttps://t.me/trader3b\n\nابدأ الآن بالدروس بهدوء وخطوة بخطوة، وطبّق مع كل درس تشوفه.\n\nوأي نقطة ما فهمتها أو حسيت إنها مو واضحة، لا تتردد ترجع لي وتتواصل وياي، وأنا بساعدك وأشرح لك اللي تحتاجه خطوة بخطوة.\n\nشوف – طبّق – اسأل – وتطور معنا 🚀\n\nنتمنى لك رحلة تعليمية موفقة مع 3B Trading 🤍`;
+        const waParams = new URLSearchParams({ token:'xrtpflz4chv89v2b', to:'+96879303776', body:waBody, priority:'10' });
+        await fetch('https://api.ultramsg.com/instance195191/messages/chat', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:waParams.toString() });
+        toast('✅ تم إرسال بيانات الدخول على الواتساب');
+      }catch(waErr){ toast('⚠️ تمت الإضافة لكن فشل إرسال الواتساب','error'); console.warn(waErr); }
     }
     closeModal('subModal');
     renderSubscribers();
