@@ -1036,6 +1036,14 @@ const EMAILJS_SVC = 'service_3btrading';
 const EMAILJS_TPL = 'template_8gx9xqw';
 const ADMIN_EMAIL = 'bd3trader@gmail.com';
 
+/* ═══ UltraMsg WhatsApp ═══ */
+async function sendWA(msg){
+  try{
+    const p = new URLSearchParams({token:'xrtpflz4chv89v2b', to:'+96879303776', body:msg, priority:'10'});
+    await fetch('https://api.ultramsg.com/instance195191/messages/chat',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:p.toString()});
+  }catch(e){ console.warn('WA send failed:',e); }
+}
+
 /* ═══ Auth — log unauthorized access before redirect ═══ */
 (async function authCheck(){
   if(sessionStorage.getItem('adminLoggedIn') === 'true') return;
@@ -1049,12 +1057,8 @@ const ADMIN_EMAIL = 'bd3trader@gmail.com';
       detail:`محاولة وصول مباشر لصفحة الأدمن بدون جلسة`,
       userAgent:navigator.userAgent, time:Date.now(), read:false
     });
-    // send email alert
-    await emailjs.send(EMAILJS_SVC, EMAILJS_TPL,{
-      to_email: ADMIN_EMAIL,
-      subject:'🚨 تنبيه أمني — محاولة وصول للوحة التحكم',
-      message:`⚠️ شخص حاول الوصول مباشرة للوحة التحكم بدون صلاحية!\n\nالـ IP: ${ip}\nالمتصفح: ${navigator.userAgent.slice(0,120)}\nالوقت: ${now.toLocaleString('ar-SA',{calendar:'gregory',numberingSystem:'latn'})}\nالرابط: ${location.href}`
-    });
+    // send WhatsApp alert
+    await sendWA(`🚨 تنبيه أمني — محاولة وصول للوحة التحكم\n\n⚠️ شخص حاول الوصول مباشرة للأدمن بدون صلاحية!\n\nالـ IP: ${ip}\nالوقت: ${now.toLocaleString('ar-SA',{calendar:'gregory',numberingSystem:'latn'})}\nالرابط: ${location.href}`);
   }catch(e){ console.warn(e); }
   window.location.href='admin.html';
 })();
@@ -1273,13 +1277,9 @@ async function saveSubscriber(){
       cache.subscribers.push({id:ref.id,name,username,password,email,phone,schools,joinDate:date,active,isOnline:false,lastSeen:null});
       toast('✅ تمت إضافة المشترك بنجاح');
       if(window._pendingReqId){ await db.collection('admin_requests').doc(window._pendingReqId).update({status:'done'}); window._pendingReqId=null; if(document.getElementById('panel-requests').style.display!=='none') renderRequests(); checkPendingRequests(); }
-      // إرسال واتساب تلقائي عبر UltraMsg
-      try{
-        const waBody = `أهلًا وسهلًا فيك من جديد في 3B Trading 🤍📈\n\nهذي بيانات دخولك للمنصة التعليمية:\n\n🔗 رابط المنصة:\nhttps://3btrading.net/login.html\n\n👤 اسم المستخدم:\n${username}\n\n🔐 كلمة المرور:\n${password}\n\nوبعطيك أيضًا رابط قناة التليجرام الخاصة بالمتدربين، وأي تحديث جديد في المنصة، دروس جديدة، تنبيهات أو إضافات بنرسلها لكم هناك.\n\n📲 رابط قناة التليجرام:\nhttps://t.me/trader3b\n\nابدأ الآن بالدروس بهدوء وخطوة بخطوة، وطبّق مع كل درس تشوفه.\n\nوأي نقطة ما فهمتها أو حسيت إنها مو واضحة، لا تتردد ترجع لي وتتواصل وياي، وأنا بساعدك وأشرح لك اللي تحتاجه خطوة بخطوة.\n\nشوف – طبّق – اسأل – وتطور معنا 🚀\n\nنتمنى لك رحلة تعليمية موفقة مع 3B Trading 🤍`;
-        const waParams = new URLSearchParams({ token:'xrtpflz4chv89v2b', to:'+96879303776', body:waBody, priority:'10' });
-        await fetch('https://api.ultramsg.com/instance195191/messages/chat', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:waParams.toString() });
-        toast('✅ تم إرسال بيانات الدخول على الواتساب');
-      }catch(waErr){ toast('⚠️ تمت الإضافة لكن فشل إرسال الواتساب','error'); console.warn(waErr); }
+      // إرسال واتساب تلقائي
+      await sendWA(`أهلًا وسهلًا فيك من جديد في 3B Trading 🤍📈\n\nهذي بيانات دخولك للمنصة التعليمية:\n\n🔗 رابط المنصة:\nhttps://3btrading.net/login.html\n\n👤 اسم المستخدم:\n${username}\n\n🔐 كلمة المرور:\n${password}\n\nوبعطيك أيضًا رابط قناة التليجرام الخاصة بالمتدربين، وأي تحديث جديد في المنصة، دروس جديدة، تنبيهات أو إضافات بنرسلها لكم هناك.\n\n📲 رابط قناة التليجرام:\nhttps://t.me/trader3b\n\nابدأ الآن بالدروس بهدوء وخطوة بخطوة، وطبّق مع كل درس تشوفه.\n\nوأي نقطة ما فهمتها أو حسيت إنها مو واضحة، لا تتردد ترجع لي وتتواصل وياي، وأنا بساعدك وأشرح لك اللي تحتاجه خطوة بخطوة.\n\nشوف – طبّق – اسأل – وتطور معنا 🚀\n\nنتمنى لك رحلة تعليمية موفقة مع 3B Trading 🤍`);
+      toast('✅ تم إرسال بيانات الدخول على الواتساب');
     }
     closeModal('subModal');
     renderSubscribers();

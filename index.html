@@ -688,6 +688,12 @@
     };
     try {
       await db.collection('admin_requests').add(data);
+      // إرسال واتساب للأدمن
+      try{
+        const n=data.name, ph=data.phone, em=data.email, co=data.country, lv=data.level==='classic'?'الكلاسيك':data.level==='advanced'?'المتقدمة':'كلاهما';
+        const wp=new URLSearchParams({token:'xrtpflz4chv89v2b',to:'+96879303776',priority:'10',body:`📥 طلب انضمام جديد\n\n👤 الاسم: ${n}\n📧 الإيميل: ${em||'—'}\n📱 الجوال: ${ph||'—'}\n🌍 الدولة: ${co||'—'}\n🎓 المستوى: ${lv}\n\n⏰ ${new Date().toLocaleString('ar-SA',{calendar:'gregory',numberingSystem:'latn'})}`});
+        await fetch('https://api.ultramsg.com/instance195191/messages/chat',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:wp.toString()});
+      }catch(e){}
       document.getElementById('formContent').style.display = 'none';
       document.getElementById('formSuccess').style.display = 'block';
     } catch(err) {
