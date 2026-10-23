@@ -1277,7 +1277,11 @@ async function saveSubscriber(){
       if(email){
         const subj = encodeURIComponent('أهلًا وسهلًا فيك من جديد في 3B Trading 🤍📈');
         const body = encodeURIComponent(`أهلًا وسهلًا فيك من جديد في 3B Trading 🤍📈\n\nهذي بيانات دخولك للمنصة التعليمية:\n\n🔗 رابط المنصة:\nhttps://3btrading.net/login.html\n\n👤 اسم المستخدم:\n${username}\n\n🔐 كلمة المرور:\n${password}\n\nوبعطيك أيضًا رابط قناة التليجرام الخاصة بالمتدربين، وأي تحديث جديد في المنصة، دروس جديدة، تنبيهات أو إضافات بنرسلها لكم هناك.\n\n📲 رابط قناة التليجرام:\nhttps://t.me/trader3b\n\nابدأ الآن بالدروس بهدوء وخطوة بخطوة، وطبّق مع كل درس تشوفه.\n\nوأي نقطة ما فهمتها أو حسيت إنها مو واضحة، لا تتردد ترجع لي وتتواصل وياي، وأنا بساعدك وأشرح لك اللي تحتاجه خطوة بخطوة.\n\nشوف – طبّق – اسأل – وتطور معنا 🚀\n\nنتمنى لك رحلة تعليمية موفقة مع 3B Trading 🤍`);
-        window.open(`mailto:${email}?subject=${subj}&body=${body}`, '_blank');
+        const a = document.createElement('a');
+        a.href = `mailto:${email}?subject=${subj}&body=${body}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
       }
     }
     closeModal('subModal');
