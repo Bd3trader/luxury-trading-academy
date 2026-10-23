@@ -1273,17 +1273,15 @@ async function saveSubscriber(){
       cache.subscribers.push({id:ref.id,name,username,password,email,phone,schools,joinDate:date,active,isOnline:false,lastSeen:null});
       toast('✅ تمت إضافة المشترك بنجاح');
       if(window._pendingReqId){ await db.collection('admin_requests').doc(window._pendingReqId).update({status:'done'}); window._pendingReqId=null; if(document.getElementById('panel-requests').style.display!=='none') renderRequests(); checkPendingRequests(); }
-      // إرسال بيانات الدخول للمشترك عبر الإيميل
-      if(email){
-        try{
+      // إرسال بيانات الدخول للأدمن عبر الإيميل
+      try{
           await emailjs.send(EMAILJS_SVC, EMAILJS_TPL,{
-            to_email: email,
-            subject: 'أهلًا وسهلًا فيك من جديد في 3B Trading 🤍📈',
-            message: `أهلًا وسهلًا فيك من جديد في 3B Trading 🤍📈\n\nهذي بيانات دخولك للمنصة التعليمية:\n\n🔗 رابط المنصة:\nhttps://3btrading.net/login.html\n\n👤 اسم المستخدم:\n${username}\n\n🔐 كلمة المرور:\n${password}\n\nوبعطيك أيضًا رابط قناة التليجرام الخاصة بالمتدربين، وأي تحديث جديد في المنصة، دروس جديدة، تنبيهات أو إضافات بنرسلها لكم هناك.\n\n📲 رابط قناة التليجرام:\nhttps://t.me/trader3b\n\nابدأ الآن بالدروس بهدوء وخطوة بخطوة، وطبّق مع كل درس تشوفه.\n\nوأي نقطة ما فهمتها أو حسيت إنها مو واضحة، لا تتردد ترجع لي وتتواصل وياي، وأنا بساعدك وأشرح لك اللي تحتاجه خطوة بخطوة.\n\nشوف – طبّق – اسأل – وتطور معنا 🚀\n\nنتمنى لك رحلة تعليمية موفقة مع 3B Trading 🤍`
+            to_email: ADMIN_EMAIL,
+            subject: `📋 بيانات دخول مشترك جديد — ${name}`,
+            message: `تم إضافة مشترك جديد:\n\nالاسم: ${name}\nالإيميل: ${email||'—'}\nالجوال: ${phone||'—'}\n\n━━━━━━━━━━━━━━━━━━\n\nأهلًا وسهلًا فيك من جديد في 3B Trading 🤍📈\n\nهذي بيانات دخولك للمنصة التعليمية:\n\n🔗 رابط المنصة:\nhttps://3btrading.net/login.html\n\n👤 اسم المستخدم:\n${username}\n\n🔐 كلمة المرور:\n${password}\n\nوبعطيك أيضًا رابط قناة التليجرام الخاصة بالمتدربين، وأي تحديث جديد في المنصة، دروس جديدة، تنبيهات أو إضافات بنرسلها لكم هناك.\n\n📲 رابط قناة التليجرام:\nhttps://t.me/trader3b\n\nابدأ الآن بالدروس بهدوء وخطوة بخطوة، وطبّق مع كل درس تشوفه.\n\nوأي نقطة ما فهمتها أو حسيت إنها مو واضحة، لا تتردد ترجع لي وتتواصل وياي، وأنا بساعدك وأشرح لك اللي تحتاجه خطوة بخطوة.\n\nشوف – طبّق – اسأل – وتطور معنا 🚀\n\nنتمنى لك رحلة تعليمية موفقة مع 3B Trading 🤍`
           });
           toast('📧 تم إرسال بيانات الدخول للإيميل');
-        }catch(emailErr){ toast('⚠️ تمت الإضافة لكن فشل إرسال الإيميل','error'); console.warn(emailErr); }
-      }
+      }catch(emailErr){ toast('⚠️ تمت الإضافة لكن فشل إرسال الإيميل','error'); console.warn(emailErr); }
     }
     closeModal('subModal');
     renderSubscribers();
