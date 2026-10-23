@@ -1057,8 +1057,12 @@ async function sendWA(msg){
       detail:`محاولة وصول مباشر لصفحة الأدمن بدون جلسة`,
       userAgent:navigator.userAgent, time:Date.now(), read:false
     });
-    // send WhatsApp alert
-    await sendWA(`🚨 تنبيه أمني — محاولة وصول للوحة التحكم\n\n⚠️ شخص حاول الوصول مباشرة للأدمن بدون صلاحية!\n\nالـ IP: ${ip}\nالوقت: ${now.toLocaleString('ar-SA',{calendar:'gregory',numberingSystem:'latn'})}\nالرابط: ${location.href}`);
+    // send email alert
+    await emailjs.send(EMAILJS_SVC, EMAILJS_TPL,{
+      to_email: ADMIN_EMAIL,
+      subject:'🚨 تنبيه أمني — محاولة وصول للوحة التحكم',
+      message:`⚠️ شخص حاول الوصول مباشرة للوحة التحكم بدون صلاحية!\n\nالـ IP: ${ip}\nالمتصفح: ${navigator.userAgent.slice(0,120)}\nالوقت: ${now.toLocaleString('ar-SA',{calendar:'gregory',numberingSystem:'latn'})}\nالرابط: ${location.href}`
+    });
   }catch(e){ console.warn(e); }
   window.location.href='admin.html';
 })();

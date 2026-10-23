@@ -272,12 +272,20 @@ document.getElementById('registerForm').addEventListener('submit', async functio
     // 1. Save to Firestore
     await db.collection('admin_requests').add(reqData);
 
-    // 2. إرسال واتساب للأدمن
+    // 2. Send email (EmailJS)
     try {
-      const waParams = new URLSearchParams({token:'xrtpflz4chv89v2b', to:'+96879303776', priority:'10',
-        body:`📥 طلب انضمام جديد\n\n👤 الاسم: ${name}\n📧 الإيميل: ${email||'—'}\n📱 الجوال: ${phone||'—'}\n🌍 الدولة: ${country||'—'}\n🎂 العمر: ${age||'—'}\n\n⏰ ${new Date().toLocaleString('ar-SA',{calendar:'gregory',numberingSystem:'latn'})}`});
-      await fetch('https://api.ultramsg.com/instance195191/messages/chat',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:waParams.toString()});
-    } catch(waErr) { console.warn('WA send failed:', waErr); }
+      emailjs.init(EMAILJS_PUBLIC);
+      await emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE_REG, {
+        to_email:  ADMIN_EMAIL,
+        from_name: name,
+        email:     email,
+        phone:     phone,
+        country:   country,
+        age:       age,
+        req_type:  'طلب انضمام جديد',
+        sent_at:   new Date().toLocaleString('ar-SA'),
+      });
+    } catch(emailErr) { console.warn('EmailJS not configured:', emailErr); }
 
     // 3. Show success
     document.getElementById('formView').style.display = 'none';
