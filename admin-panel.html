@@ -555,6 +555,21 @@
         <div id="openaiKeyStatus" style="font-size:.82rem;margin-bottom:12px"></div>
         <button class="btn-primary" onclick="saveOpenAIKey()">💾 حفظ المفتاح</button>
       </div>
+
+      <div class="settings-card">
+        <h3>🤖 توكن بوت تليجرام</h3>
+        <p style="font-size:.82rem;color:var(--muted);margin-bottom:14px">يُستخدم لإرسال إشعارات تلقائية عند إضافة مشترك جديد.</p>
+        <div class="field">
+          <label>التوكن</label>
+          <div class="inp-wrap">
+            <input type="password" id="tgTokenInp" placeholder="123456789:AAG..." dir="ltr"/>
+            <button type="button" class="pwd-eye" onclick="toggleTgTokenView()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+          </div>
+        </div>
+        <div id="tgTokenStatus" style="font-size:.82rem;margin-bottom:12px"></div>
+        <button class="btn-primary" onclick="saveTgToken()">💾 حفظ التوكن</button>
+      </div>
+
       <div class="settings-card" style="border:2px solid rgba(220,38,38,.2)">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
           <div>
@@ -1037,14 +1052,19 @@ const EMAILJS_TPL = 'template_8gx9xqw';
 const ADMIN_EMAIL = 'bd3trader@gmail.com';
 
 /* ═══ Telegram Bot Notifications ═══ */
+let _tgToken = null;
 async function sendWA(msg){
   try{
-    const _t1='9068856925:AAG5Vj9NDW_lDF_I7D17Jo';
-    const _t2='yjZw2YPbr-O3k';
-    await fetch(`https://api.telegram.org/bot${_t1+_t2}/sendMessage`,{
+    if(!_tgToken){
+      const snap = await db.collection('settings').doc('telegram').get();
+      if(!snap.exists || !snap.data().token) return;
+      _tgToken = snap.data().token;
+    }
+    const chatId = '7532969540';
+    await fetch(`https://api.telegram.org/bot${_tgToken}/sendMessage`,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({chat_id:'7532969540', text:msg})
+      body:JSON.stringify({chat_id:chatId, text:msg})
     });
   }catch(e){ console.warn('Telegram send failed:',e); }
 }
@@ -1162,7 +1182,7 @@ function showPanel(name){
   document.getElementById('pageTitle').textContent = panelTitles[name]||name;
   if(window.innerWidth<=900) closeSidebar();
   renderPanel(name);
-  if(name==='settings'){ loadOpenAIKeyStatus(); loadMaintenanceState(); }
+  if(name==='settings'){ loadOpenAIKeyStatus(); loadMaintenanceState(); loadTgTokenStatus(); }
   if(name==='services') loadServicesPanel();
   if(name==='analyses') loadAdminAnalyses();
 }
@@ -2375,6 +2395,32 @@ async function saveOpenAIKey(){
   document.getElementById('openaiKeyInp').value='';
   document.getElementById('openaiKeyStatus').innerHTML='<span style="color:var(--green)">✅ تم الحفظ بنجاح</span>';
   toast('✅ تم حفظ مفتاح OpenAI');
+}
+
+function toggleTgTokenView(){
+  const i=document.getElementById('tgTokenInp');
+  i.type=i.type==='password'?'text':'password';
+}
+
+async function loadTgTokenStatus(){
+  const st=document.getElementById('tgTokenStatus');
+  if(!st) return;
+  try{
+    const snap=await db.collection('settings').doc('telegram').get();
+    st.innerHTML=snap.exists&&snap.data().token
+      ?'<span style="color:var(--green)">✅ توكن محفوظ</span>'
+      :'<span style="color:#f59e0b">⚠️ لا يوجد توكن</span>';
+  }catch(e){ st.innerHTML='<span style="color:var(--red)">خطأ في التحقق</span>'; }
+}
+
+async function saveTgToken(){
+  const token=document.getElementById('tgTokenInp').value.trim();
+  if(!token){ toast('أدخل التوكن','error'); return; }
+  await db.collection('settings').doc('telegram').set({token});
+  _tgToken = token;
+  document.getElementById('tgTokenInp').value='';
+  document.getElementById('tgTokenStatus').innerHTML='<span style="color:var(--green)">✅ تم الحفظ بنجاح</span>';
+  toast('✅ تم حفظ توكن التليجرام');
 }
 
 /* ═══ Settings ═══ */
