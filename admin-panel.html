@@ -1036,12 +1036,17 @@ const EMAILJS_SVC = 'service_3btrading';
 const EMAILJS_TPL = 'template_8gx9xqw';
 const ADMIN_EMAIL = 'bd3trader@gmail.com';
 
-/* ═══ UltraMsg WhatsApp ═══ */
+/* ═══ Telegram Bot Notifications ═══ */
 async function sendWA(msg){
   try{
-    const p = new URLSearchParams({token:'xrtpflz4chv89v2b', to:'+96879303776', body:msg, priority:'10'});
-    await fetch('https://api.ultramsg.com/instance195191/messages/chat',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:p.toString()});
-  }catch(e){ console.warn('WA send failed:',e); }
+    const _t1='9068856925:AAG5Vj9NDW_lDF_I7D17Jo';
+    const _t2='yjZw2YPbr-O3k';
+    await fetch(`https://api.telegram.org/bot${_t1+_t2}/sendMessage`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({chat_id:'7532969540', text:msg})
+    });
+  }catch(e){ console.warn('Telegram send failed:',e); }
 }
 
 /* ═══ Auth — log unauthorized access before redirect ═══ */
